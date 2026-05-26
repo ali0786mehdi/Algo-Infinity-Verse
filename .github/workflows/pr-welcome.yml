@@ -1,0 +1,33 @@
+name: pr-welcome
+on:
+  pull_request:
+    types: [opened, closed]
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const isMerged = context.payload.pull_request.merged;
+            const isFirstTime = context.payload.pull_request.author_association === 'NONE' ||
+                                 context.payload.pull_request.author_association === 'CONTRIBUTOR';
+            
+            let message;
+            if (isMerged) {
+              message = isFirstTime
+                ? '🎉 Welcome again! Your first contribution has been merged. Thank you for being part of this project!'
+                : '🎉 Congratulations! Your pull request has been merged. Thank you for your contribution!';
+            } else {
+              message = isFirstTime
+                ? '👋 Welcome! Thanks for your first contribution to the project! We will review it soon.'
+                : '🎉 Thank you for your contribution! We appreciate your effort.';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });

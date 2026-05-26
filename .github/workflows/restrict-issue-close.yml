@@ -1,0 +1,50 @@
+name: restrict-issue-close
+on:
+  issues:
+    types: [closed]
+jobs:
+  check-closer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if closer is maintainer
+        uses: actions/github-script@v7
+        env:
+          MAINTAINERS: ${{ vars.MAINTAINERS }}
+        with:
+          script: |
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            const maintainers = (process.env.MAINTAINERS || 'maintainers').split(',').map(m => m.trim());
+            const closer = context.actor;
+            
+            try {
+              const { data: membership } = await github.rest.orgs.checkMembershipForUser({
+                org: context.repo.owner,
+                username: closer
+              });
+              
+              const isMaintainer = maintainers.includes(closer) || 
+                                    membership.role === 'admin' || 
+                                    membership.role === 'member';
+              
+              if (!isMaintainer) {
+                throw new Error('Not a maintainer');
+              }
+            } catch (err) {
+              await github.rest.issues.reopen({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: '⚠️ **Issue Reopened**\n\nOnly maintainers can close issues. This issue has been automatically reopened.'
+              });
+            }

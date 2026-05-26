@@ -1,0 +1,56 @@
+name: issue-labeler
+on:
+  issues:
+    types: [opened]
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add ssoc26 label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['ssoc26']
+            })
+      - name: Check title for keywords
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.issue.title.toLowerCase();
+            const labels = [];
+            
+            if (title.includes('bug')) {
+              labels.push('bug');
+            }
+            if (title.includes('feature')) {
+              labels.push('feature-request');
+            }
+            if (title.includes('enhancement')) {
+              labels.push('enhancement');
+            }
+            if (title.includes('ui') || title.includes('ux')) {
+              labels.push('ui/ux');
+            }
+            
+            if (labels.length > 0) {
+              github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: labels
+              });
+            }
+      - name: Thank you comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🙏 **Thank you for raising this issue!**\n\nThe maintainers will review your issue soon. In the meantime, please make sure you have followed the issue template and provided all necessary information.'
+            })
