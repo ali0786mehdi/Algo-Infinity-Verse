@@ -4155,6 +4155,7 @@ body.light-mode {
 /* Global utility flag to handle hide/show switches */
 .hidden {
     display: none !important;
+}
 
 .recommendation-card{
     margin-top:15px;
