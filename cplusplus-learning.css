@@ -1,0 +1,508 @@
+/* ─────────────────────────────────────────────
+   C++ Learning Page – Scoped Component Styles
+   ───────────────────────────────────────────── */
+
+:root {
+  --cpp-primary: #00599C;
+  --cpp-secondary: #659AD2;
+  --cpp-gradient: linear-gradient(135deg, #00599C 0%, #659AD2 100%);
+  --cpp-bg: rgba(0, 89, 156, 0.06);
+  --cpp-bg-hover: rgba(0, 89, 156, 0.12);
+}
+
+/* Hero typing text */
+.typing-text_cpp {
+  color: var(--cpp-primary);
+  font-weight: 600;
+}
+
+/* ── Topic Navigation Sidebar ── */
+.cpp-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.cpp-sidebar {
+  position: sticky;
+  top: 100px;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.25rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.cpp-sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  padding: 0 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 0.5rem;
+}
+
+.cpp-sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cpp-sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.cpp-sidebar-nav li a:hover,
+.cpp-sidebar-nav li a.active {
+  color: var(--cpp-primary);
+  background: var(--cpp-bg);
+  border-left-color: var(--cpp-primary);
+}
+
+.cpp-sidebar-nav li a .nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.cpp-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Lesson Section Card ── */
+.cpp-lesson {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease;
+}
+
+.cpp-lesson:target {
+  border-color: var(--cpp-primary);
+}
+
+.cpp-lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cpp-lesson-number {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--cpp-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+
+.cpp-lesson-header h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cpp-lesson p,
+.cpp-lesson li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 0.75rem;
+}
+
+.cpp-lesson ul,
+.cpp-lesson ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.cpp-lesson li {
+  margin-bottom: 0.4rem;
+}
+
+.cpp-lesson strong {
+  color: var(--text-primary);
+}
+
+/* ── Concept Card ── */
+.cpp-concept-card {
+  background: var(--dark-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.cpp-concept-card h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cpp-primary);
+  margin: 0 0 0.5rem;
+}
+
+.cpp-concept-card p {
+  margin-bottom: 0;
+}
+
+/* ── Code Block ── */
+.cpp-code-block {
+  position: relative;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.cpp-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.cpp-code-lang {
+  font-family: "Fira Code", monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--cpp-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cpp-code-copy {
+  background: none;
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.cpp-code-copy:hover {
+  color: var(--text-primary);
+  border-color: var(--cpp-secondary);
+}
+
+.cpp-code-copy.copied {
+  color: #22c55e;
+  border-color: #22c55e;
+}
+
+.cpp-code-block pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  background: #0d1117;
+  overflow-x: auto;
+}
+
+.cpp-code-block code {
+  font-family: "Fira Code", Consolas, Monaco, monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #e6edf3;
+}
+
+/* Token colors */
+.cpp-code-block .tok-kw { color: #c792ea; }
+.cpp-code-block .tok-fn { color: #82aaff; }
+.cpp-code-block .tok-str { color: #c3e88d; }
+.cpp-code-block .tok-num { color: #f78c6c; }
+.cpp-code-block .tok-cmt { color: #546e7a; font-style: italic; }
+.cpp-code-block .tok-op { color: #89ddff; }
+.cpp-code-block .tok-bi { color: #ffcb6b; }
+.cpp-code-block .tok-var { color: #f07178; }
+.cpp-code-block .tok-bool { color: #ff5370; }
+.cpp-code-block .tok-param { color: #e6edf3; }
+.cpp-code-block .tok-pch { color: #ffcb6b; }
+
+/* ── Exercise Box ── */
+.cpp-exercise {
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.cpp-exercise-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #22c55e;
+  margin-bottom: 0.75rem;
+}
+
+.cpp-exercise-title i {
+  font-size: 1.1rem;
+}
+
+.cpp-exercise ol,
+.cpp-exercise ul {
+  margin-bottom: 0.75rem;
+}
+
+.cpp-exercise-toggle {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cpp-exercise-toggle:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.cpp-exercise-solution {
+  display: none;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.cpp-exercise-solution.visible {
+  display: block;
+}
+
+.cpp-exercise-solution p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Output Block ── */
+.cpp-output {
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.cpp-output-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.cpp-output pre {
+  margin: 0;
+  font-family: "Fira Code", monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── Progress Tracker ── */
+.cpp-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.cpp-progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--dark-surface);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.cpp-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--cpp-gradient);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.cpp-progress-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* ── Key Takeaway / Tip Callout ── */
+.cpp-callout {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--cpp-bg);
+  border: 1px solid rgba(0, 89, 156, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.25rem 0;
+}
+
+.cpp-callout-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.cpp-callout p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── Table ── */
+.cpp-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.cpp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.cpp-table th {
+  background: rgba(0, 89, 156, 0.12);
+  color: var(--cpp-primary);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.cpp-table td {
+  padding: 0.65rem 1rem;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+}
+
+.cpp-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .cpp-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .cpp-lesson {
+    padding: 1.5rem;
+  }
+
+  .cpp-lesson-header h3 {
+    font-size: 1.15rem;
+  }
+
+  .cpp-code-block pre {
+    padding: 1rem;
+  }
+
+  .cpp-code-block code {
+    font-size: 0.78rem;
+  }
+
+  .cpp-progress-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .cpp-progress-text {
+    text-align: center;
+  }
+
+  .cpp-callout {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cpp-lesson {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .cpp-lesson-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .cpp-exercise {
+    padding: 1rem;
+  }
+}
+
+/* ── Accessibility: focus-visible ── */
+.cpp-sidebar-nav li a:focus-visible,
+.cpp-code-copy:focus-visible,
+.cpp-exercise-toggle:focus-visible {
+  outline: 2px solid var(--cpp-primary);
+  outline-offset: 2px;
+}
+
+/* ── Print styles ── */
+@media print {
+  .cpp-sidebar,
+  .cpp-progress-bar,
+  .cpp-exercise-toggle,
+  .cpp-code-copy,
+  .navbar,
+  .footer {
+    display: none !important;
+  }
+
+  .cpp-lesson {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+  }
+
+  .cpp-code-block pre {
+    background: #f5f5f5;
+    color: #333;
+  }
+}

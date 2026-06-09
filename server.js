@@ -442,6 +442,7 @@ function resolveStaticPath(pathname) {
     "/javascript-learning": "javascript-learning.html",
     "/dbms-learning": "dbms-learning.html",
     "/powerbi-learning": "powerbi-learning.html",
+    "/cplusplus-learning": "cplusplus-learning.html",
     "/feedback": "feedback.html",
     "/feedback.html": "feedback.html",
     "/support-page": "support-page/index.html",
