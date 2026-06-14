@@ -50,8 +50,16 @@ body {
   display: none !important;
 }
 
-.hidden {
-  display: none !important;
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 /* ===== LOADING SCREEN ===== */
@@ -620,8 +628,8 @@ body {
 
 .dark-mode-btn,
 .menu-toggle {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 10px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -823,7 +831,9 @@ body {
 .dropdown-item:focus-visible,
 .nav-cta-btn:focus-visible,
 .dark-mode-btn:focus-visible,
-.menu-toggle:focus-visible {
+.menu-toggle:focus-visible,
+.favorite-btn:focus-visible,
+.notes-btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
@@ -1454,8 +1464,8 @@ section[id] {
 /* ===== FAVORITE BUTTON ===== */
 
 .favorite-btn {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
   background: var(--glass-bg);
@@ -1488,8 +1498,8 @@ section[id] {
 }
 
 .notes-btn {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
   background: var(--glass-bg);
@@ -3770,8 +3780,8 @@ section[id] {
 }
 
 .social-links a {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -4581,11 +4591,11 @@ section[id] {
 .footer-questions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .footer-question {
-  padding: 0.4rem 0.8rem;
+  padding: 0.6rem 1rem;
   border-radius: 15px;
   background: var(--dark-surface);
   border: 1px solid var(--glass-border);
@@ -4758,7 +4768,6 @@ body.light-mode {
 body.light-mode .navbar {
   background: rgba(255, 255, 255, 0.85);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
 }
 
 body.light-mode .nav-links {
@@ -5576,6 +5585,7 @@ body.light-mode .nav-auth-link:hover {
   font-size: 1.5rem;
   background: var(--gradient-3);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -5919,6 +5929,7 @@ body.light-mode .nav-auth-link:hover {
   font-weight: 700;
   background: var(--gradient-3);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

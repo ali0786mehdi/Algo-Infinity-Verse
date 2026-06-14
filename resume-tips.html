@@ -37,7 +37,7 @@
     </div>
 
     <!-- Scroll to Top Button -->
-    <button id="scrollTopBtn" class="scroll-top-btn">
+    <button id="scrollTopBtn" aria-label="Scroll to top" class="scroll-top-btn">
       <i class="fas fa-circle-chevron-up"></i>
     </button>
 
@@ -52,9 +52,8 @@
           <a href="index.html#home" class="nav-link">Home</a>
         </li>
         <li class="nav-item has-dropdown">
-          <button
-            class="nav-link dropdown-toggle"
-            aria-haspopup="true"
+          <button class="nav-link dropdown-toggle"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <span>Learn</span>
@@ -73,8 +72,8 @@
             <a href="c-learning.html" class="dropdown-item" role="menuitem">Learn C</a>
             <a href="sql-learning.html" class="dropdown-item" role="menuitem">Learn SQL</a>
             <a href="dbms-learning.html" class="dropdown-item" role="menuitem">Learn DBMS</a>
-            <a href="divide-and-conquer-learning.html"  class="dropdown-item">Learn Divide &amp; Conquer</a>
-            <a href="bit-manipulation-learning.html"  class="dropdown-item">Learn Bit Manipulation</a>
+            <a href="divide-and-conquer-learning.html"  class="dropdown-item" role="menuitem">Learn Divide &amp; Conquer</a>
+            <a href="bit-manipulation-learning.html"  class="dropdown-item" role="menuitem">Learn Bit Manipulation</a>
             <a href="recursion-learning.html" class="dropdown-item" role="menuitem">Learn Recursion</a>
             <a href="sliding-window-learning.html"  class="dropdown-item" role="menuitem">Learn Sliding Window</a>
             <a href="prefix-sum-learning.html"  class="dropdown-item" role="menuitem">Learn Prefix Sum</a>
@@ -91,9 +90,8 @@
           </div>
         </li>
         <li class="nav-item has-dropdown">
-          <button
-            class="nav-link dropdown-toggle"
-            aria-haspopup="true"
+          <button class="nav-link dropdown-toggle"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <span>Interview</span>
@@ -109,8 +107,7 @@
             <a href="system-design.html" class="dropdown-item" role="menuitem"
               >System Design</a
             >
-            <a
-              href="behavioral-questions.html"
+            <a href="behavioral-questions.html"
               class="dropdown-item"
               role="menuitem"
               >Behavioral Questions</a
@@ -123,9 +120,8 @@
           </div>
         </li>
         <li class="nav-item has-dropdown">
-          <button
-            class="nav-link dropdown-toggle"
-            aria-haspopup="true"
+          <button class="nav-link dropdown-toggle"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <span>Community</span>
@@ -138,8 +134,7 @@
             <a href="index.html#dashboard" class="dropdown-item" role="menuitem"
               >Leaderboard</a
             >
-            <a
-              href="support-page/index.html"
+            <a href="support-page/index.html"
               class="dropdown-item"
               role="menuitem"
               >Support</a
@@ -150,17 +145,15 @@
           </div>
         </li>
         <li class="nav-item has-dropdown nav-profile-dropdown">
-          <button
-            class="nav-link dropdown-toggle"
-            aria-haspopup="true"
+          <button class="nav-link dropdown-toggle"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <span>Profile</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
           <div class="dropdown-menu dropdown-menu-end" role="menu">
-            <a
-              href="index.html#dashboard"
+            <a href="index.html#dashboard"
               class="dropdown-item"
               role="menuitem"
             >
@@ -176,8 +169,7 @@
               Coding Resume
             </a>
             <div class="dropdown-divider"></div>
-            <a
-              href="login.html"
+            <a href="login.html"
               class="dropdown-item nav-auth-link"
               role="menuitem"
               id="navLoginBtn"
@@ -185,8 +177,7 @@
               <i class="fas fa-sign-in-alt"></i>
               Sign In
             </a>
-            <a
-              href="signup.html"
+            <a href="signup.html"
               class="dropdown-item nav-auth-link"
               role="menuitem"
               id="navSignupBtn"
@@ -197,7 +188,7 @@
           </div>
         </li>
         <li class="nav-item nav-cta desktop-only">
-          <a href="index.html#practice" class="btn btn-primary nav-cta-btn">
+          <a href="index.html#practice" class="btn btn-primary nav-cta-btn" aria-label="Start learning practice problems">
             <i class="fas fa-rocket"></i>
             Start Learning
           </a>
@@ -829,10 +820,10 @@
               Algorithms and acing technical interviews.
             </p>
             <div class="social-links">
-              <a href="#"><i class="fa-brands fa-github"></i></a>
-              <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-              <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-              <a href="#"><i class="fa-brands fa-youtube"></i></a>
+              <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+              <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+              <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
             </div>
           </div>
           <div class="footer-section">

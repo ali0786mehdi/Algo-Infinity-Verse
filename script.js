@@ -2925,12 +2925,12 @@ function renderProblems(filter = "all", searchQuery = "") {
                    ? "active"
                    : ""
                }"
-data-id="${problem.id}">
+data-id="${problem.id}" aria-label="Favorite problem">
         <i class="fas fa-heart"></i>
     </button>
                <button class="notes-btn ${
       userProgress.problemNotes[problem.id] ? "has-notes" : ""
-    }" data-id="${problem.id}">
+    }" data-id="${problem.id}" aria-label="Problem notes">
   <i class="fas fa-sticky-note"></i>
 </button>
 

@@ -22,7 +22,7 @@
           <a href="../index.html#home" class="nav-link">Home</a>
         </li>
         <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link dropdown-toggle" aria-haspopup="menu" aria-expanded="false">
             <span>Learn</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
@@ -65,7 +65,7 @@
           </div>
         </li>
         <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link dropdown-toggle" aria-haspopup="menu" aria-expanded="false">
             <span>Interview</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
@@ -77,7 +77,7 @@
           </div>
         </li>
         <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link dropdown-toggle" aria-haspopup="menu" aria-expanded="false">
             <span>Community</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
@@ -89,7 +89,7 @@
           </div>
         </li>
         <li class="nav-item has-dropdown nav-profile-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link dropdown-toggle" aria-haspopup="menu" aria-expanded="false">
             <span>Profile</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
@@ -118,7 +118,7 @@
           </div>
         </li>
         <li class="nav-item nav-cta desktop-only">
-          <a href="../index.html#practice" class="btn btn-primary nav-cta-btn">
+          <a href="../index.html#practice" class="btn btn-primary nav-cta-btn" aria-label="Start learning practice problems">
             <i class="fas fa-rocket"></i>
             Start Learning
           </a>
@@ -146,10 +146,10 @@
                 <div class="support-card">
                     <h2>Support Request</h2>
                     <form class="support-form" id="supportForm">
-                        <input type="text" placeholder="Name" required>
-                        <input type="email" placeholder="Email" required>
-                        <input type="text" placeholder="Subject" required>
-                        <textarea placeholder="Message" required></textarea>
+                        <input type="text" placeholder="Name" aria-label="Your Name" required>
+                        <input type="email" placeholder="Email" aria-label="Your Email Address" required>
+                        <input type="text" placeholder="Subject" aria-label="Subject" required>
+                        <textarea placeholder="Message" aria-label="Message details" required></textarea>
                         <button class="btn btn-primary" type="submit">
                             <i class="fas fa-paper-plane"></i>
                             Submit Request
@@ -159,15 +159,15 @@
                 <div class="support-card">
                     <h2>Bug Report</h2>
                     <form class="support-form" id="bugForm">
-                        <select required>
+                        <select required aria-label="Select Bug Type">
                             <option value="">Select Bug Type</option>
                             <option>UI Issue</option>
                             <option>Performance Bug</option>
                             <option>Crash</option>
                             <option>Other</option>
                         </select>
-                        <textarea placeholder="Describe the issue" required></textarea>
-                        <input type="file">
+                        <textarea placeholder="Describe the issue" aria-label="Describe the issue details" required></textarea>
+                        <input type="file" aria-label="Upload File or Screenshot">
                         <button class="btn btn-secondary" type="submit">
                             <i class="fas fa-bug"></i>
                             Report Bug

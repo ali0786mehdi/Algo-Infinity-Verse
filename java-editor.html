@@ -30,7 +30,7 @@
       <ul class="nav-links" id="navLinks">
         <li class="nav-item"><a href="index.html#home" class="nav-link">Home</a></li>
         <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link dropdown-toggle" aria-haspopup="menu" aria-expanded="false">
             <span>Learn</span><i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
           <div class="dropdown-menu" role="menu">
@@ -50,7 +50,7 @@
           </div>
         </li>
         <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link dropdown-toggle" aria-haspopup="menu" aria-expanded="false">
             <span>Interview</span><i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
           <div class="dropdown-menu" role="menu">
@@ -60,7 +60,7 @@
           </div>
         </li>
         <li class="nav-item has-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link dropdown-toggle" aria-haspopup="menu" aria-expanded="false">
             <span>Community</span><i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
           <div class="dropdown-menu" role="menu">
@@ -70,19 +70,19 @@
           </div>
         </li>
         <li class="nav-item has-dropdown nav-profile-dropdown">
-          <button class="nav-link dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link dropdown-toggle" aria-haspopup="menu" aria-expanded="false">
             <span>Profile</span><i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
           <div class="dropdown-menu dropdown-menu-end" role="menu">
             <a href="index.html#dashboard" class="dropdown-item" role="menuitem"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="resume.html" class="dropdown-item" role="menuitem"><i class="fas fa-file-alt"></i> Coding Resume</a>
             <div class="dropdown-divider"></div>
-            <a href="login.html" class="dropdown-item nav-auth-link" id="navLoginBtn"><i class="fas fa-sign-in-alt"></i> Sign In</a>
-            <a href="signup.html" class="dropdown-item nav-auth-link" id="navSignupBtn"><i class="fas fa-user-plus"></i> Sign Up</a>
+            <a href="login.html" class="dropdown-item nav-auth-link" id="navLoginBtn" role="menuitem"><i class="fas fa-sign-in-alt"></i> Sign In</a>
+            <a href="signup.html" class="dropdown-item nav-auth-link" id="navSignupBtn" role="menuitem"><i class="fas fa-user-plus"></i> Sign Up</a>
           </div>
         </li>
         <li class="nav-item nav-cta desktop-only">
-          <a href="index.html#practice" class="btn btn-primary nav-cta-btn"><i class="fas fa-rocket"></i> Start Learning</a>
+          <a href="index.html#practice" class="btn btn-primary nav-cta-btn" aria-label="Start learning practice problems"><i class="fas fa-rocket"></i> Start Learning</a>
         </li>
       </ul>
       <div class="nav-buttons">
@@ -113,23 +113,23 @@
             <span id="jeStatusBadge" class="je-status-badge ce-status-ready">Ready</span>
           </div>
           <div class="editor-actions">
-            <select id="jeExampleSelect" class="je-select">
+            <select id="jeExampleSelect" class="je-select" aria-label="Load example">
               <option value="hello">Hello World</option>
               <option value="variables">Variables & Types</option>
               <option value="collections">ArrayList Example</option>
               <option value="function">Methods</option>
               <option value="class">Classes & Objects</option>
             </select>
-            <button id="jeCopyBtn" class="je-icon-btn" title="Copy Code"><i class="fas fa-copy"></i></button>
-            <button id="jeSaveBtn" class="je-icon-btn" title="Save Draft"><i class="fas fa-save"></i></button>
-            <button id="jeResetBtn" class="je-icon-btn je-reset-btn" title="Reset Editor"><i class="fas fa-undo"></i></button>
+            <button id="jeCopyBtn" class="je-icon-btn" title="Copy Code" aria-label="Copy Code"><i class="fas fa-copy"></i></button>
+            <button id="jeSaveBtn" class="je-icon-btn" title="Save Draft" aria-label="Save Draft"><i class="fas fa-save"></i></button>
+            <button id="jeResetBtn" class="je-icon-btn je-reset-btn" title="Reset Editor" aria-label="Reset Editor"><i class="fas fa-undo"></i></button>
             <button id="jeRunBtn" class="je-run-btn"><i class="fas fa-play"></i> Run Code</button>
           </div>
         </div>
 
         <div class="editor-main">
           <div id="jeLineNumbers" class="je-line-numbers">1</div>
-          <textarea id="jeEditor" spellcheck="false" placeholder="Write your Java code here..."></textarea>
+          <textarea id="jeEditor" spellcheck="false" placeholder="Write your Java code here..." aria-label="Java code editor"></textarea>
         </div>
       </div>
 
@@ -148,7 +148,7 @@
           <div class="panel-header">
             <i class="fas fa-exclamation-triangle"></i>
             <span>Console / Errors</span>
-            <button id="jeConsoleClear" class="console-clear-btn" title="Clear Console"><i class="fas fa-trash-alt"></i></button>
+            <button id="jeConsoleClear" class="console-clear-btn" title="Clear Console" aria-label="Clear Console"><i class="fas fa-trash-alt"></i></button>
           </div>
           <div id="jeConsoleBody" class="panel-body">
             <span class="je-console-placeholder">No errors detected.</span>
@@ -163,10 +163,10 @@
           <h3>Algo Infinity Verse</h3>
           <p>The ultimate platform for mastering Data Structures and Algorithms. Empowering developers to crack their dream interviews.</p>
           <div class="social-links">
-            <a href="#"><i class="fab fa-github"></i></a>
-            <a href="#"><i class="fab fa-linkedin"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
           </div>
         </div>
         <div class="footer-section">

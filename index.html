@@ -35,7 +35,7 @@
     </div>
 
     <!-- Scroll to Top Button -->
-    <button id="scrollTopBtn" class="scroll-top-btn">
+    <button id="scrollTopBtn" aria-label="Scroll to top" class="scroll-top-btn">
       <i class="fas fa-circle-chevron-up"></i>
     </button>
 
@@ -50,15 +50,14 @@
           <a href="#home" class="nav-link">Home</a>
         </li>
         <li class="nav-item has-dropdown">
-          <button
-            class="nav-link dropdown-toggle"
-            aria-haspopup="true"
+          <button class="nav-link dropdown-toggle"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <span>Learn</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
-          <div class="dropdown-menu">
+          <div class="dropdown-menu" role="menu">
             <a href="index.html#topics" class="dropdown-item" role="menuitem">DSA Topics</a>
             <a href="index.html#practice" class="dropdown-item" role="menuitem">Practice Problems</a>
             <a href="index.html#quiz" class="dropdown-item" role="menuitem">Quizzes</a>
@@ -105,85 +104,80 @@
           </div>
         </li>
         <li class="nav-item has-dropdown">
-          <button
-            class="nav-link dropdown-toggle"
-            aria-haspopup="true"
+          <button class="nav-link dropdown-toggle"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <span>Interview</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
-          <div class="dropdown-menu">
-            <a href="#interview" class="dropdown-item">Interview Prep</a>
+          <div class="dropdown-menu" role="menu">
+            <a href="#interview" class="dropdown-item" role="menuitem">Interview Prep</a>
             <a href="cheat-sheets.html" class="dropdown-item"
-              >DSA Cheat Sheets</a
+               role="menuitem">DSA Cheat Sheets</a
             >
-            <a href="system-design.html" class="dropdown-item">System Design</a>
+            <a href="system-design.html" class="dropdown-item" role="menuitem">System Design</a>
             <a href="behavioral-questions.html" class="dropdown-item"
-              >Behavioral Questions</a
+               role="menuitem">Behavioral Questions</a
             >
-            <a href="company-interview.html" class="dropdown-item">Company Question Bank</a>
+            <a href="company-interview.html" class="dropdown-item" role="menuitem">Company Question Bank</a>
           </div>
         </li>
         <li class="nav-item has-dropdown">
-          <button
-            class="nav-link dropdown-toggle"
-            aria-haspopup="true"
+          <button class="nav-link dropdown-toggle"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <span>Community</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
-          <div class="dropdown-menu">
-            <a href="community.html" class="dropdown-item">Discussions</a>
-            <a href="#dashboard" class="dropdown-item">Leaderboard</a>
-            <a href="support-page/index.html" class="dropdown-item">Support</a>
-            <a href="feedback.html" class="dropdown-item">Feedback</a>
+          <div class="dropdown-menu" role="menu">
+            <a href="community.html" class="dropdown-item" role="menuitem">Discussions</a>
+            <a href="#dashboard" class="dropdown-item" role="menuitem">Leaderboard</a>
+            <a href="support-page/index.html" class="dropdown-item" role="menuitem">Support</a>
+            <a href="feedback.html" class="dropdown-item" role="menuitem">Feedback</a>
           </div>
         </li>
         <li class="nav-item has-dropdown nav-profile-dropdown">
-          <button
-            class="nav-link dropdown-toggle"
-            aria-haspopup="true"
+          <button class="nav-link dropdown-toggle"
+            aria-haspopup="menu"
             aria-expanded="false"
           >
             <span>Profile</span>
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
-          <div class="dropdown-menu dropdown-menu-end">
-            <a href="#dashboard" class="dropdown-item">
+          <div class="dropdown-menu dropdown-menu-end" role="menu">
+            <a href="#dashboard" class="dropdown-item" role="menuitem">
               <i class="fas fa-tachometer-alt"></i>
               Dashboard
             </a>
-            <a href="#profile" class="dropdown-item">
+            <a href="#profile" class="dropdown-item" role="menuitem">
               <i class="fas fa-user"></i>
               My Profile
             </a>
-            <a href="resume.html" class="dropdown-item">
+            <a href="resume.html" class="dropdown-item" role="menuitem">
               <i class="fas fa-file-alt"></i>
               Coding Resume
             </a>
             <div class="dropdown-divider"></div>
-            <a
-              href="login.html"
+            <a href="login.html"
               class="dropdown-item nav-auth-link"
               id="navLoginBtn"
-            >
+             role="menuitem">
               <i class="fas fa-sign-in-alt"></i>
               Sign In
             </a>
-            <a
-              href="signup.html"
+            <a href="signup.html"
               class="dropdown-item nav-auth-link"
               id="navSignupBtn"
-            >
+             role="menuitem">
               <i class="fas fa-user-plus"></i>
               Sign Up
             </a>
           </div>
         </li>
         <li class="nav-item nav-cta desktop-only">
-          <a href="#practice" class="btn btn-primary nav-cta-btn">
+          <a href="#practice" class="btn btn-primary nav-cta-btn" aria-label="Start learning practice problems">
             <i class="fas fa-rocket"></i>
             Start Learning
           </a>
@@ -356,6 +350,7 @@
           <div class="rust-editor-panel">
             <div class="panel-header">
               <h2>Editor</h2>
+              <label for="rustExampleSelect" class="visually-hidden">Choose a Rust example</label>
               <select id="rustExampleSelect">
                 <option value="hello">Hello World</option>
                 <option value="ownership">Ownership & Borrowing</option>
@@ -364,6 +359,7 @@
               </select>
             </div>
 
+            <label for="rustEditor" class="visually-hidden">Rust code editor</label>
             <textarea id="rustEditor" spellcheck="false"></textarea>
 
             <div class="rust-actions">
@@ -548,8 +544,7 @@
               Master the STAR method and answer behavioral questions confidently
             </p>
             <a
-              href="behavioral-questions.html"
-              class="card-btn"
+              href="behavioral-questions.html" class="card-btn" aria-label="Start learning behavioral questions"
               style="
                 text-decoration: none;
                 display: inline-block;
@@ -565,7 +560,7 @@
             </div>
             <h3>Technical Interviews</h3>
             <p>Whiteboard coding practice and problem-solving strategies</p>
-            <button class="card-btn" data-category="technical">
+            <button class="card-btn" data-category="technical" aria-label="Start learning technical interviews">
               Start Learning
             </button>
           </div>
@@ -596,8 +591,7 @@
             <h3>System Design</h3>
             <p>Learn to design scalable systems and architecture</p>
             <a
-              href="system-design.html"
-              class="card-btn"
+              href="system-design.html" class="card-btn" aria-label="Start learning system design"
               style="
                 text-decoration: none;
                 display: inline-block;
@@ -616,8 +610,7 @@
               Quick reference guides with complexity tables and code templates
             </p>
             <a
-              href="cheat-sheets.html"
-              class="card-btn"
+              href="cheat-sheets.html" class="card-btn" aria-label="Start learning DSA cheat sheets"
               style="
                 text-decoration: none;
                 display: inline-block;
@@ -636,8 +629,7 @@
 
                   <p> Learn resume structure, ATS-friendly formatting, project presentation, and placement preparation.</p>
 
-                  <a href="resume-tips.html" 
-                  class="card-btn"
+                  <a href="resume-tips.html" class="card-btn" aria-label="Start learning resume tips"
                   style="
                 text-decoration: none;
                 display: inline-block;
@@ -675,8 +667,7 @@
               </div>
               <button
                 class="profile-edit-btn"
-                id="profileEditBtn"
-                title="Edit Profile"
+                id="profileEditBtn" title="Edit Profile" aria-label="Edit Profile"
               >
                 <i class="fas fa-pen"></i>
               </button>
@@ -1022,9 +1013,7 @@
         <div class="modal-header">
           <div class="step-badge-tag" id="roadmapStepBadge">Step 1</div>
           <h3 id="roadmapStepModalTitle">Introduction to DSA</h3>
-          <button class="modal-close" id="roadmapStepModalClose">
-            &times;
-          </button>
+          <button class="modal-close" id="roadmapStepModalClose" aria-label="Close roadmap step modal">&times;</button>
         </div>
         <div class="modal-body">
           <div class="roadmap-step-theory">
@@ -1212,7 +1201,7 @@
             <span class="quiz-difficulty" id="topicQuizDifficulty">Medium</span>
           </div>
           <h3 id="topicQuizTitle">Topic Quiz</h3>
-          <button class="modal-close" id="topicQuizModalClose">
+          <button class="modal-close" id="topicQuizModalClose" aria-label="Close quiz modal">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -1267,7 +1256,7 @@
       <div class="modal-content profile-edit-modal">
         <div class="modal-header">
           <h3>Edit Profile</h3>
-          <button class="modal-close" id="profileModalClose">&times;</button>
+          <button class="modal-close" id="profileModalClose" aria-label="Close edit profile modal">&times;</button>
         </div>
         <div class="modal-body">
           <div class="profile-edit-form">
@@ -1321,8 +1310,7 @@
             </div>
             <button
               class="profile-edit-btn"
-              id="profileSectionEditBtn"
-              title="Edit Profile"
+              id="profileSectionEditBtn" title="Edit Profile" aria-label="Edit Profile"
             >
               <i class="fas fa-pen"></i>
             </button>
@@ -1379,7 +1367,7 @@
         <div class="modal-header">
           <h3 id="notesModalTitle">Problem Notes</h3>
 
-          <button class="modal-close" id="notesModalClose">
+          <button class="modal-close" id="notesModalClose" aria-label="Close notes modal">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -1416,10 +1404,10 @@
               Algorithms and acing technical interviews.
             </p>
             <div class="social-links">
-              <a href="#"><i class="fa-brands fa-github"></i></a>
-              <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-              <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-              <a href="#"><i class="fa-brands fa-youtube"></i></a>
+              <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+              <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+              <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
             </div>
           </div>
           <div class="footer-section">
@@ -1487,7 +1475,7 @@
                 aria-describedby="newsletter-error"
                 aria-invalid="false"
               />
-              <button type="submit"><i class="fas fa-paper-plane"></i></button>
+              <button type="submit" aria-label="Subscribe to newsletter"><i class="fas fa-paper-plane"></i></button>
               <span
                 class="newsletter-error"
                 id="newsletter-error"
