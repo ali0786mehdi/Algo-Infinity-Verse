@@ -243,10 +243,6 @@ function initProgressTracker() {
   if (!fill || !count) return;
 
   let completed = new Set();
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (Array.isArray(saved)) completed = new Set(saved);
-  } catch {}
 
   function updateUI() {
     const pct = Math.round((completed.size / TOTAL_TOPICS) * 100);
@@ -257,8 +253,11 @@ function initProgressTracker() {
 
   updateUI();
 
+  let ready = false;
+
   const observer = new IntersectionObserver(
     (entries) => {
+      if (!ready) return;
       let changed = false;
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -282,4 +281,10 @@ function initProgressTracker() {
   );
 
   document.querySelectorAll(".js-lesson").forEach((l) => observer.observe(l));
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      ready = true;
+    });
+  });
 }

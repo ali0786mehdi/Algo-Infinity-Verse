@@ -3,8 +3,151 @@
   font-weight: 600;
 }
 
-/* Reuse js-layout, js-sidebar, js-lesson, js-exercise patterns
-   from javascript-learning.css — only override the accent color */
+/* ── Layout ── */
+.js-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+/* ── Sidebar ── */
+.js-sidebar {
+  position: sticky;
+  top: 100px;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.25rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.js-sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  padding: 0 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 0.5rem;
+}
+
+.js-sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.js-sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.js-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Lesson Card ── */
+.js-lesson {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease;
+}
+
+.js-lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.js-lesson-header h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.js-lesson p,
+.js-lesson li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 0.75rem;
+}
+
+.js-lesson ul,
+.js-lesson ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.js-lesson li {
+  margin-bottom: 0.4rem;
+}
+
+.js-lesson strong {
+  color: var(--text-primary);
+}
+
+/* ── Progress Bar ── */
+.js-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.js-progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--dark-surface);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.js-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.js-progress-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* ── Exercise Box ── */
+.js-exercise {
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
 
 /* ── Sidebar active color ── */
 .js-sidebar-nav li a:hover,
@@ -230,29 +373,13 @@
 .hl-table tr:hover td {
   background: rgba(99, 102, 241, 0.06);
 }
-
-/* Progress fill color override */
-.js-progress-fill {
-  background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
-}
-
 /* Accessibility */
 .hl-code-copy:focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
 }
 
-/* Gradient text fallback (Firefox/older browsers ignore -webkit-background-clip) */
-
-/* :target highlight wasn't guaranteed to show — base border may not exist */
-.js-lesson:target {
-  border: 1px solid #6366f1;
-  transition: border-color 0.3s ease;
-}
-
-/* Table row hover was a near-invisible white overlay — breaks in light mode */
-
-/* Code copy button focus state was missing a non-:focus-visible fallback for keyboard nav in older browsers */
+/* Code copy button focus fallback for keyboard nav in older browsers */
 .hl-code-copy:focus {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
@@ -267,23 +394,40 @@
   .js-lesson {
     padding: 1.5rem;
   }
+  .js-lesson-header h3 {
+    font-size: 1.15rem;
+  }
   .hl-code-block pre {
     padding: 1rem;
   }
-}
-@media print {
-  .js-sidebar,
-  .js-progress-bar,
-  .js-exercise-toggle,
-  .hl-code-copy,
-  .navbar,
-  .footer {
-    display: none !important;
+  .js-progress-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  .js-progress-text {
+    text-align: center;
   }
 }
-/* Exercise Section */
 
+@media (max-width: 480px) {
+  .js-lesson {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+  .js-lesson-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .js-exercise {
+    padding: 1rem;
+  }
+}
 .js-exercise-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
   color: #6366f1;
@@ -291,19 +435,20 @@
 }
 
 .js-exercise-toggle {
-  margin-top: 0.75rem;
-  padding: 0.65rem 1rem;
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
   color: #6366f1;
+  font-family: Poppins, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
   transition: all 0.2s ease;
 }
 
 .js-exercise-toggle:hover {
-  background: rgba(99, 102, 241, 0.18);
+  background: rgba(99, 102, 241, 0.25);
 }
 
 .js-exercise-solution {
@@ -327,5 +472,16 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media print {
+  .js-sidebar,
+  .js-progress-bar,
+  .js-exercise-toggle,
+  .hl-code-copy,
+  .navbar,
+  .footer {
+    display: none !important;
   }
 }
