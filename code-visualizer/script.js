@@ -534,6 +534,9 @@ const mockUserCompletedRoadmaps = [
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('certificates-dashboard')) {
     renderCertificatesDashboard(mockUserCompletedRoadmaps);
+  }
+});
+
 // Function to update user interface metrics for Interview Readiness
 function renderReadinessDashboard(data) {
   // Update numbers
@@ -583,3 +586,66 @@ document.addEventListener('DOMContentLoaded', () => {
      renderReadinessDashboard(dummyDataReport);
   }
 });
+
+/**
+ * Saves the current page's bookmark details to browser local storage.
+ * Call this function whenever a user opens/navigates to a learning resource page or visualizer.
+ * @param {string} title - The title of the module or topic
+ * @param {string} category - e.g., 'DSA', 'System Design', 'Interview Prep'
+ * @param {string} relativeUrl - The file path or query string to load upon click
+ */
+function trackUserProgress(title, category, relativeUrl) {
+  const progressMetadata = {
+    title,
+    category,
+    relativeUrl,
+    timestamp: new Date().toLocaleString()
+  };
+  localStorage.setItem('last_visited_learning_page', JSON.stringify(progressMetadata));
+}
+
+/**
+ * Checks local storage for previous progress and loads the resume widget if data exists.
+ */
+function initResumeWidget() {
+  const widget = document.getElementById('resume-learning-widget');
+  const titleElem = document.getElementById('resume-page-title');
+  const categoryElem = document.getElementById('resume-page-category');
+  const timeElem = document.getElementById('resume-page-time');
+  const resumeBtn = document.getElementById('resume-learning-btn');
+
+  if (!widget) return;
+
+  const savedData = localStorage.getItem('last_visited_learning_page');
+
+  if (savedData) {
+    const progress = JSON.parse(savedData);
+
+    // Update UI elements with retrieved metadata
+    titleElem.innerText = progress.title;
+    categoryElem.innerText = progress.category;
+    timeElem.innerText = progress.timestamp;
+
+    // Display widget card reactively
+    widget.style.display = 'block';
+
+    // Hook up click functionality to redirect user
+    resumeBtn.onclick = () => {
+      window.location.href = progress.relativeUrl;
+    };
+  } else {
+    widget.style.display = 'none';
+  }
+}
+
+// Simulated Tracker Event: Let's log a baseline entry if no history exists for demonstration purposes
+document.addEventListener('DOMContentLoaded', () => {
+  // If the user is checking out the dashboard for the first time, mock an active track
+  if (!localStorage.getItem('last_visited_learning_page')) {
+    trackUserProgress("Graph Traversals (BFS & DFS)", "Data Structures & Algorithms", "#graph-visualizer");
+  }
+
+  // Initialize and check layout visibility rules
+  initResumeWidget();
+});
+
