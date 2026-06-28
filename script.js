@@ -1052,6 +1052,7 @@ let lastQuizResultData = null;
 let quizStartTime = null;
 let quizTimerInterval = null;
 let currentNotesProblemId = null;
+let tQuiz = null;
 
 function startQuiz(topic) {
   const topicKey = getQuizTopicKey(topic);
@@ -3647,7 +3648,7 @@ window.addEventListener('hashchange', () => {
       }
       }
     });
-    if (typeof tQuiz !== 'undefined') tQuiz = null;
+    if (typeof tQuiz !== 'undefined' && tQuiz !== null) tQuiz = null;
   }
 });
 
