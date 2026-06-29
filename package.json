@@ -28,7 +28,6 @@
     "firebase-admin": "^12.7.0",
     "form-data": "^4.0.6",
     "ioredis": "^5.11.1",
-    "isolated-vm": "^6.1.2",
     "js-yaml": "^5.0.0",
     "mammoth": "^1.8.0",
     "multer": "^2.2.0",
