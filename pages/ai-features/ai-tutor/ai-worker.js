@@ -27,9 +27,6 @@ class PipelineSingleton {
 
 // Listen for messages from the main thread (ai-tutor.js)
 self.addEventListener('message', async (event) => {
-    self.addEventListener('message', async (event) => {
-        const { text, codeContext } = event.data;
-
     const { text, codeContext } = event.data;
 
     try {

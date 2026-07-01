@@ -99,6 +99,7 @@ function validateMagicBytes(buffer, mimeType) {
 }
 const userSocketMap = new Map();
 const studyRooms = new Map();
+const memoryUserStore = new Map();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = __dirname;
@@ -254,23 +255,40 @@ async function createUser(userData) {
 }
 
 async function ensureUserStore() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
   try {
-    await fs.access(USERS_FILE);
-  } catch {
-    await fs.writeFile(USERS_FILE, "[]\n");
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    try {
+      await fs.access(USERS_FILE);
+    } catch {
+      await fs.writeFile(USERS_FILE, "[]\n");
+    }
+  } catch (err) {
+    console.error("[ensureUserStore] Failed to initialize user store:", err);
   }
 }
 
 async function readUsers() {
   await ensureUserStore();
-  const raw = await fs.readFile(USERS_FILE, "utf8");
-  return JSON.parse(raw || "[]");
+  try {
+    const raw = await fs.readFile(USERS_FILE, "utf8");
+    const users = JSON.parse(raw || "[]");
+    users.forEach((u) => memoryUserStore.set(u.email, u));
+    return users;
+  } catch (err) {
+    console.error("[readUsers] Failed to read users:", err);
+    return Array.from(memoryUserStore.values());
+  }
 }
 
 async function writeUsers(users) {
   await ensureUserStore();
-  await fs.writeFile(USERS_FILE, `${JSON.stringify(users, null, 2)}\n`);
+  try {
+    await fs.writeFile(USERS_FILE, `${JSON.stringify(users, null, 2)}\n`);
+    users.forEach((u) => memoryUserStore.set(u.email, u));
+  } catch (err) {
+    console.error("[writeUsers] Failed to write users:", err);
+    users.forEach((u) => memoryUserStore.set(u.email, u));
+  }
 }
 
 async function ensureAuditsStore() {
@@ -1775,17 +1793,19 @@ if (pathname === "/api/forgot-password" && req.method === "POST") {
       const { initializeApp, getApps } = await import("firebase/app");
       const { getAuth, sendPasswordResetEmail } = await import("firebase/auth");
 
-      const configRes = await fetch(`http://127.0.0.1:${process.env.PORT || 3000}/api/firebase-config`);
-      const firebaseConfig = await configRes.json();
+      const firebaseConfig = {
+        apiKey: process.env.FIREBASE_API_KEY,
+        authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.FIREBASE_APP_ID,
+      };
 
-      if (firebaseConfig.configured) {
+      if (firebaseConfig.projectId) {
         const existingApps = getApps();
         const clientApp = existingApps.find(a => a.name === "reset-client") ||
-          initializeApp({
-            apiKey: firebaseConfig.apiKey,
-            authDomain: firebaseConfig.authDomain,
-            projectId: firebaseConfig.projectId,
-          }, "reset-client");
+          initializeApp(firebaseConfig, "reset-client");
 
         const auth = getAuth(clientApp);
         await sendPasswordResetEmail(auth, email);
@@ -1798,7 +1818,6 @@ if (pathname === "/api/forgot-password" && req.method === "POST") {
     // Always return success to prevent email enumeration
     return sendJson(res, 200, { message: "Reset email sent if account exists." });
   }
-
   if (pathname === "/api/feedback" && req.method === "POST") {
     const session = getSession(req);
     let payload;
@@ -2444,22 +2463,8 @@ if (pathname === "/api/forgot-password" && req.method === "POST") {
     const difficulty = ["Easy", "Medium", "Hard"].includes(body.difficulty) ? body.difficulty : "Medium";
     const topic = body.topic || "arrays";
 
-    // Generate a unique room ID, retrying on collision so a new room can
-    // never silently overwrite (evict) an existing one.
-    let roomId;
-    for (let attempt = 0; ; attempt++) {
-      const candidate = "ROOM-" + Math.floor(10000 + Math.random() * 90000);
-      if (!studyRooms.has(candidate)) {
-        roomId = candidate;
-        break;
-      }
-      // Fall back to a collision-resistant ID if the small space is saturated.
-      if (attempt >= 10) {
-        roomId = "ROOM-" + crypto.randomUUID();
-        break;
-      }
-    }
-
+    const roomId = "ROOM-" + Math.floor(10000 + Math.random() * 90000);
+    
     let hostName = "Host";
     const users = await readUsers();
     const hostUser = users.find(u => u.id === session.sub);
@@ -3007,7 +3012,7 @@ async function serveStatic(req, res, pathname) {
   }
 }
 
-const server = http.createServer(async (req, res) => {
+async function requestHandler(req, res) {
   try {
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
     const pathname = normalizePathname(decodeURIComponent(url.pathname));
@@ -3039,7 +3044,9 @@ const server = http.createServer(async (req, res) => {
     console.error(error);
     sendJson(res, 500, { error: "Something went wrong." });
   }
-});
+}
+
+const server = http.createServer(requestHandler);
 
 // ===== CODE ANALYSIS ENGINE =====
 // Used by the POST /api/predict-acceptance route in handleApi().
@@ -3483,7 +3490,7 @@ socket.on('voice-ice', ({ roomId, candidate, to, from }) => {
 });
 // -----------------------------------------
 
-export { server, hashPassword, passwordMatches, applySM2, validateSignup, updateMemoryStore, readMemoryStore, appendToJsonArrayFile };
+export { server, requestHandler, hashPassword, passwordMatches, applySM2, validateSignup, updateMemoryStore, readMemoryStore, appendToJsonArrayFile };
 if (process.env.VERCEL === "1") {
   db = initializeFirebase();
   useFirestore = !!db;

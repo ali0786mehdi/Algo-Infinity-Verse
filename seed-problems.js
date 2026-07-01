@@ -148,13 +148,13 @@ async function seed() {
 
   const batch = firestore.batch();
   for (const problem of problems) {
-    const ref = firestore.collection("problems").doc();
-    batch.set(ref, { ...problem, createdAt: new Date() });
+    // Deterministic doc ID derived from the title so re-running the seed
+    // updates existing problems (merge) instead of creating duplicates.
     const problemId = problem.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
-    const ref = firestore.collection(COLLECTIONS.PROBLEMS).doc(problemId);
+    const ref = firestore.collection("problems").doc(problemId);
     batch.set(ref, { ...problem, createdAt: new Date() }, { merge: true });
   }
 

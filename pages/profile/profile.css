@@ -248,3 +248,156 @@
         flex-direction: column;
     }
 }
+/* ===== PROFILE NAVIGATION ===== */
+
+.profile-nav {
+    display: flex;
+    align-items: center;
+    padding: 8px 0 16px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: 'Poppins', sans-serif;
+    text-decoration: none;
+}
+
+.back-btn i {
+    font-size: 1rem;
+    transition: transform 0.25s ease;
+}
+
+.back-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    transform: translateX(-4px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.back-btn:hover i {
+    transform: translateX(-2px);
+}
+
+.back-btn:active {
+    transform: scale(0.97);
+}
+
+.back-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Dark Theme */
+.dark .back-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+.dark .back-btn:hover {
+    background: #334155;
+    border-color: #7c3aed;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .profile-nav {
+        padding: 4px 0 12px 0;
+    }
+    
+    .back-btn {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+        gap: 6px;
+    }
+    
+    .back-btn span {
+        display: inline;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-nav {
+        padding: 2px 0 10px 0;
+    }
+    
+    .back-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 6px;
+        gap: 4px;
+    }
+    
+    .back-btn span {
+        display: none; /* Hide text on very small screens, show only icon */
+    }
+    
+    .back-btn i {
+        font-size: 1.2rem;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .back-btn {
+        transition: none;
+    }
+    
+    .back-btn:hover {
+        transform: none;
+    }
+    
+    .back-btn:hover i {
+        transform: none;
+    }
+    
+    .back-btn:active {
+        transform: none;
+    }
+}
+
+/* Accessibility - Focus visible */
+.back-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+/* Alternative: Text link styles */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    padding: 6px 0;
+}
+
+.back-link:hover {
+    color: var(--primary);
+    transform: translateX(-4px);
+}
+
+.back-link:hover i {
+    transform: translateX(-2px);
+}
+
+.back-link i {
+    transition: transform 0.25s ease;
+}

@@ -3,23 +3,41 @@
   let isRefreshing = false;
   let refreshPromise = null;
 
+  const UNAUTHENTICATED_ENDPOINTS = [
+    '/api/spaced-repetition',
+    '/api/leaderboard',
+    '/api/problem-notes',
+    '/api/recommendations',
+  ];
+
+  function shouldRedirectOn401(url) {
+    if (url.includes('/api/refresh') || url.includes('/api/login') || url.includes('/api/signup')) {
+      return false;
+    }
+    for (const endpoint of UNAUTHENTICATED_ENDPOINTS) {
+      if (url.startsWith(endpoint)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   window.fetch = async function(...args) {
     const response = await originalFetch(...args);
 
     const requestObj = args[0];
     const url = typeof requestObj === 'string' ? requestObj : requestObj.url;
     
-    // Check if we hit a 401, but ignore if the request itself was a refresh or login/signup attempt
-    if (response.status === 401 && !url.includes('/api/refresh') && !url.includes('/api/login') && !url.includes('/api/signup')) {
+    if (response.status === 401 && shouldRedirectOn401(url)) {
       if (!isRefreshing) {
         isRefreshing = true;
         refreshPromise = originalFetch('/api/refresh', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' }
         }).then(res => {
           isRefreshing = false;
           if (!res.ok) {
-            // Silent redirect if refresh fails
             const path = window.location.pathname;
             const isAuthPage = path === '/login.html' || path === '/login' || path.endsWith('/login.html') ||
                                path === '/signup.html' || path === '/signup' || path.endsWith('/signup.html') ||
@@ -39,11 +57,8 @@
 
       try {
         await refreshPromise;
-        // Token refreshed successfully, re-execute the original failed request
-        // The browser will automatically send the new cookies
         return originalFetch(...args);
       } catch (e) {
-        // If refresh fails, return the original 401 response
         return response;
       }
     }

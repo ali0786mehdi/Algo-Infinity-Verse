@@ -183,10 +183,12 @@ export function verifyRefreshToken(token) {
   return session;
 }
 
+const PASSWORD_PEPPER = process.env.PASSWORD_PEPPER || "";
+
 export function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
   const hash = crypto
     .pbkdf2Sync(
-      password,
+      password + PASSWORD_PEPPER,
       salt,
       PBKDF2_ITERATIONS,
       PASSWORD_KEY_LENGTH,
@@ -198,7 +200,7 @@ export function hashPassword(password, salt = crypto.randomBytes(16).toString("h
 
 export function passwordMatches(password, stored) {
   const calculated = crypto.pbkdf2Sync(
-    password,
+    password + PASSWORD_PEPPER,
     stored.salt,
     stored.iterations || PBKDF2_ITERATIONS,
     PASSWORD_KEY_LENGTH,

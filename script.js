@@ -1,68 +1,4 @@
 // ============================================
-// DOM SANITIZER FALLBACK (if not loaded externally)
-// ============================================
-if (typeof window !== 'undefined' && !window.DOMSanitizer) {
-  const fallbackEscapeHtml = (unsafe) => {
-    if (unsafe === null || unsafe === undefined) return '';
-    return String(unsafe)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  };
-
-  const fallbackSanitizeHTML = (htmlStr) => {
-    if (htmlStr === null || htmlStr === undefined) return '';
-    const stringified = String(htmlStr);
-    if (typeof DOMParser !== 'undefined') {
-      try {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(stringified, 'text/html');
-        const cleanNode = (node) => {
-          if (node.nodeType === 3) return;
-          if (node.nodeType !== 1) { node.remove(); return; }
-          const tag = node.tagName.toLowerCase();
-          const blacklist = ['script', 'iframe', 'object', 'embed', 'style', 'link', 'meta', 'svg', 'math'];
-          if (blacklist.includes(tag)) { node.remove(); return; }
-          const attrs = Array.from(node.attributes);
-          attrs.forEach(attr => {
-            const name = attr.name.toLowerCase();
-            const value = attr.value.toLowerCase();
-            if (name.startsWith('on') || value.startsWith('javascript:')) {
-              node.removeAttribute(attr.name);
-            }
-          });
-          Array.from(node.childNodes).forEach(cleanNode);
-        };
-        Array.from(doc.body.childNodes).forEach(cleanNode);
-        return doc.body.innerHTML;
-      } catch (e) {
-        console.error('DOMParser fallback sanitization failed, using escapeHtml:', e);
-        return fallbackEscapeHtml(stringified);
-      }
-    }
-    return stringified
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '')
-      .replace(/\s*href\s*=\s*["']javascript:[^"']*["']/gi, '');
-  };
-
-  window.DOMSanitizer = {
-    escapeHtml: fallbackEscapeHtml,
-    sanitizeHTML: fallbackSanitizeHTML,
-    safeRender: (element, content, asHTML = false) => {
-      if (!element) return;
-      if (!asHTML) {
-        element.textContent = content;
-      } else {
-        element.innerHTML = fallbackSanitizeHTML(content);
-      }
-    }
-  };
-}
-
-// ============================================
 // UTILITY FUNCTIONS (Memoization & Debounce)
 // ============================================
 function debounce(func, wait) {
@@ -243,11 +179,6 @@ async function loadPartial(id, url) {
     
     document.getElementById(id).innerHTML = html;
     handleActiveNav();
-    if (id === 'navbar-placeholder' || id === 'navbar') {
-      if (typeof initNavbar === 'function') {
-        initNavbar();
-      }
-    }
   } catch (e) {
     if (e.name !== 'AbortError') {
       console.warn('Could not load partial:', url);
@@ -383,7 +314,7 @@ const practiceProblems = [
   { id: 9, title: "Trapping Rain Water", difficulty: "hard", tags: ["Arrays", "Two Pointers"], acceptance: "48.7%", category: "arrays", description: "Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.", constraints: ["1 ≤ height.length ≤ 2 × 10⁴", "0 ≤ height[i] ≤ 10⁵"], followUp: "Can you solve it in O(n) time and O(1) space using the two-pointer technique?", functionName: "trap", params: ["height"], guide: "height: array of non-negative integers representing bar heights in the elevation map\nreturns: total units of rainwater that can be trapped between the bars\n\nHint: Use two pointers (left at 0, right at end). Track maxLeft and maxRight. At each step, process the shorter side: if height[left] < height[right], water += max(0, maxLeft - height[left]), else water += max(0, maxRight - height[right]).", testCases: [{ input: [[0,1,0,2,1,0,1,3,2,1,2,1]], expected: 6 }, { input: [[4,2,0,3,2,5]], expected: 9 }] },
   { id: 10, title: "Reverse Linked List", difficulty: "easy", tags: ["Linked List"], acceptance: "72.1%", category: "linkedlist", description: "Given an array representing a linked list, reverse it and return the reversed array.", constraints: ["0 ≤ arr.length ≤ 5000", "-5000 ≤ arr[i] ≤ 5000"], followUp: "Can you solve it both iteratively and recursively?", functionName: "reverseList", params: ["head"], guide: "head: array of integers representing the linked list values\nreturns: reversed array with elements in opposite order\n\nHint: Use two pointers (prev starts empty, curr starts at head). Iterate through, reversing each element's position.", testCases: [{ input: [[1,2,3,4,5]], expected: [5,4,3,2,1] }, { input: [[1,2]], expected: [2,1] }, { input: [[]], expected: [] }] },
   { id: 11, title: "Invert Binary Tree", difficulty: "easy", tags: ["Trees", "DFS"], acceptance: "68.5%", category: "trees", description: "Given a binary tree represented as a level-order array, invert it and return the inverted level-order array.", constraints: ["0 ≤ arr.length ≤ 100", "-100 ≤ arr[i] ≤ 100"], followUp: "Can you solve it both recursively and iteratively using a queue or stack?", functionName: "invertTree", params: ["root"], guide: "root: level-order array of integers representing the binary tree (null for missing nodes)\nreturns: level-order array of the inverted binary tree (swapped left/right children)\n\nHint: Recursively swap left and right children at each node. Base case: when root is null or empty.", testCases: [{ input: [[4,2,7,1,3,6,9]], expected: [4,7,2,9,6,3,1] }, { input: [[2,1,3]], expected: [2,3,1] }, { input: [[]], expected: [] }] },
-  { id: 12, title: "Validate BST", difficulty: "medium", tags: ["Trees", "Recursion"], acceptance: "28.4%", category: "trees", description: "Given a binary tree represented as a level-order array (null for missing children), determine if it is a valid BST.", constraints: ["1 ≤ arr.length ≤ 10⁴", "-2³¹ ≤ arr[i] ≤ 2³¹ - 1"], followUp: "Can you solve it without recursion?", functionName: "isValidBST", params: ["root"], guide: "root: level-order array of integers representing the binary tree (null for missing nodes)\nreturns: true if the tree is a valid BST (left < root < right for every node), false otherwise", testCases: [{ input: [[2,1,3]], expected: true }, { input: [[5,1,4,null,null,3,6]], expected: false }] },
+  { id: 12, title: "Validate BST", difficulty: "medium", tags: ["Trees", "Recursion"], acceptance: "28.4%", category: "trees", description: "Given a binary tree represented as a level-order array (null for missing children), determine if it is a valid BST.", constraints: ["1 ≤ arr.length ≤ 10⁴", "-2³¹ ≤ arr[i] ≤ 2³¹ - 1"], followUp: "Can you solve it without recursion?", functionName: "isValidBST", testCases: [{ input: [[2,1,3]], expected: true }, { input: [[5,1,4,null,null,3,6]], expected: false }] },
   { id: 13, title: "Number of Islands", difficulty: "medium", tags: ["Graphs", "DFS"], acceptance: "54.8%", category: "graphs", description: "Given an m x n 2D binary grid which represents a map of '1's (land) and '0's (water), return the number of islands.", constraints: ["1 ≤ m, n ≤ 300", "grid[i][j] is '0' or '1'"], followUp: "Can you solve it using both DFS and Union-Find?", functionName: "numIslands", testCases: [{ input: [[["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]], expected: 1 }, { input: [[["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]], expected: 3 }, { input: [[["0"]]], expected: 0 }] },
   { id: 14, title: "House Robber", difficulty: "medium", tags: ["DP", "Arrays"], acceptance: "42.3%", category: "dp", description: "You are a professional robber planning to rob houses along a street. Return the maximum amount of money you can rob without robbing two adjacent houses.", constraints: ["1 ≤ nums.length ≤ 100", "0 ≤ nums[i] ≤ 400"], followUp: "What if the houses are arranged in a circle?", functionName: "rob", testCases: [{ input: [[1,2,3,1]], expected: 4 }, { input: [[2,7,9,3,1]], expected: 12 }, { input: [[2,1,1,2]], expected: 4 }] },
   { id: 15, title: "Course Schedule", difficulty: "medium", tags: ["Graphs", "Topological Sort"], acceptance: "44.7%", category: "graphs", description: "There are numCourses courses. Given prerequisites, return true if you can finish all courses.", constraints: ["1 ≤ numCourses ≤ 2000", "0 ≤ prerequisites.length ≤ 5000", "prerequisites[i].length == 2"], followUp: "Can you return the actual valid course order?", functionName: "canFinish", testCases: [{ input: [2, [[1,0]]], expected: true }, { input: [2, [[1,0],[0,1]]], expected: false }] },
@@ -566,61 +497,46 @@ let currentProblem = null;
 // ==========================================
 // 1. SINGLE CENTRALIZED INITIALIZATION
 // ==========================================
-function safeInit(name, fn, feature) {
-  try {
-    if (typeof fn === 'function') {
-      fn();
-    } else {
-      console.warn(`Initializer ${name} is not a function`);
-    }
-  } catch (err) {
-    console.error(`Error during ${name} initialization:`, err);
-    if (window.reportError) {
-      window.reportError(err, feature || name);
-    }
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOMContentLoaded fired, initializing app...');
-  safeInit('loadUserData', loadUserData);
-  //safeInit('initFlashcardsRevision', initFlashcardsRevision);
+  loadUserData();
+  //initFlashcardsRevision();
 
-  safeInit('initLoadingScreen', initLoadingScreen);
-  safeInit('initNavbar', initNavbar);
-  safeInit('initHeroSection', initHeroSection);
-  safeInit('initTopicsSection', initTopicsSection, 'topics');
-  safeInit('initQuizSection', initQuizSection, 'quiz');
-  safeInit('initPracticeSection', initPracticeSection, 'practice');
-  safeInit('initRoadmap', initRoadmap, 'roadmap');
-  safeInit('initDashboard', initDashboard, 'dashboard');
-  safeInit('initGamification', initGamification, 'gamification');
-  safeInit('initChatbot', initChatbot, 'chatbot');
-  safeInit('initProfile', initProfile, 'profile');
-  safeInit('initScrollEffects', initScrollEffects);
+  initLoadingScreen();
+  initNavbar();
+  initHeroSection();
+  initTopicsSection();
+  initQuizSection();
+  initPracticeSection();
+  initRoadmap();
+  initDashboard();
+  initGamification();
+  initChatbot();
+  initProfile();
+  initScrollEffects();
   console.log('App initialization complete');
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  safeInit('loadUserData', loadUserData);
-  safeInit('initLoadingScreen', initLoadingScreen);
-  safeInit('initNavbar', initNavbar);
-  safeInit('initHeroSection', initHeroSection);
-  safeInit('initTopicOfTheDay', initTopicOfTheDay, 'topics');
-  safeInit('initTopicsSection', initTopicsSection, 'topics');
-  safeInit('initQuizSection', initQuizSection, 'quiz');
-  safeInit('initPracticeSection', initPracticeSection, 'practice');
-  safeInit('initRoadmap', initRoadmap, 'roadmap');
-  safeInit('initDashboard', initDashboard, 'dashboard');
-  safeInit('initGamification', initGamification, 'gamification');
-  safeInit('initDailyChallenge', initDailyChallenge, 'gamification');
-  safeInit('initChatbot', initChatbot, 'chatbot');
-  safeInit('initProfile', initProfile, 'profile');
-  safeInit('initAiInterviewer', initAiInterviewer, 'editor');
-  safeInit('initNewsletterValidation', initNewsletterValidation);
-  safeInit('initScrollEffects', initScrollEffects);
-  safeInit('initFooterCurrentDate', initFooterCurrentDate);
-  safeInit('updateProfile', updateProfile, 'profile');
+  loadUserData();
+  initLoadingScreen();
+  initNavbar();
+  initHeroSection();
+  initTopicOfTheDay();
+  initTopicsSection();
+  initQuizSection();
+  initPracticeSection();
+  initRoadmap();
+  initDashboard();
+  initGamification();
+  initDailyChallenge();
+  initChatbot();
+  initProfile();
+  initAiInterviewer();
+  initNewsletterValidation();
+  initScrollEffects();
+  initFooterCurrentDate();
+  updateProfile();
 });
 
 // ============================================
@@ -702,8 +618,9 @@ function initAiInterviewer() {
         bubble.setAttribute('role', 'status');
         bubble.setAttribute('aria-live', 'polite');
 
+        const hintText = document.createTextNode(data.hint);
         const hintSpan = document.createElement('span');
-        hintSpan.innerHTML = window.DOMSanitizer.sanitizeHTML(data.hint);
+        hintSpan.appendChild(hintText);
 
         bubble.innerHTML = `
             <div class="ai-hint-header">
@@ -857,424 +774,8 @@ function initNavbar() {
     if (!isMobile()) {
       if (navLinks.classList.contains("active")) toggleMenu(false);
       document.querySelectorAll(".has-dropdown.open").forEach(el => el.classList.remove("open"));
-        dropdownToggles.forEach(toggle => toggle.setAttribute("aria-expanded", "false"));
+      dropdownToggles.forEach(toggle => toggle.setAttribute("aria-expanded", "false"));
     }
-  });
-
-  // Initialize navbar search
-  initNavbarSearch();
-}
-
-// ===== NAVBAR SEARCH LOGIC =====
-function initNavbarSearch() {
-  const searchInputs = document.querySelectorAll(".nav-search-input");
-  if (!searchInputs.length) return;
-
-  const searchIndex = [
-    // Learn - Main
-    { title: "DSA Topics", url: "/index.html#topics", category: "Learn", keywords: "dsa topics algorithms structures data arrays stacks queues graphs trees" },
-    { title: "Practice Problems", url: "/index.html#practice", category: "Learn", keywords: "practice problems coding solutions challenges leetcode" },
-    { title: "Quizzes", url: "/pages/tools/quiz-system/quiz-system.html", category: "Learn", keywords: "quizzes assessments tests knowledge check" },
-    { title: "Learning Roadmap", url: "/index.html#roadmap", category: "Learn", keywords: "roadmap path syllabus curriculum guide tracks" },
-    { title: "Intermediate Roadmap", url: "/pages/learning/intermediate-roadmap/intermediate-roadmap.html", category: "Learn", keywords: "intermediate roadmap path backend advanced frontend" },
-    { title: "Algorithm Timeline", url: "/pages/visualizers/algorithm-timeline/algorithm-timeline.html", category: "Learn", keywords: "algorithm timeline history evolution milestones" },
-    { title: "Concept Bridge Trainer", url: "/pages/learning/concept-bridge/concept-bridge.html", category: "Learn", keywords: "concept bridge trainer math science connections analogies" },
-    { title: "Problem Solving Framework", url: "/pages/tools/problem-solving-framework/problem-solving-framework.html", category: "Learn", keywords: "problem solving framework template steps methodology" },
-    { title: "Think-Aloud AI Judge", url: "/pages/tools/think-aloud-judge/think-aloud-judge.html", category: "Learn", keywords: "think-aloud ai judge feedback review debugger advisor" },
-    { title: "Reverse Interview Mode", url: "/pages/interview/reverse-interview/reverse-interview.html", category: "Learn", keywords: "reverse interview client requirement design conversation" },
-    { title: "Cognitive Load Analyzer", url: "/pages/tools/cognitive-load-analyzer/cognitive-load-analyzer.html", category: "Learn", keywords: "cognitive load analyzer difficulty readability complexity" },
-    { title: "AI Memory Scanner", url: "/pages/tools/memory-scanner/memory-scanner.html", category: "Learn", keywords: "ai memory scanner spaced repetition retention cards flashcards" },
-    { title: "Problem Deconstructor", url: "/pages/tools/problem-deconstructor/problem-deconstructor.html", category: "Learn", keywords: "problem deconstructor subproblems divide conquer breakdown" },
-    { title: "Cross Topic Trainer", url: "/pages/tools/cross-topic-trainer/cross-topic-trainer.html", category: "Learn", keywords: "cross topic trainer mix graphs trees heaps arrays" },
-    { title: "Wrong Turn Replay", url: "/pages/tools/wrong-turn-replay/wrong-turn-replay.html", category: "Learn", keywords: "wrong turn replay debug errors mistakes bug tracker history" },
-    { title: "Compare Code", url: "/pages/tools/compare/compare.html", category: "Learn", keywords: "compare code diff solutions languages benchmark performance" },
-    { title: "Reverse Complexity", url: "/pages/tools/reverse-complexity/reverse-complexity.html", category: "Learn", keywords: "reverse complexity big o space time code generator constraint" },
-    
-    // Learn - DSA Topics
-    { title: "Learn Arrays", url: "/pages/learning/array-learning/array-learning.html", category: "Data Structures", keywords: "arrays dynamic linear vectors list matrices" },
-    { title: "Learn Linked Lists", url: "/pages/learning/linkedlist-learning/linkedlist-learning.html", category: "Data Structures", keywords: "linked lists singly doubly circular pointers nodes" },
-    { title: "Learn Stacks", url: "/pages/learning/stack-learning/stack-learning.html", category: "Data Structures", keywords: "stacks lifo push pop callstack brackets balance" },
-    { title: "Learn Queues", url: "/pages/visualizers/stack-queue-visualizer/stack-queue-visualizer.html", category: "Data Structures", keywords: "queues stack queue visualizer fifo push pop shift double ended deque circular" },
-    { title: "Learn Trees", url: "/pages/learning/trees-learning/trees-learning.html", category: "Data Structures", keywords: "trees bst binary search tree avl red black node" },
-    { title: "Tree Traversals", url: "/pages/visualizers/tree-traversal/tree-traversal.html", category: "Data Structures", keywords: "tree traversals inorder preorder postorder levelorder bfs dfs" },
-    { title: "Learn Graphs", url: "/pages/learning/graph-learning/graph-learning.html", category: "Data Structures", keywords: "graphs vertices edges adjacent representations list matrix" },
-    { title: "Learn Matrix", url: "/pages/learning/matrix-learning/matrix-learning.html", category: "Data Structures", keywords: "matrix grid 2d array dimensions rows columns cells" },
-    { title: "Learn Heaps", url: "/pages/learning/heaps-learning/heaps-learning.html", category: "Data Structures", keywords: "heaps priority queue binary min max heap tree" },
-    { title: "Learn Prefix Sum", url: "/pages/learning/prefix-sum-learning/prefix-sum-learning.html", category: "Data Structures", keywords: "prefix sum array query range sum linear scan" },
-    { title: "Learn Sliding Window", url: "/pages/learning/sliding-window-learning/sliding-window-learning.html", category: "Algorithms", keywords: "sliding window subarray substring unique max sum" },
-    { title: "Learn Recursion", url: "/pages/learning/recursion-learning/recursion-learning.html", category: "Algorithms", keywords: "recursion induction call stack base case backtracking" },
-    { title: "Learn Divide & Conquer", url: "/pages/learning/divide-and-conquer-learning/divide-and-conquer-learning.html", category: "Algorithms", keywords: "divide conquer merge sort quick binary search" },
-    { title: "Learn Bit Manipulation", url: "/pages/learning/bit-manipulation-learning/bit-manipulation-learning.html", category: "Algorithms", keywords: "bit manipulation operations mask shift xor and or not" },
-    { title: "Learn Binary Search", url: "/pages/visualizers/pathfinding-visualizer/pathfinding-visualizer.html", category: "Algorithms", keywords: "binary search divide conquer sorted list logarithmic pathfinding" },
-    { title: "Learn Shortest Path", url: "/pages/learning/shortest-path-learning/shortest-path-learning.html", category: "Algorithms", keywords: "shortest path dijkstra bellman ford spfa floyd warshall graph" },
-    { title: "Learn MST (Minimum Spanning Tree)", url: "/pages/learning/mst-learning/mst-learning.html", category: "Algorithms", keywords: "minimum spanning tree mst kruskal prim graph disjoint set union dsu" },
-    { title: "Learn Segment Tree", url: "/pages/learning/segment-tree-learning/segment-tree-learning.html", category: "Data Structures", keywords: "segment tree range queries update sum min max lazy propagation" },
-    { title: "Learn Fenwick Tree", url: "/pages/learning/fenwick-tree-learning/fenwick-tree-learning.html", category: "Data Structures", keywords: "fenwick tree binary indexed tree bit range sum point update" },
-    { title: "Learn Sparse Table", url: "/pages/learning/sparse-table-learning/sparse-table-learning.html", category: "Data Structures", keywords: "sparse table range queries rmq static array constant time" },
-    { title: "Learn Trie & Strings", url: "/pages/learning/trie-string-learning/trie-string-learning.html", category: "Data Structures", keywords: "trie strings suffix tree prefix pattern search autocomplete" },
-    { title: "Learn CP Patterns", url: "/pages/learning/cp-patterns-learning/cp-patterns-learning.html", category: "Algorithms", keywords: "cp patterns competitive programming template tricks math" },
-    { title: "Learn Bitmask DP", url: "/pages/learning/bitmask-dp-learning/bitmask-dp-learning.html", category: "Algorithms", keywords: "bitmask dp dynamic programming exponential states subset" },
-    { title: "Learn DP (Dynamic Programming)", url: "/pages/learning/dp-learning/dp-learning.html", category: "Algorithms", keywords: "dynamic programming dp memoization tabulation knapsack" },
-
-    // Languages & Core
-    { title: "Learn Python", url: "/pages/learning/python-learning/python-learning.html", category: "Languages", keywords: "python basics core syntax loops list dict oop" },
-    { title: "Learn JavaScript", url: "/pages/learning/javascript-learning/javascript-learning.html", category: "Languages", keywords: "javascript es6 async promise DOM fetch object functional" },
-    { title: "Learn Java", url: "/pages/learning/java-learning/java-learning.html", category: "Languages", keywords: "java oop inheritance polymorphism collections stream multithread" },
-    { title: "Learn C++", url: "/pages/learning/cplusplus-learning/cplusplus-learning.html", category: "Languages", keywords: "c++ cpp stl pointers references structures class templates" },
-    { title: "Learn C", url: "/pages/learning/c-learning/c-learning.html", category: "Languages", keywords: "c manual memory malloc pointers structures files low level" },
-    { title: "Learn PHP", url: "/pages/learning/php-learning/php-learning.html", category: "Languages", keywords: "php web backend server request db mysql session" },
-    { title: "Learn DBMS", url: "/pages/learning/dbms-learning/dbms-learning.html", category: "Core CS", keywords: "dbms database relational sql normal forms transactions acid locks" },
-    { title: "Learn Operating Systems", url: "/pages/learning/os-learning/os-learning.html", category: "Core CS", keywords: "operating systems os threads processes scheduling memory paging deadlock virtual" },
-    { title: "Learn Comp. Architecture", url: "/pages/learning/computer-architecture/computer-architecture.html", category: "Core CS", keywords: "computer architecture assembly cpu cache registers pipeline instructions" },
-    { title: "Learn OOP (Object Oriented Programming)", url: "/pages/learning/oop-learning/oop-learning.html", category: "Core CS", keywords: "oop object oriented inheritance polymorphism encapsulation abstraction interfaces" },
-    { title: "Learn SQL", url: "/pages/learning/sql-learning/sql-learning.html", category: "Core CS", keywords: "sql query databases select join group by indexes optimization schemas" },
-    { title: "Learn Power BI", url: "/pages/learning/powerbi-learning/powerbi-learning.html", category: "Core CS", keywords: "power bi data analysis visualization dashboard reports query dax" },
-
-    // System Design
-    { title: "Learn System Design", url: "/pages/resources/system-design/system-design.html", category: "System Design", keywords: "system design scalability load balancer caching sharding microservices replication cap" },
-    { title: "Learn API Design", url: "/pages/learning/api-design-learning/api-design-learning.html", category: "System Design", keywords: "api design rest graphql gRPC status codes endpoints auth rate limiting spec" },
-    { title: "Learn Cache Systems", url: "/pages/learning/cache-learning/cache-learning.html", category: "System Design", keywords: "cache systems lru lfu eviction policies write back through consistency cache hit miss" },
-
-    // Visualizers & Tools
-    { title: "Sorting Visualizer", url: "/pages/sort/sorting-visualizer.html", category: "Visualizers", keywords: "sorting visualizer bubble merge quick heap comparison animation" },
-    { title: "Graph Visualizer", url: "/pages/visualizers/graph-visualizer/graph-visualizer.html", category: "Visualizers", keywords: "graph visualizer representation bfs dfs adjacency list" },
-    { title: "Pathfinding Visualizer", url: "/pages/visualizers/pathfinding-visualizer/pathfinding-visualizer.html", category: "Visualizers", keywords: "pathfinding visualizer a star dijkstra bfs dfs maze generator grid" },
-    { title: "Recursion Tree Visualizer", url: "/pages/visualizers/recursion-tree-visualizer/recursion-tree-visualizer.html", category: "Visualizers", keywords: "recursion tree visualizer fibonacci call stack tree visualization" },
-    { title: "Tree Visualizer", url: "/pages/visualizers/tree-visualizer/tree-visualizer.html", category: "Visualizers", keywords: "tree visualizer bst binary search tree heap visualizer" },
-    { title: "Complexity Calculator", url: "/pages/tools/complexity-calculator/complexity-calculator.html", category: "Tools", keywords: "complexity calculator space time complexity analyser big o calculator" },
-    { title: "Pattern Recognition Trainer", url: "/pages/tools/pattern-trainer/pattern-trainer.html", category: "Tools", keywords: "pattern recognition trainer identify problems clues" },
-    { title: "Edge Case Generator", url: "/pages/tools/edge-case-generator/edge-case-generator.html", category: "Tools", keywords: "edge case generator arrays strings extreme inputs numbers bounds check" },
-    { title: "Dry Run Simulator", url: "/pages/tools/dry-run-simulator/dry-run-simulator.html", category: "Tools", keywords: "dry run simulator code trace variables step execution state debugger" },
-    { title: "Solution Evolution", url: "/pages/tools/solution-evolution/solution-evolution.html", category: "Tools", keywords: "solution evolution brute force optimized optimized space code transformation" },
-    { title: "Algorithm Crime Lab", url: "/pages/tools/investigation-lab/investigation-lab.html", category: "Tools", keywords: "algorithm crime lab investigate bugs logs crash dumps issues debug" },
-    { title: "DSA Mythbusters", url: "/pages/tools/algorithm-mythology/algorithm-mythology.html", category: "Tools", keywords: "dsa mythbusters misconceptions myths truths structures" },
-    { title: "Algorithm Arena", url: "/pages/tools/algorithm-arena/algorithm-arena.html", category: "Tools", keywords: "algorithm arena battle code competition challenges game math" },
-    { title: "Algorithms in Real Apps", url: "/pages/tools/everyday-apps/everyday-apps.html", category: "Tools", keywords: "algorithms in real apps everyday applications autocomplete search GPS database index" },
-    { title: "Weakness Dashboard", url: "/pages/tools/topic-weakness-dashboard/topic-weakness-dashboard.html", category: "Tools", keywords: "weakness dashboard stats tracking progress score card review recommendations" },
-
-    // Editors
-    { title: "Python Editor", url: "/pages/editors/python-editor/python-editor.html", category: "Editors", keywords: "python editor compiler runner playground scratchpad" },
-    { title: "Java Editor", url: "/pages/editors/java-editor/java-editor.html", category: "Editors", keywords: "java editor compiler runner playground scratchpad" },
-    { title: "C++ Editor", url: "/pages/editors/cpp-editor/cpp-editor.html", category: "Editors", keywords: "c++ cpp editor compiler runner playground scratchpad" },
-    { title: "C Editor", url: "/pages/editors/c-editor/c-editor.html", category: "Editors", keywords: "c editor compiler runner playground scratchpad" },
-    { title: "PHP Editor", url: "/pages/editors/php-editor/php-editor.html", category: "Editors", keywords: "php editor compiler runner playground scratchpad" },
-    { title: "Ruby Editor", url: "/pages/editors/ruby-editor/ruby-editor.html", category: "Editors", keywords: "ruby editor compiler runner playground scratchpad" },
-    { title: "Scala Editor", url: "/pages/editors/scala-editor/scala-editor.html", category: "Editors", keywords: "scala editor compiler runner playground scratchpad" },
-    { title: "Go Editor", url: "/pages/editors/go-editor/go-editor.html", category: "Editors", keywords: "go editor compiler runner playground scratchpad" },
-    { title: "HTML Editor", url: "/pages/editors/html-editor/html-editor.html", category: "Editors", keywords: "html css js editor preview iframe live design" },
-    { title: "SQL Editor", url: "/pages/editors/sql-editor/sql-editor.html", category: "Editors", keywords: "sql database editor query terminal tables sandbox" },
-    { title: "React Playground", url: "/pages/editors/react-playground/react-playground.html", category: "Editors", keywords: "react playground components live compile state props rendering sandbox" },
-    { title: "Code Playground", url: "/Playground/playground.html", category: "Editors", keywords: "code playground editor compiler runner multi language sandbox" },
-
-    // Career & Interview
-    { title: "DSA Cheat Sheets", url: "/pages/resources/cheat-sheets/cheat-sheets.html", category: "Interview", keywords: "dsa cheat sheets formula summary revision fast track reference" },
-    { title: "Interview Experiences", url: "/pages/interview/interview-experience/interview-experience.html", category: "Interview", keywords: "interview experiences faang reviews questions answers database" },
-    { title: "Interview Heatmap", url: "/pages/interview/interview-heatmap/interview-heatmap.html", category: "Interview", keywords: "interview heatmap tracking calendar schedule logs prep progress" },
-    { title: "Interview Mistakes", url: "/pages/interview/interview-mistakes/interview-mistakes.html", category: "Interview", keywords: "interview mistakes common errors bugs logic communication anti patterns" },
-
-    // Community & General
-    { title: "Discussions Forum", url: "/community", category: "Community", keywords: "discussions community threads replies topics comments questions share" },
-    { title: "Leaderboard / Dashboard", url: "/index.html#dashboard", category: "Community", keywords: "leaderboard dashboard ranking score points level user progress stats" },
-    { title: "Support Hub", url: "/support-page", category: "Community", keywords: "support page help desk tickets issues contact us details" },
-    { title: "Feedback", url: "/feedback", category: "Community", keywords: "feedback review suggestions bugs report improvements forms" },
-    { title: "About Us", url: "/pages/resources/about-us.html", category: "Community", keywords: "about us team mission story timeline contributors project information" },
-    { title: "FAQ", url: "/pages/resources/faq/faq.html", category: "Community", keywords: "faq frequently asked questions help answers troubleshooting guide" },
-    { title: "Blog", url: "/pages/resources/blog/blog.html", category: "Community", keywords: "blog articles news updates stories coding tips resources publications" }
-  ];
-
-  // Helper to escape regex special characters
-  const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-  // Helper to highlight matching text in title
-  const highlightText = (text, query) => {
-    if (!query) return text;
-    const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
-    if (!tokens.length) return text;
-    let highlighted = text;
-    tokens.forEach(token => {
-      const regex = new RegExp(`(${escapeRegExp(token)})`, "gi");
-      highlighted = highlighted.replace(regex, `<mark class="search-highlight">$1</mark>`);
-    });
-    return highlighted;
-  };
-
-  searchInputs.forEach(input => {
-    const wrapper = input.closest(".nav-search");
-    if (!wrapper) return;
-    const clearBtn = wrapper.querySelector(".clear-search-btn");
-    const dropdown = wrapper.querySelector(".search-dropdown");
-    let activeSuggestionIndex = -1;
-
-    // Load recent searches and frequently visited from localStorage
-    const getRecentSearches = () => {
-      try {
-        return JSON.parse(localStorage.getItem("nav_recent_searches")) || [];
-      } catch {
-        return [];
-      }
-    };
-
-    const addRecentSearch = (query) => {
-      if (!query || !query.trim()) return;
-      const cleanQuery = query.trim();
-      let recent = getRecentSearches();
-      recent = recent.filter(q => q.toLowerCase() !== cleanQuery.toLowerCase());
-      recent.unshift(cleanQuery);
-      if (recent.length > 5) recent.pop();
-      localStorage.setItem("nav_recent_searches", JSON.stringify(recent));
-    };
-
-    const removeRecentSearch = (query) => {
-      let recent = getRecentSearches();
-      recent = recent.filter(q => q !== query);
-      localStorage.setItem("nav_recent_searches", JSON.stringify(recent));
-    };
-
-    const getFrequentlyVisited = () => {
-      try {
-        const visited = JSON.parse(localStorage.getItem("nav_frequently_visited")) || {};
-        const sorted = Object.entries(visited)
-          .map(([url, count]) => {
-            const page = searchIndex.find(p => p.url === url);
-            return page ? { ...page, count } : null;
-          })
-          .filter(Boolean)
-          .sort((a, b) => b.count - a.count);
-        return sorted.slice(0, 5);
-      } catch {
-        return [];
-      }
-    };
-
-    const trackPageVisit = (url) => {
-      try {
-        const visited = JSON.parse(localStorage.getItem("nav_frequently_visited")) || {};
-        visited[url] = (visited[url] || 0) + 1;
-        localStorage.setItem("nav_frequently_visited", JSON.stringify(visited));
-      } catch (e) {
-        console.warn("Could not track page visit:", e);
-      }
-    };
-
-    const syncAllInputs = (value) => {
-      searchInputs.forEach(inp => {
-        if (inp.value !== value) {
-          inp.value = value;
-          const wrp = inp.closest(".nav-search");
-          if (wrp) {
-            const clr = wrp.querySelector(".clear-search-btn");
-            if (clr) clr.style.display = value ? "flex" : "none";
-          }
-        }
-      });
-    };
-
-    const renderDropdown = (query = "") => {
-      if (!dropdown) return;
-      dropdown.innerHTML = "";
-      activeSuggestionIndex = -1;
-
-      if (!query.trim()) {
-        const recent = getRecentSearches();
-        const popular = getFrequentlyVisited();
-
-        const defaultPopular = [
-          { title: "DSA Cheat Sheets", url: "/cheat-sheets.html", category: "Interview" },
-          { title: "Practice Problems", url: "/index.html#practice", category: "Learn" },
-          { title: "Sorting Visualizer", url: "/sorting-visualizer.html", category: "Visualizers" },
-          { title: "Assessments", url: "/quiz-system.html", category: "Learn" },
-          { title: "Learning Path Generator", url: "/personalized-learning-path.html", category: "Editors" }
-        ];
-
-        const popularList = popular.length ? popular : defaultPopular.slice(0, 5);
-        let hasContent = false;
-
-        if (recent.length) {
-          hasContent = true;
-          const section = document.createElement("div");
-          section.className = "search-dropdown-section";
-          section.innerHTML = `<div class="search-section-title">Recent Searches</div>`;
-
-          recent.forEach(q => {
-            const item = document.createElement("div");
-            item.className = "recent-item";
-            
-            const link = document.createElement("a");
-            link.className = "recent-link";
-            link.innerHTML = `<i class="fas fa-history"></i><span>${escapeHtml(q)}</span>`;
-            link.addEventListener("click", (e) => {
-              e.preventDefault();
-              syncAllInputs(q);
-              renderDropdown(q);
-            });
-
-            const removeBtn = document.createElement("button");
-            removeBtn.className = "remove-recent-btn";
-            removeBtn.setAttribute("aria-label", "Remove from history");
-            removeBtn.innerHTML = `<i class="fas fa-trash-can"></i>`;
-            removeBtn.addEventListener("click", (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              removeRecentSearch(q);
-              renderDropdown();
-            });
-
-            item.appendChild(link);
-            item.appendChild(removeBtn);
-            section.appendChild(item);
-          });
-          dropdown.appendChild(section);
-        }
-
-        if (popularList.length) {
-          hasContent = true;
-          const section = document.createElement("div");
-          section.className = "search-dropdown-section";
-          section.innerHTML = `<div class="search-section-title">${popular.length ? "Frequently Visited" : "Popular Pages"}</div>`;
-
-          popularList.forEach(page => {
-            const link = document.createElement("a");
-            link.href = page.url;
-            link.className = "suggestion-item";
-            link.innerHTML = `
-              <div class="suggestion-content">
-                <span class="suggestion-title">${escapeHtml(page.title)}</span>
-                <span class="suggestion-path">Navigation &gt; ${escapeHtml(page.category)}</span>
-              </div>
-              <span class="suggestion-badge">${escapeHtml(page.category)}</span>
-              <i class="fas fa-chevron-right suggestion-arrow"></i>
-            `;
-            link.addEventListener("click", () => {
-              trackPageVisit(page.url);
-              addRecentSearch(page.title);
-            });
-            section.appendChild(link);
-          });
-          dropdown.appendChild(section);
-        }
-
-        dropdown.style.display = hasContent ? "block" : "none";
-        return;
-      }
-
-      const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
-      const matches = searchIndex.filter(item => {
-        const titleMatch = tokens.every(tok => item.title.toLowerCase().includes(tok));
-        const catMatch = tokens.every(tok => item.category.toLowerCase().includes(tok));
-        const keywordMatch = tokens.every(tok => item.keywords.toLowerCase().includes(tok));
-        return titleMatch || catMatch || keywordMatch;
-      });
-
-      if (!matches.length) {
-        dropdown.innerHTML = `
-          <div class="search-no-results">
-            <i class="fas fa-triangle-exclamation"></i>
-            <span>No results found for "${escapeHtml(query)}"</span>
-          </div>
-        `;
-        dropdown.style.display = "block";
-        return;
-      }
-
-      const section = document.createElement("div");
-      section.className = "search-dropdown-section";
-      section.innerHTML = `<div class="search-section-title">Matches (${matches.length})</div>`;
-
-      matches.forEach(page => {
-        const link = document.createElement("a");
-        link.href = page.url;
-        link.className = "suggestion-item";
-        link.innerHTML = `
-          <div class="suggestion-content">
-            <span class="suggestion-title">${highlightText(page.title, query)}</span>
-            <span class="suggestion-path">Navigation &gt; ${escapeHtml(page.category)}</span>
-          </div>
-          <span class="suggestion-badge">${escapeHtml(page.category)}</span>
-          <i class="fas fa-chevron-right suggestion-arrow"></i>
-        `;
-        link.addEventListener("click", () => {
-          trackPageVisit(page.url);
-          addRecentSearch(page.title);
-        });
-        section.appendChild(link);
-      });
-      dropdown.appendChild(section);
-      dropdown.style.display = "block";
-    };
-
-    const escapeHtml = (unsafe) => {
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    };
-
-    input.addEventListener("input", (e) => {
-      const val = e.target.value;
-      syncAllInputs(val);
-      renderDropdown(val);
-    });
-
-    input.addEventListener("focus", () => {
-      setTimeout(() => {
-        renderDropdown(input.value);
-      }, 150);
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!wrapper.contains(e.target)) {
-        dropdown.style.display = "none";
-      }
-    });
-
-    if (clearBtn) {
-      clearBtn.addEventListener("click", () => {
-        syncAllInputs("");
-        renderDropdown();
-        input.focus();
-      });
-    }
-
-    input.addEventListener("keydown", (e) => {
-      const items = dropdown.querySelectorAll(".suggestion-item, .recent-item, .recent-link");
-      if (!items.length) return;
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
-        updateSelectedSuggestion(items);
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
-        updateSelectedSuggestion(items);
-      } else if (e.key === "Enter") {
-        if (activeSuggestionIndex >= 0 && activeSuggestionIndex < items.length) {
-          e.preventDefault();
-          items[activeSuggestionIndex].click();
-        } else if (items.length > 0) {
-          e.preventDefault();
-          items[0].click();
-        }
-      } else if (e.key === "Escape") {
-        dropdown.style.display = "none";
-        input.blur();
-      }
-    });
-
-    const updateSelectedSuggestion = (items) => {
-      items.forEach((item, index) => {
-        if (index === activeSuggestionIndex) {
-          item.classList.add("selected");
-          item.focus();
-          item.scrollIntoView({ block: "nearest" });
-        } else {
-          item.classList.remove("selected");
-        }
-      });
-      input.focus();
-    };
   });
 }
 
@@ -1379,131 +880,6 @@ function updateLevelProgress() {
 }
 
 // ============================================
-// BACK TO TOP BUTTON
-// ============================================
-
-/**
- * Initialize Back to Top button functionality
- */
-function initBackToTop() {
-    const backToTopBtn = document.getElementById('backToTop');
-    if (!backToTopBtn) return;
-
-    let isVisible = false;
-    let scrollTimeout;
-    let progressRing = backToTopBtn.querySelector('.progress-ring-fill');
-
-    /**
-     * Check scroll position and toggle button visibility
-     */
-    function toggleBackToTop() {
-        const scrollY = window.scrollY || window.pageYOffset;
-        const shouldShow = scrollY > 300;
-
-        if (shouldShow && !isVisible) {
-            backToTopBtn.classList.add('visible');
-            isVisible = true;
-            updateProgressRing(scrollY);
-        } else if (!shouldShow && isVisible) {
-            backToTopBtn.classList.remove('visible');
-            isVisible = false;
-        } else if (shouldShow && isVisible) {
-            updateProgressRing(scrollY);
-        }
-    }
-
-    /**
-     * Update progress ring (optional enhancement)
-     */
-    function updateProgressRing(scrollY) {
-        if (!progressRing) {
-            progressRing = backToTopBtn.querySelector('.progress-ring-fill');
-            if (!progressRing) return;
-        }
-
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = maxScroll > 0 ? (scrollY / maxScroll) * 100 : 0;
-        const circumference = 2 * Math.PI * 20;
-        const offset = circumference - (progress / 100) * circumference;
-        
-        progressRing.style.strokeDasharray = circumference;
-        progressRing.style.strokeDashoffset = offset;
-    }
-
-    /**
-     * Scroll to top smoothly
-     */
-    function scrollToTop() {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            window.scrollTo(0, 0);
-            updateProgressRing(0);
-            return;
-        }
-
-        const startY = window.scrollY || window.pageYOffset;
-        const duration = 500;
-        const startTime = performance.now();
-
-        function easeInOutCubic(t) {
-            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        }
-
-        function animateScroll(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easedProgress = easeInOutCubic(progress);
-            
-            window.scrollTo(0, startY * (1 - easedProgress));
-            
-            if (progress < 1) {
-                requestAnimationFrame(animateScroll);
-            }
-        }
-
-        requestAnimationFrame(animateScroll);
-        
-        setTimeout(() => {
-            updateProgressRing(0);
-        }, duration + 100);
-    }
-
-    // Throttled scroll listener
-    function throttledScroll() {
-        if (scrollTimeout) {
-            cancelAnimationFrame(scrollTimeout);
-        }
-        scrollTimeout = requestAnimationFrame(toggleBackToTop);
-    }
-
-    // Event listeners
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-    window.addEventListener('resize', throttledScroll, { passive: true });
-
-    // Click handler
-    backToTopBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        scrollToTop();
-    });
-
-    // Keyboard support
-    backToTopBtn.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === 'Space') {
-            e.preventDefault();
-            scrollToTop();
-        }
-    });
-
-    // Touch support for mobile
-    backToTopBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        scrollToTop();
-    }, { passive: false });
-
-    // Initial check
-    toggleBackToTop();
-}
-
-// ============================================
 // TOPICS
 // ============================================
 function getDayOfYear() {
@@ -1556,7 +932,7 @@ function initTopicsSection() {
     card.className = "topic-card animate-in";
     card.style.animationDelay = `${index * 0.1}s`;
     const progress = getTopicProgress(topic.name);
-    card.innerHTML = `<div class="topic-icon">${topic.icon}</div><h3 class="topic-name">${escapeHtml(topic.name)}</h3><p class="topic-desc">${escapeHtml(topic.description)}</p><div class="topic-meta"><span class="difficulty-badge ${getDifficultyClass(topic.difficulty)}">${escapeHtml(topic.difficulty)}</span><span class="topic-count">${progress.total} problems</span></div><div class="topic-mastery"><div class="mastery-header"><span class="mastery-label">Progress</span><span class="mastery-stats">${progress.completed}/${progress.total} solved</span></div><div class="mastery-bar"><div class="mastery-fill" style="width: ${progress.percentage}%"></div></div><span class="mastery-percentage">${progress.percentage}%</span></div>`;
+    card.innerHTML = `<div class="topic-icon">${topic.icon}</div><h3 class="topic-name">${topic.name}</h3><p class="topic-desc">${topic.description}</p><div class="topic-meta"><span class="difficulty-badge ${getDifficultyClass(topic.difficulty)}">${topic.difficulty}</span><span class="topic-count">${progress.total} problems</span></div><div class="topic-mastery"><div class="mastery-header"><span class="mastery-label">Progress</span><span class="mastery-stats">${progress.completed}/${progress.total} solved</span></div><div class="mastery-bar"><div class="mastery-fill" style="width: ${progress.percentage}%"></div></div><span class="mastery-percentage">${progress.percentage}%</span></div>`;
     topicsGrid.appendChild(card);
     card.addEventListener("click", () => openTopicModal(topic));
   });
@@ -1576,9 +952,9 @@ function openTopicModal(topic) {
   const modalTitle = document.getElementById("modalTitle");
   if (modalTitle) modalTitle.textContent = topic.name;
   const modalTheory = document.getElementById("modalTheory");
-  if (modalTheory) modalTheory.innerHTML = window.DOMSanitizer.sanitizeHTML(topic.theory);
+  if (modalTheory) modalTheory.innerHTML = topic.theory;
   const modalDifficulty = document.getElementById("modalDifficulty");
-  if (modalDifficulty) modalDifficulty.innerHTML = `<span class="difficulty-badge ${getDifficultyClass(topic.difficulty)}">${escapeHtml(topic.difficulty)}</span>`;
+  if (modalDifficulty) modalDifficulty.innerHTML = `<span class="difficulty-badge ${getDifficultyClass(topic.difficulty)}">${topic.difficulty}</span>`;
   const problemsList = document.getElementById("modalProblems");
   if (problemsList) {
     problemsList.innerHTML = topic.problems
@@ -1588,9 +964,9 @@ function openTopicModal(topic) {
           <button
             type="button"
             class="sample-problem-item"
-            data-problem-name="${escapeHtml(p)}"
+            data-problem-name="${p.replace(/"/g, "&quot;")}"
             style="width:100%; text-align:left; cursor:pointer; padding:0.6rem 1rem; border-radius:8px; border:1px solid var(--glass-border); transition:all 0.2s ease;"
-          >${escapeHtml(p)}</button>
+          >${p}</button>
         </li>`
       )
       .join("");
@@ -1615,10 +991,6 @@ function openTopicModal(topic) {
         if (match) openQuizEditor(match);
       }, 600);
     };
-  }
-  const modalCloseBtn = document.getElementById("modalClose");
-  if (modalCloseBtn) {
-    modalCloseBtn.onclick = () => closeTopicModal();
   }
   modal.classList.add("active");
 }
@@ -1656,7 +1028,7 @@ function initQuizSection() {
     const card = document.createElement("div");
     card.className = "quiz-card animate-in";
     card.style.animationDelay = `${index * 0.1}s`;
-    card.innerHTML = `<div class="quiz-card-icon">${topic.icon}</div><h3 class="quiz-card-title">${escapeHtml(topic.name)}</h3><p class="quiz-card-desc">Test your knowledge with 10 unique questions</p><div class="quiz-card-meta"><span class="quiz-count">10 Questions</span><span class="quiz-difficulty ${getDifficultyClass(topic.difficulty)}">${escapeHtml(topic.difficulty)}</span></div><div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-${topicKey}"></div></div><div class="quiz-stats"><span>Best: <strong id="best-${topicKey}">--</strong></span><span>Attempts: <strong id="attempts-${topicKey}">0</strong></span></div><button class="btn btn-primary start-quiz-btn" data-topic="${escapeHtml(topicKey)}"><i class="fas fa-play"></i> Start Quiz</button>`;
+    card.innerHTML = `<div class="quiz-card-icon">${topic.icon}</div><h3 class="quiz-card-title">${topic.name}</h3><p class="quiz-card-desc">Test your knowledge with 10 unique questions</p><div class="quiz-card-meta"><span class="quiz-count">10 Questions</span><span class="quiz-difficulty ${getDifficultyClass(topic.difficulty)}">${topic.difficulty}</span></div><div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-${topicKey}"></div></div><div class="quiz-stats"><span>Best: <strong id="best-${topicKey}">--</strong></span><span>Attempts: <strong id="attempts-${topicKey}">0</strong></span></div><button class="btn btn-primary start-quiz-btn" data-topic="${topicKey}"><i class="fas fa-play"></i> Start Quiz</button>`;
     quizGrid.appendChild(card);
     card.addEventListener("click", () => startQuiz(topicKey));
     const startBtn = card.querySelector(".start-quiz-btn");
@@ -1837,7 +1209,13 @@ function showQuizResults(score, total, percentage, xpEarned, completionTime) {
 function showQuizReview() {
   if (!lastQuizReview || !lastQuizReview.questions || !lastQuizReview.answers) { showNotification("No review data found", "error"); return; }
   const resultEl = document.getElementById("topicQuizResult");
-  const escapeHtml = (value = "") => window.DOMSanitizer.escapeHtml(value);
+  const escapeHtml = (value = "") =>
+    String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&`#39`;");
 
   // Ensure layout doesn't cut off items: keep scrollable container, and avoid nested flex issues.
   let html = `<div class="quiz-review"><h2>📖 Quiz Review</h2><div class="quiz-review-container"><div class="quiz-review-items">`;
@@ -1869,8 +1247,6 @@ function restoreQuizResults() {
 function initPracticeSection() {
   const problemsGrid = document.querySelector(".problems-grid");
   if (!problemsGrid) return;
-  if (problemsGrid.dataset.initialized) return;
-  problemsGrid.dataset.initialized = "true";
 
   // Notes modal
   const notesCloseBtn = document.getElementById("notesModalClose");
@@ -1892,135 +1268,42 @@ function initPracticeSection() {
     });
   });
 
-  // AI Recommend Button variables for debouncing & aborting
-  let aiRecommendDebounceTimer = null;
-  let aiRecommendAbortController = null;
-  let recommendationRequestCounter = 0;
-
+  // AI Recommend Button
   const aiRecommendBtn = document.getElementById("ai-recommend-btn");
-  const aiRecommendStatus = document.getElementById("ai-recommend-status");
-  const aiRecommendStatusMsg = document.getElementById("ai-recommend-status-msg");
-  const aiRecommendDisableToggle = document.getElementById("ai-recommend-disable-toggle");
-  const aiRecommendDebounceInput = document.getElementById("ai-recommend-debounce-input");
-
-  function updateRecommendationStatus(text, type, requestId) {
-    // Only update if this request matches the latest request counter
-    if (requestId !== undefined && requestId !== recommendationRequestCounter) return;
-
-    if (aiRecommendStatusMsg) {
-      aiRecommendStatusMsg.textContent = text;
-      aiRecommendStatusMsg.style.opacity = text ? "1" : "0";
-      
-      if (type === "cancelled") {
-        aiRecommendStatusMsg.style.color = "#ff9800"; // Orange
-      } else if (type === "success") {
-        aiRecommendStatusMsg.style.color = "#4caf50"; // Green
-      } else if (type === "loading") {
-        aiRecommendStatusMsg.style.color = "#3b82f6"; // Blue
-      } else if (type === "waiting") {
-        aiRecommendStatusMsg.style.color = "#a1a1aa"; // Grey
-      } else {
-        aiRecommendStatusMsg.style.color = "";
-      }
-    }
-    
-    if (aiRecommendStatus) {
-      aiRecommendStatus.textContent = text;
-    }
-  }
-
-  async function startRecommendationRequest(requestId, disableOnFetch) {
-    aiRecommendAbortController = new AbortController();
-    const signal = aiRecommendAbortController.signal;
-
-    try {
-      if (aiRecommendBtn) {
-        aiRecommendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding...';
-        if (disableOnFetch) {
-          aiRecommendBtn.disabled = true;
-        }
-      }
-      updateRecommendationStatus("Finding...", "loading", requestId);
-
-      const res = await fetch("/api/recommendations/next", { signal });
-      if (res.status === 401) {
-         alert("Please log in to get AI recommendations.");
-         updateRecommendationStatus("Authentication required", "cancelled", requestId);
-         return;
-      }
-      const data = await res.json();
-      
-      if (data.success && data.recommendation) {
-         const rec = data.recommendation;
-         currentFilter = rec.topic.toLowerCase();
-         currentPage = 1;
-         
-         filterButtons.forEach((b) => {
-           if(b.dataset.filter === currentFilter) b.classList.add("active");
-           else b.classList.remove("active");
-         });
-         
-         renderProblems();
-         updateRecommendationStatus("New result", "success", requestId);
-         alert("AI Recommendation: " + rec.reason + "\n\n" + (rec.aiTip || ""));
-      } else {
-         alert("Could not get recommendation.");
-         updateRecommendationStatus("Failed", "cancelled", requestId);
-      }
-    } catch (err) {
-       if (err.name === 'AbortError') {
-          console.log("AI recommend request was cancelled.");
-          // Update status if it's the latest request
-          updateRecommendationStatus("Request cancelled", "cancelled", requestId);
-       } else {
-          console.error("AI recommend error:", err);
-          alert("Failed to fetch recommendation.");
-          updateRecommendationStatus("Failed", "cancelled", requestId);
-       }
-    } finally {
-       // Only clean up UI/state if this is the active request
-       if (requestId === recommendationRequestCounter) {
-         aiRecommendAbortController = null;
-         if (aiRecommendBtn) {
-           aiRecommendBtn.innerHTML = '<i class="fas fa-magic"></i> AI Recommend Next';
-           aiRecommendBtn.disabled = false;
-         }
-       }
-    }
-  }
-
   if (aiRecommendBtn) {
-    aiRecommendBtn.addEventListener("click", () => {
-      const disableOnFetch = aiRecommendDisableToggle ? aiRecommendDisableToggle.checked : false;
-      const debounceDelayVal = aiRecommendDebounceInput ? parseInt(aiRecommendDebounceInput.value, 10) : 500;
-      const debounceDelay = isNaN(debounceDelayVal) ? 500 : debounceDelayVal;
-
-      // Increment request counter
-      recommendationRequestCounter++;
-      const currentRequestId = recommendationRequestCounter;
-
-      // Clear any pending debounce timer
-      if (aiRecommendDebounceTimer) {
-        clearTimeout(aiRecommendDebounceTimer);
-        aiRecommendDebounceTimer = null;
-      }
-
-      // Abort active request if any
-      if (aiRecommendAbortController) {
-        aiRecommendAbortController.abort();
-        aiRecommendAbortController = null;
-        // Immediate status update to cancelled
-        updateRecommendationStatus("Request cancelled", "cancelled", currentRequestId);
-      }
-
-      if (debounceDelay === 0) {
-        startRecommendationRequest(currentRequestId, disableOnFetch);
-      } else {
-        updateRecommendationStatus("Waiting...", "waiting", currentRequestId);
-        aiRecommendDebounceTimer = setTimeout(() => {
-          aiRecommendDebounceTimer = null;
-          startRecommendationRequest(currentRequestId, disableOnFetch);
-        }, debounceDelay);
+    aiRecommendBtn.addEventListener("click", async () => {
+      try {
+        aiRecommendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding...';
+        aiRecommendBtn.disabled = true;
+        
+        const res = await fetch("/api/recommendations/next");
+        if (res.status === 401) {
+           alert("Please log in to get AI recommendations.");
+           return;
+        }
+        const data = await res.json();
+        
+        if (data.success && data.recommendation) {
+           const rec = data.recommendation;
+           currentFilter = rec.topic.toLowerCase();
+           currentPage = 1;
+           
+           filterButtons.forEach((b) => {
+             if(b.dataset.filter === currentFilter) b.classList.add("active");
+             else b.classList.remove("active");
+           });
+           
+           renderProblems();
+           alert("AI Recommendation: " + rec.reason + "\n\n" + (rec.aiTip || ""));
+        } else {
+           alert("Could not get recommendation.");
+        }
+      } catch (err) {
+         console.error("AI recommend error:", err);
+         alert("Failed to fetch recommendation.");
+      } finally {
+         aiRecommendBtn.innerHTML = '<i class="fas fa-magic"></i> AI Recommend Next';
+         aiRecommendBtn.disabled = false;
       }
     });
   }
@@ -2107,8 +1390,6 @@ function renderProblems() {
   updatePaginationControls(currentPage, totalPages);
 }
 
-const problemCardHtmlCache = new Map();
-
 function renderProblemCards(problems) {
   const problemsGrid = document.querySelector(".problems-grid");
   if (!problemsGrid) return;
@@ -2116,16 +1397,6 @@ function renderProblemCards(problems) {
   const cpType = userProgress.codingPersonality ? userProgress.codingPersonality.type : "brute-force first";
 
   const html = problems.map(problem => {
-    const isCompleted = userProgress.completedProblems.includes(problem.id);
-    const isFavorite = userProgress.favoriteProblems.includes(problem.id);
-    const hasNotes = userProgress.problemNotes && !!userProgress.problemNotes[problem.id];
-    
-    const cacheKey = `${problem.id}_${isCompleted}_${isFavorite}_${hasNotes}_${cpType}_${problem.highlightedTitle || ''}_${problem.highlightedDescription || ''}`;
-    
-    if (problemCardHtmlCache.has(cacheKey)) {
-      return problemCardHtmlCache.get(cacheKey);
-    }
-
     let isRec = false, recLabel = "";
     if (cpType === "brute-force first") {
       if (problem.difficulty === "easy" || problem.tags.includes("Arrays")) { isRec = true; recLabel = "Plan First!"; }
@@ -2137,14 +1408,14 @@ function renderProblemCards(problems) {
       if (problem.tags.includes("Greedy") || problem.tags.includes("Divide and Conquer") || problem.tags.includes("Recursion")) { isRec = true; recLabel = "Heuristic Check"; }
     }
     const recBadge = isRec ? `<span class="rec-personality-badge"><i class="fas fa-brain"></i> ${recLabel}</span>` : "";
+    const isCompleted = userProgress.completedProblems.includes(problem.id);
+    const isFavorite = userProgress.favoriteProblems.includes(problem.id);
+    const hasNotes = userProgress.problemNotes && userProgress.problemNotes[problem.id];
 
     const displayTitle = problem.highlightedTitle || problem.title;
     const snippetHtml = problem.highlightedDescription ? `<div class="problem-snippet" style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${problem.highlightedDescription}</div>` : "";
 
-    const cardHtml = `<div class="problem-card animate-in" data-id="${problem.id}"><div class="problem-header"><h3 class="problem-title">${recBadge}${displayTitle}</h3><div class="problem-actions"><button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${problem.id}" aria-label="Favorite problem"><i class="fas fa-heart"></i></button><button class="notes-btn ${hasNotes ? 'has-notes' : ''}" data-id="${problem.id}" aria-label="Problem notes"><i class="fas fa-sticky-note"></i></button><span class="difficulty-badge ${problem.difficulty}">${problem.difficulty}</span></div></div>${snippetHtml}<div class="problem-tags">${problem.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div><div class="problem-meta"><span class="acceptance-rate"><i class="fas fa-users"></i> ${problem.acceptance} acceptance</span>${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> Completed</span>' : ''}</div></div>`;
-    
-    problemCardHtmlCache.set(cacheKey, cardHtml);
-    return cardHtml;
+    return `<div class="problem-card animate-in" data-id="${problem.id}"><div class="problem-header"><h3 class="problem-title">${recBadge}${displayTitle}</h3><div class="problem-actions"><button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${problem.id}" aria-label="Favorite problem"><i class="fas fa-heart"></i></button><button class="notes-btn ${hasNotes ? 'has-notes' : ''}" data-id="${problem.id}" aria-label="Problem notes"><i class="fas fa-sticky-note"></i></button><span class="difficulty-badge ${problem.difficulty}">${problem.difficulty}</span></div></div>${snippetHtml}<div class="problem-tags">${problem.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div><div class="problem-meta"><span class="acceptance-rate"><i class="fas fa-users"></i> ${problem.acceptance} acceptance</span>${isCompleted ? '<span class="completed-badge"><i class="fas fa-check"></i> Completed</span>' : ''}</div></div>`;
   }).join("");
 
   problemsGrid.innerHTML = html;
@@ -2166,12 +1437,7 @@ function attachProblemGridEventDelegation(grid) {
       e.preventDefault();
       const problemId = parseInt(favoriteBtn.dataset.id);
       toggleFavorite(problemId);
-      if (currentFilter === 'favorites') {
-        renderProblems();
-      } else {
-        const isFavorite = userProgress.favoriteProblems.includes(problemId);
-        favoriteBtn.classList.toggle('active', isFavorite);
-      }
+      renderProblems();
       return;
     }
 
@@ -2287,11 +1553,6 @@ function saveProblemNotes() {
     userProgress.problemNotes[currentNotesProblemId] = note;
     saveUserData();
     showNotification("Notes saved successfully 📝", "success");
-    // Direct DOM diff update for the notes icon on the problem card
-    const notesBtn = document.querySelector(`.problems-grid .notes-btn[data-id="${currentNotesProblemId}"]`);
-    if (notesBtn) {
-      notesBtn.classList.toggle("has-notes", !!note);
-    }
   }
   closeNotesModal();
 }
@@ -2518,12 +1779,12 @@ function openRoadmapStepModal(stepIndex, type = 'basic') {
   const titleEl = document.getElementById("roadmapStepModalTitle");
   if (titleEl) titleEl.textContent = step.title;
   const theoryEl = document.getElementById("roadmapStepTheoryContent");
-  if (theoryEl) theoryEl.innerHTML = window.DOMSanitizer.sanitizeHTML(step.theory);
+  if (theoryEl) theoryEl.innerHTML = step.theory;
   const complexitySection = document.getElementById("roadmapStepComplexitySection");
   if (step.complexity && step.complexity.length > 0 && complexitySection) {
     complexitySection.classList.remove("hidden");
     const body = document.getElementById("roadmapStepComplexityBody");
-    if (body) body.innerHTML = step.complexity.map(item => `<tr><td>${escapeHtml(item.op)}</td><td>${escapeHtml(item.time)}</td><td>${escapeHtml(item.space)}</td></tr>`).join("");
+    if (body) body.innerHTML = step.complexity.map(item => `<tr><td>${item.op}</td><td>${item.time}</td><td>${item.space}</td></tr>`).join("");
   } else if (complexitySection) complexitySection.classList.add("hidden");
   const quizSection = document.getElementById("roadmapStepQuizSection");
   const problemsSection = document.getElementById("roadmapStepProblemsSection");
@@ -2532,7 +1793,7 @@ function openRoadmapStepModal(stepIndex, type = 'basic') {
     problemsSection.classList.add("hidden");
     const quizContent = document.getElementById("roadmapStepQuizContent");
     const isCompleted = userProgress.completedRoadmapSteps.includes(step.id);
-    if (quizContent) quizContent.innerHTML = step.quiz.map((q, qIndex) => `<div class="quiz-question-container" data-qindex="${qIndex}"><div class="quiz-question-text">${qIndex + 1}. ${escapeHtml(q.question)}</div><ul class="quiz-options-list">${q.options.map((opt, oIndex) => `<li class="quiz-option-item" ${isCompleted && oIndex === q.correct ? 'class="quiz-option-item correct"' : ''} ${isCompleted ? 'style="pointer-events:none; cursor:default;"' : ''} data-oindex="${oIndex}" onclick="${isCompleted ? '' : `selectQuizOption(${step.id}, ${qIndex}, ${oIndex}, this)`}">${escapeHtml(opt)}</li>`).join("")}</ul><div class="quiz-feedback ${isCompleted ? 'correct' : 'hidden'}">${isCompleted ? `Correct! ${escapeHtml(q.explanation)}` : ''}</div></div>`).join("");
+    if (quizContent) quizContent.innerHTML = step.quiz.map((q, qIndex) => `<div class="quiz-question-container" data-qindex="${qIndex}"><div class="quiz-question-text">${qIndex + 1}. ${q.question}</div><ul class="quiz-options-list">${q.options.map((opt, oIndex) => `<li class="quiz-option-item" ${isCompleted && oIndex === q.correct ? 'class="quiz-option-item correct"' : ''} ${isCompleted ? 'style="pointer-events:none; cursor:default;"' : ''} data-oindex="${oIndex}" onclick="${isCompleted ? '' : `selectQuizOption(${step.id}, ${qIndex}, ${oIndex}, this)`}">${opt}</li>`).join("")}</ul><div class="quiz-feedback ${isCompleted ? 'correct' : 'hidden'}">${isCompleted ? `Correct! ${q.explanation}` : ''}</div></div>`).join("");
     const submitBtn = document.getElementById("roadmapStepSubmitQuizBtn");
     if (submitBtn) {
       if (isCompleted) submitBtn.style.display = "none";
@@ -2546,7 +1807,7 @@ function openRoadmapStepModal(stepIndex, type = 'basic') {
       const prob = practiceProblems.find(p => p.id === pid);
       if (!prob) return "";
       const isSolved = userProgress.completedProblems.includes(pid);
-      return `<li class="roadmap-problem-item"><div class="roadmap-problem-info"><span class="roadmap-problem-title">${escapeHtml(prob.title)}</span><div class="roadmap-problem-meta"><span class="difficulty-badge ${getDifficultyClass(prob.difficulty)}">${escapeHtml(prob.difficulty)}</span><span>Acceptance: ${escapeHtml(prob.acceptance)}</span></div></div><div class="roadmap-problem-action">${isSolved ? `<span class="roadmap-problem-status completed"><i class="fas fa-check-circle"></i> Solved</span>` : `<button class="btn btn-outline btn-sm" onclick="openCodingProblem(${pid})"><i class="fas fa-play"></i> Solve</button>`}</div></li>`;
+      return `<li class="roadmap-problem-item"><div class="roadmap-problem-info"><span class="roadmap-problem-title">${prob.title}</span><div class="roadmap-problem-meta"><span class="difficulty-badge ${getDifficultyClass(prob.difficulty)}">${prob.difficulty}</span><span>Acceptance: ${prob.acceptance}</span></div></div><div class="roadmap-problem-action">${isSolved ? `<span class="roadmap-problem-status completed"><i class="fas fa-check-circle"></i> Solved</span>` : `<button class="btn btn-outline btn-sm" onclick="openCodingProblem(${pid})"><i class="fas fa-play"></i> Solve</button>`}</div></li>`;
     }).join("");
   }
   modal.classList.add("active");
@@ -2640,58 +1901,38 @@ function updateCurrentDate() {
   if (dateEl) dateEl.textContent = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
 }
 
-let lastActivityListKey = "";
 function updateActivityList() {
   const activityList = document.getElementById("activityList");
   if (!activityList) return;
-  const currentKey = userProgress.completedProblems.slice(-5).join(",");
-  if (lastActivityListKey === currentKey && activityList.innerHTML !== "") return;
-
-  if (userProgress.completedProblems.length === 0) { activityList.innerHTML = '<p class="empty-state">No recent activity. Start solving problems!</p>'; lastActivityListKey = currentKey; return; }
+  if (userProgress.completedProblems.length === 0) { activityList.innerHTML = '<p class="empty-state">No recent activity. Start solving problems!</p>'; return; }
   const activities = userProgress.completedProblems.slice(-5).map(pid => { const problem = practiceProblems.find(p => p.id === pid); return { problem: problem ? problem.title : "Unknown", time: "Today" }; });
   activityList.innerHTML = activities.map(activity => `<div class="activity-item"><div class="activity-type"><span class="activity-icon"><i class="fas fa-code"></i></span><span>Solved: ${activity.problem}</span></div><span class="activity-time">${activity.time}</span></div>`).join("");
-  lastActivityListKey = currentKey;
 }
 
-let lastRecentProblemsKey = "";
 function updateRecentProblems() {
   const container = document.getElementById("recentProblemsList");
   if (!container) return;
-  const currentKey = (userProgress.recentProblems || []).join(",");
-  if (lastRecentProblemsKey === currentKey && container.innerHTML !== "") return;
-
-  if (!userProgress.recentProblems || userProgress.recentProblems.length === 0) { container.innerHTML = "<p>No recently viewed problems</p>"; lastRecentProblemsKey = currentKey; return; }
+  if (!userProgress.recentProblems || userProgress.recentProblems.length === 0) { container.innerHTML = "<p>No recently viewed problems</p>"; return; }
   container.innerHTML = userProgress.recentProblems.map(id => { const problem = practiceProblems.find(p => p.id === id); return problem ? `<div class="recent-problem" data-id="${problem.id}">${problem.title}</div>` : ""; }).join("");
   container.querySelectorAll(".recent-problem").forEach(item => { item.addEventListener("click", () => { const problemId = parseInt(item.dataset.id); const problem = practiceProblems.find(p => p.id === problemId); if (problem) openQuizEditor(problem); }); });
-  lastRecentProblemsKey = currentKey;
 }
 
-let lastFreezeHistoryKey = "";
 function updateFreezeHistoryList() {
   const freezeHistoryList = document.getElementById("freezeHistoryList");
   if (!freezeHistoryList) return;
   const history = userProgress.freezeHistory || [];
-  const currentKey = history.slice(-5).map(h => `${h.reason}_${h.date}`).join(",");
-  if (lastFreezeHistoryKey === currentKey && freezeHistoryList.innerHTML !== "") return;
-
-  if (history.length === 0) { freezeHistoryList.innerHTML = '<p class="empty-state">No freezes used yet.</p>'; lastFreezeHistoryKey = currentKey; return; }
+  if (history.length === 0) { freezeHistoryList.innerHTML = '<p class="empty-state">No freezes used yet.</p>'; return; }
   freezeHistoryList.innerHTML = history.slice(-5).reverse().map(h => `<div class="activity-item"><div class="activity-type"><span class="activity-icon"><i class="fas fa-snowflake" style="color:#00d2ff;"></i></span><span>${h.reason}</span></div><span class="activity-time">${new Date(h.date).toLocaleDateString()}</span></div>`).join("");
-  lastFreezeHistoryKey = currentKey;
 }
 
-let lastBadgesKey = "";
 function updateBadges() {
   const container = document.getElementById("badgesContainer");
   const grid = document.getElementById("badgesGrid");
-  const currentKey = `${userProgress.completedProblems.length}_${userProgress.streak}_${userProgress.xp}`;
-  if (lastBadgesKey === currentKey && container && container.innerHTML !== "" && (!grid || grid.innerHTML !== "")) return;
-
   const badges = [{ id: 1, icon: "🌟", name: "First Steps", description: "Begin your journey", criteria: "Solve 1 problem", earned: userProgress.completedProblems.length >= 1 }, { id: 2, icon: "🔥", name: "On Fire", description: "Keep the momentum going", criteria: "Maintain a 7-day streak", earned: userProgress.streak >= 7 }, { id: 3, icon: "💎", name: "Diamond", description: "Reach a major XP milestone", criteria: "Earn 5,000 XP", earned: userProgress.xp >= 5000 }, { id: 4, icon: "🚀", name: "Rocket", description: "Speed through problems", criteria: "Solve 50 problems", earned: userProgress.completedProblems.length >= 50 }, { id: 5, icon: "👑", name: "Master", description: "Achieve expert problem-solving", criteria: "Solve 100 problems", earned: userProgress.completedProblems.length >= 100 }, { id: 6, icon: "🎯", name: "Sharpshooter", description: "Hit the target with consistency", criteria: "Solve 25 problems and earn 2,500 XP", earned: userProgress.completedProblems.length >= 25 && userProgress.xp >= 2500 }];
   const earned = badges.filter(b => b.earned).map(b => b.id);
   if (JSON.stringify(earned) !== JSON.stringify(userProgress.badges)) { userProgress.badges = earned; saveUserData(); }
   if (container) container.innerHTML = badges.map(badge => `<div class="badge ${badge.earned ? '' : 'locked'}" tabindex="0"><span class="badge-tooltip"><strong>${badge.name}</strong><span>${badge.description}</span><span>${badge.criteria}</span></span>${badge.icon}</div>`).join("");
   if (grid) grid.innerHTML = badges.map(badge => `<div class="badge-lg ${badge.earned ? '' : 'locked'}" tabindex="0"><span class="badge-tooltip"><strong>${badge.name}</strong><span>${badge.description}</span><span>${badge.criteria}</span></span>${badge.icon}</div>`).join("");
-  lastBadgesKey = currentKey;
 }
 
 // ============================================
@@ -3050,18 +2291,11 @@ function parseDateKey(key) { const [y, m, d] = key.split("-").map(Number); retur
 
 function getActivityLevel(count) { if (!count || count === 0) return 0; if (count === 1) return 1; if (count === 2) return 2; if (count <= 4) return 3; return 4; }
 
-let lastRenderedHeatmapDataKey = "";
 function renderActivityHeatmap() {
   const container = document.getElementById("activityHeatmap");
   if (!container) return;
   const activityData = userProgress.activityData || {};
   const today = new Date();
-  const todayKey = today.toLocaleDateString("en-US");
-  const currentDataKey = `${JSON.stringify(activityData)}_${todayKey}`;
-  if (lastRenderedHeatmapDataKey === currentDataKey && container.innerHTML !== "") {
-    return;
-  }
-  
   today.setHours(23, 59, 59, 999);
   const WEEKS_TO_SHOW = 52;
   const dayOfWeek = today.getDay();
@@ -3106,7 +2340,6 @@ function renderActivityHeatmap() {
   html += "</div>";
   container.innerHTML = html;
   attachHeatmapTooltips();
-  lastRenderedHeatmapDataKey = currentDataKey;
 }
 
 function attachHeatmapTooltips() {
@@ -3192,11 +2425,11 @@ function openQuizEditor(problem) {
     if (problem.description) {
       let descHTML = problem.description;
       if (problem.constraints) descHTML += "<br><br><strong>Constraints:</strong><br>" + problem.constraints.map(c => `• ${c}`).join("<br>");
-      descEl.innerHTML = window.DOMSanitizer.sanitizeHTML(descHTML);
+      descEl.innerHTML = descHTML;
     } else descEl.textContent = `Solve the "${problem.title}" problem.`;
   }
   const quizExamples = document.getElementById("quizExamples");
-  if (quizExamples) quizExamples.innerHTML = window.DOMSanitizer.sanitizeHTML(generateExamples(problem));
+  if (quizExamples) quizExamples.innerHTML = generateExamples(problem);
   renderTestCases(generateTestCases(problem));
   const editor = document.getElementById("codeEditor");
   const langSelect = document.getElementById("languageSelect");
@@ -3223,10 +2456,6 @@ function openQuizEditor(problem) {
   const outputIcon = document.getElementById('outputToggleIcon');
   if (outputPanel) outputPanel.classList.remove('collapsed');
   if (outputIcon) { outputIcon.classList.remove('fa-chevron-up'); outputIcon.classList.add('fa-chevron-down'); }
-  const quizCloseBtn = document.getElementById("quizModalClose");
-  if (quizCloseBtn) {
-    quizCloseBtn.onclick = () => closeQuizEditor();
-  }
   modal.classList.add("active");
   updateLineNumbers();
   syncScroll();
@@ -3317,36 +2546,23 @@ function getDefaultCode(lang, problem) {
     return getClassTemplate(lang, problem);
   }
 
-  const hasNullableInt = problem.testCases?.some(tc =>
-    tc.input.some(v => Array.isArray(v) && v.some(x => x === null || x === undefined))
-  );
-
   const paramTypes = tc?.input ? tc.input.map(v => mapType(j2t(v), lang)) : [];
   const retType = tc?.expected !== undefined ? mapType(j2t(tc.expected), lang) : 'auto';
 
-  const cppIntType = hasNullableInt ? 'vector<optional<int>>' : 'vector<int>';
-
   const paramStr = params.length
     ? params.map((p, i) => {
-        let t = paramTypes[i] || 'auto';
-        if (lang === 'cpp') {
-          if (t === 'vector<int>' && hasNullableInt) t = cppIntType;
-          return t + ' ' + p;
-        }
+        const t = paramTypes[i] || 'auto';
+        if (lang === 'cpp') return t + ' ' + p;
         if (lang === 'c') {
           const origJt = tc?.input ? j2t(tc.input[i]) : null;
           const is2d = origJt === 'int[][]';
           const isArray = origJt && origJt.endsWith('[]');
           if (is2d) return t + ' ' + p + ', int* ' + p + 'Sizes, int ' + p + 'Size';
-          if (isArray && hasNullableInt && origJt === 'int[]') return t + ' ' + p + ', int* ' + p + 'Valid, int ' + p + 'Size';
           if (isArray) return t + ' ' + p + ', int ' + p + 'Size';
           return t + ' ' + p;
         }
         if (lang === 'java') return t + ' ' + p;
-        if (lang === 'swift') {
-          if (t === '[Int]' && hasNullableInt) t = '[Int?]';
-          return '_ ' + p + ': ' + t;
-        }
+        if (lang === 'swift') return '_ ' + p + ': ' + t;
         return p;
       }).join(', ')
     : 'params';
@@ -3358,15 +2574,11 @@ function getDefaultCode(lang, problem) {
     docComment = lines.map(l => prefix + l).join('\n') + '\n';
   }
 
-  const cppDefaultIncludes = hasNullableInt
-    ? '#include <optional>\n#include <string>\n#include <stack>\n#include <climits>\nusing namespace std;\n\n'
-    : '#include <string>\n#include <stack>\nusing namespace std;\n\n';
-
   const templates = {
     javascript: docComment + "function " + fnName + "(" + (params.join(', ') || 'params') + ") {\n    \n}",
     python: docComment + "def " + fnName + "(" + (params.join(', ') || 'params') + "):\n    pass\n",
     java: "class Solution {\n" + docComment.replace(/^(.)/gm, '    $1') + "    public " + retType + " " + fnName + "(" + paramStr + ") {\n        \n    }\n}",
-    cpp: cppDefaultIncludes + docComment + retType + " " + fnName + "(" + paramStr + ") {\n    \n}",
+    cpp: '#include <string>\n#include <stack>\nusing namespace std;\n\n' + docComment + retType + " " + fnName + "(" + paramStr + ") {\n    \n}",
     c: '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdbool.h>\n\n' + docComment + retType + " " + fnName + "(" + paramStr + ") {\n    \n}",
     swift: docComment + "func " + fnName + "(" + paramStr + ") -> " + retType + " {\n    \n}"
   };
@@ -3374,7 +2586,7 @@ function getDefaultCode(lang, problem) {
 }
 
 function generateExamples(problem) {
-  const examples = { 1: `<strong>Example 1:</strong><br>Input: nums = [2,7,11,15], target = 9<br>Output: [0,1]<br><br><strong>Follow-up:</strong> Can you solve it in O(n) using a Hash Map?`, 2: `<strong>Example 1:</strong><br>Input: s = "()"<br>Output: true<br><br><strong>Follow-up:</strong> Can you solve it in O(n) using a Stack?`, 3: `<strong>Example 1:</strong><br>Input: list1 = [1,2,4], list2 = [1,3,4]<br>Output: [1,1,2,3,4,4]<br><br><strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`, 4: `<strong>Example 1:</strong><br>Input: nums = [-2,1,-3,4,-1,2,1,-5,4]<br>Output: 6<br><br><strong>Follow-up:</strong> Can you solve it using Kadane's Algorithm in O(n)?`, 6: `<strong>Example 1:</strong><br>Input: adjList = [[2,4],[1,3],[2,4],[1,3]]<br>Output: [[2,4],[1,3],[2,4],[1,3]]<br><br><strong>Follow-up:</strong> Can you solve it using both BFS and DFS approaches?`, 7: `<strong>Example 1:</strong><br>Input: nums = [10,9,2,5,3,7,101,18]<br>Output: 4<br><br><strong>Follow-up:</strong> Can you improve from O(n²) to O(n log n) using binary search?`, 9: `<strong>Example 1:</strong><br>Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]<br>Output: 6<br><br><strong>Follow-up:</strong> Can you solve it in O(n) time and O(1) space using the two-pointer technique?`, 10: `<strong>Example 1:</strong><br>Input: head = [1,2,3,4,5]<br>Output: [5,4,3,2,1]<br><br><strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`, 11: `<strong>Example 1:</strong><br>Input: root = [4,2,7,1,3,6,9]<br>Output: [4,7,2,9,6,3,1]<br><br><strong>Follow-up:</strong> Can you solve it both recursively and iteratively using a queue or stack?`, 12: `<strong>Example 1:</strong><br>Input: root = [2,1,3]<br>Output: true<br><br><strong>Follow-up:</strong> Can you solve it without recursion using iterative inorder traversal?` };
+  const examples = { 1: `<strong>Example 1:</strong><br>Input: nums = [2,7,11,15], target = 9<br>Output: [0,1]<br><br><strong>Follow-up:</strong> Can you solve it in O(n) using a Hash Map?`, 2: `<strong>Example 1:</strong><br>Input: s = "()"<br>Output: true<br><br><strong>Follow-up:</strong> Can you solve it in O(n) using a Stack?`, 3: `<strong>Example 1:</strong><br>Input: list1 = [1,2,4], list2 = [1,3,4]<br>Output: [1,1,2,3,4,4]<br><br><strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`, 4: `<strong>Example 1:</strong><br>Input: nums = [-2,1,-3,4,-1,2,1,-5,4]<br>Output: 6<br><br><strong>Follow-up:</strong> Can you solve it using Kadane's Algorithm in O(n)?`, 6: `<strong>Example 1:</strong><br>Input: adjList = [[2,4],[1,3],[2,4],[1,3]]<br>Output: [[2,4],[1,3],[2,4],[1,3]]<br><br><strong>Follow-up:</strong> Can you solve it using both BFS and DFS approaches?`, 7: `<strong>Example 1:</strong><br>Input: nums = [10,9,2,5,3,7,101,18]<br>Output: 4<br><br><strong>Follow-up:</strong> Can you improve from O(n²) to O(n log n) using binary search?`, 9: `<strong>Example 1:</strong><br>Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]<br>Output: 6<br><br><strong>Follow-up:</strong> Can you solve it in O(n) time and O(1) space using the two-pointer technique?`, 10: `<strong>Example 1:</strong><br>Input: head = [1,2,3,4,5]<br>Output: [5,4,3,2,1]<br><br><strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`, 11: `<strong>Example 1:</strong><br>Input: root = [4,2,7,1,3,6,9]<br>Output: [4,7,2,9,6,3,1]<br><br><strong>Follow-up:</strong> Can you solve it both recursively and iteratively using a queue or stack?` };
   return examples[problem.id] || "<strong>Example:</strong><br>Solve this problem";
 }
 
@@ -3392,8 +2604,8 @@ function renderTestCases(testCases, results) {
       const statusClass = passed ? 'passed' : 'failed';
       const icon = passed ? '✓' : '✗';
       const label = passed ? 'PASS' : 'FAIL';
-      const actualStr = r.actual !== undefined && r.actual !== null ? escapeHtml(JSON.stringify(r.actual)) : '';
-      const errorStr = escapeHtml(r.error || '');
+      const actualStr = r.actual !== undefined && r.actual !== null ? JSON.stringify(r.actual) : '';
+      const errorStr = r.error || '';
       return `<div class="test-case ${r.ran ? statusClass : ''}">
         <div class="test-case-header">
           <span class="test-case-name">Test ${i + 1}</span>
@@ -3402,8 +2614,8 @@ function renderTestCases(testCases, results) {
           </span>
         </div>
         <div class="test-case-details">
-          <div class="test-case-input">Input: <code>${Array.isArray(tc.input) ? tc.input.map(v => escapeHtml(JSON.stringify(v))).join(', ') : escapeHtml(JSON.stringify(tc.input))}</code></div>
-          <div class="test-case-expected">Expected: <code>${escapeHtml(JSON.stringify(tc.expected))}</code></div>
+          <div class="test-case-input">Input: <code>${Array.isArray(tc.input) ? tc.input.map(v => JSON.stringify(v)).join(', ') : JSON.stringify(tc.input)}</code></div>
+          <div class="test-case-expected">Expected: <code>${JSON.stringify(tc.expected)}</code></div>
           ${r.ran && (passed !== undefined) ? `<div class="test-case-actual">Actual: <code>${actualStr || errorStr}</code></div>` : ''}
         </div>
       </div>`;
@@ -3416,8 +2628,8 @@ function renderTestCases(testCases, results) {
           <span class="test-case-result pending">⏳ Pending</span>
         </div>
         <div class="test-case-details">
-          <div class="test-case-input">Input: <code>${Array.isArray(tc.input) ? tc.input.map(v => escapeHtml(JSON.stringify(v))).join(', ') : escapeHtml(JSON.stringify(tc.input))}</code></div>
-          <div class="test-case-expected">Expected: <code>${escapeHtml(JSON.stringify(tc.expected))}</code></div>
+          <div class="test-case-input">Input: <code>${Array.isArray(tc.input) ? tc.input.map(v => JSON.stringify(v)).join(', ') : JSON.stringify(tc.input)}</code></div>
+          <div class="test-case-expected">Expected: <code>${JSON.stringify(tc.expected)}</code></div>
         </div>
       </div>
     `).join("");
@@ -3482,15 +2694,11 @@ function valToLit(v, t) {
 function genCppHarness(code, fn, tcs, isClass) {
   const outType = j2t(tcs[0].expected);
   const inTypes = tcs[0].input.map(v => j2t(v));
-  const hasNullableInt = inTypes.some(t => t === 'int[]') && tcs.some(tc => tc.input.some((v, i) => inTypes[i] === 'int[]' && Array.isArray(v) && v.some(x => x === null || x === undefined)));
-  let s = '#include <iostream>\n#include <string>\n#include <vector>\n' + (hasNullableInt ? '#include <optional>\n' : '') + '#include <sstream>\nusing namespace std;\n\n';
+  let s = '#include <iostream>\n#include <string>\n#include <vector>\n#include <sstream>\nusing namespace std;\n\n';
   s += code + '\n\n';
   s += 'string __j(bool v) { return v ? "true" : "false"; }\n';
   s += 'string __j(int v) { return to_string(v); }\n';
   s += 'string __j(const string& v) { return "\\"" + v + "\\""; }\n';
-  if (hasNullableInt) {
-    s += 'template<typename T>\nstring __j(const optional<T>& v) {\n  if (!v.has_value()) return "null";\n  return __j(v.value());\n}\n';
-  }
   s += 'template<typename T>\nstring __j(const vector<T>& v) {\n  if (v.empty()) return "[]";\n  stringstream ss;\n  ss << "[" << __j(v[0]);\n  for (size_t i=1;i<v.size();i++) ss << "," << __j(v[i]);\n  ss << "]";\n  return ss.str();\n}\n';
   s += 'int main() {\n  cout << "__RESULT__:";\n  cout << "[";\n';
   for (let i = 0; i < tcs.length; i++) {
@@ -3499,14 +2707,8 @@ function genCppHarness(code, fn, tcs, isClass) {
     let callArgs = '';
     for (let j = 0; j < inTypes.length; j++) {
       if (j > 0) callArgs += ', ';
-      if (inTypes[j] === 'int[]') {
-        const vals = tcs[i].input[j];
-        if (hasNullableInt) {
-          callArgs += 'vector<optional<int>>{' + vals.map(x => x === null || x === undefined ? 'std::nullopt' : String(x)).join(',') + '}';
-        } else {
-          callArgs += 'vector<int>{' + vals.join(',') + '}';
-        }
-      } else if (inTypes[j] === 'int[][]') callArgs += 'vector<vector<int>>{' + tcs[i].input[j].map(row => '{' + row.join(',') + '}').join(',') + '}';
+      if (inTypes[j] === 'int[]') callArgs += 'vector<int>{' + tcs[i].input[j].map(x => x === null || x === undefined ? 0 : x).join(',') + '}';
+      else if (inTypes[j] === 'int[][]') callArgs += 'vector<vector<int>>{' + tcs[i].input[j].map(row => '{' + row.join(',') + '}').join(',') + '}';
       else if (inTypes[j] === 'string[]') callArgs += 'vector<string>{' + tcs[i].input[j].map(x => '"' + String(x).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"').join(',') + '}';
       else if (inTypes[j] === 'string[][]') callArgs += 'vector<vector<string>>{' + tcs[i].input[j].map(row => '{' + row.map(x => '"' + String(x).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"').join(',') + '}').join(',') + '}';
       else callArgs += valToLit(tcs[i].input[j], inTypes[j]);
@@ -3515,13 +2717,7 @@ function genCppHarness(code, fn, tcs, isClass) {
     s += '    cout << "{\\"index\\":' + i + ',\\"ran\\":true,\\"passed\\":";\n';
     let compExpr = '"false"';
     if (outType === 'int[]') {
-      const exp = tcs[i].expected;
-      if (hasNullableInt) {
-        const expOpt = 'vector<optional<int>>{' + exp.map(x => x === null || x === undefined ? 'std::nullopt' : String(x)).join(',') + '}';
-        compExpr = '(__r == ' + expOpt + ' ? "true" : "false")';
-      } else {
-        compExpr = '(__r == vector<int>{' + exp.map(x => x === null || x === undefined ? 0 : x).join(',') + '} ? "true" : "false")';
-      }
+      compExpr = '(__r == vector<int>{' + tcs[i].expected.map(x => x === null || x === undefined ? 0 : x).join(',') + '} ? "true" : "false")';
     } else if (outType === 'int[][]') {
       compExpr = '(__r == vector<vector<int>>{' + tcs[i].expected.map(row => '{' + row.join(',') + '}').join(',') + '} ? "true" : "false")';
     } else if (outType === 'int') {
@@ -3592,7 +2788,6 @@ function genJavaHarness(code, fn, tcs, isClass) {
 function genCHarness(code, fn, tcs, isClass) {
   const outType = j2t(tcs[0].expected);
   const inTypes = tcs[0].input.map(v => j2t(v));
-  const hasNullableInt = inTypes.some(t => t === 'int[]') && tcs.some(tc => tc.input.some((v, i) => inTypes[i] === 'int[]' && Array.isArray(v) && v.some(x => x === null || x === undefined)));
   let s = '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdbool.h>\n\n';
   s += code + '\n\n';
   if (outType === 'int[]') {
@@ -3613,13 +2808,9 @@ function genCHarness(code, fn, tcs, isClass) {
       if (inTypes[j] === 'int[]') {
         const arr = tcs[i].input[j];
         if (arr.length === 0) {
-          callArgs += hasNullableInt ? 'NULL, NULL, 0' : 'NULL, 0';
-        } else if (hasNullableInt) {
-          const vals = arr.map(x => x === null || x === undefined ? 0 : x);
-          const valid = arr.map(x => x === null || x === undefined ? 0 : 1);
-          callArgs += '(int[]){' + vals.join(',') + '}, (int[]){' + valid.join(',') + '}, ' + arr.length;
+          callArgs += 'NULL, 0';
         } else {
-          callArgs += '(int[]){' + arr.join(',') + '}, ' + arr.length;
+          callArgs += '(int[]){' + arr.map(x => x).join(',') + '}, ' + arr.length;
         }
       } else if (inTypes[j] === 'int[][]') {
         const arr = tcs[i].input[j];
@@ -3695,15 +2886,11 @@ function genCHarness(code, fn, tcs, isClass) {
 function genSwiftHarness(code, fn, tcs, isClass) {
   const outType = j2t(tcs[0].expected);
   const inTypes = tcs[0].input.map(v => j2t(v));
-  const hasNullableInt = inTypes.some(t => t === 'int[]') && tcs.some(tc => tc.input.some((v, i) => inTypes[i] === 'int[]' && Array.isArray(v) && v.some(x => x === null || x === undefined)));
   let s = 'import Foundation\n\n';
   s += code + '\n\n';
   s += 'func __j(_ v: Int) -> String { return String(v) }\n';
   s += 'func __j(_ v: Bool) -> String { return v ? "true" : "false" }\n';
   s += 'func __j(_ v: String) -> String { return "\\"\\(v)\\"" }\n';
-  if (hasNullableInt) {
-    s += 'func __j(_ v: [Int?]) -> String {\n  return "[" + v.map { $0.map(String.init) ?? "null" }.joined(separator: ",") + "]"\n}\n';
-  }
   if (outType === 'int[]' || outType === 'int[][]') {
     s += 'func __j(_ v: [Int]) -> String {\n  if v.isEmpty { return "[]" }\n  return "[" + v.map(String.init).joined(separator: ",") + "]"\n}\n';
   }
@@ -3717,13 +2904,8 @@ function genSwiftHarness(code, fn, tcs, isClass) {
     let callArgs = '';
     for (let j = 0; j < inTypes.length; j++) {
       if (j > 0) callArgs += ', ';
-      if (inTypes[j] === 'int[]') {
-        if (hasNullableInt) {
-          callArgs += '[' + tcs[i].input[j].map(x => x === null || x === undefined ? 'nil' : String(x)).join(',') + '] as [Int?]';
-        } else {
-          callArgs += '[' + tcs[i].input[j].join(',') + '] as [Int]';
-        }
-      } else if (inTypes[j] === 'int[][]') callArgs += '[' + tcs[i].input[j].map(row => '[' + row.join(',') + ']').join(',') + '] as [[Int]]';
+      if (inTypes[j] === 'int[]') callArgs += '[' + tcs[i].input[j].map(x => x === null || x === undefined ? 0 : x).join(',') + '] as [Int]';
+      else if (inTypes[j] === 'int[][]') callArgs += '[' + tcs[i].input[j].map(row => '[' + row.join(',') + ']').join(',') + '] as [[Int]]';
       else if (inTypes[j] === 'string[]') callArgs += '[' + tcs[i].input[j].map(x => '"' + String(x).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"').join(',') + '] as [String]';
       else if (inTypes[j] === 'string[][]') callArgs += '[' + tcs[i].input[j].map(row => '[' + row.map(x => '"' + String(x).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"').join(',') + ']').join(',') + '] as [[String]]';
       else callArgs += valToLit(tcs[i].input[j], inTypes[j]);
@@ -3768,6 +2950,7 @@ const API_BASE = (location.hostname === 'localhost' || location.hostname === '12
   : '';
 
 async function executeViaApi(lang, code, originalCode) {
+  // Make sure this points to your new secure Node.js route
   const response = await fetch(`${API_BASE}/api/execute`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -3789,9 +2972,10 @@ async function executeViaApi(lang, code, originalCode) {
     throw new Error(result.message || "Execution failed");
   }
 
+  // JDoodle returns output directly
   return { 
     stdout: result.data.output || "", 
-    stderr: "",
+    stderr: "", // JDoodle merges stderr into output
     memory: result.data.memory,
     cpuTime: result.data.cpuTime
   };
@@ -3813,23 +2997,6 @@ function parseTestResults(stdout, testCount) {
   return { allPassed: false, testResults: Array(testCount).fill({ ran: false, passed: false, error: "No test result marker found" }), rawOutput: stdout };
 }
 
-function executeJS(code) {
-  const logs = [];
-  const origLog = console.log;
-  console.log = function(...args) {
-    logs.push(args.map(String).join(" "));
-  };
-  try {
-    const result = (0, eval)(code);
-    if (result !== undefined) logs.push(String(result));
-    return { success: true, stdout: logs.join("\n") };
-  } catch (e) {
-    return { success: false, stdout: logs.join("\n"), error: e.message };
-  } finally {
-    console.log = origLog;
-  }
-}
-
 async function executeCode(code, lang, problem) {
   const testCases = generateTestCases(problem);
   if (!testCases || testCases.length === 0) {
@@ -3842,29 +3009,30 @@ async function executeCode(code, lang, problem) {
   let stdout = "", stderr = "", memory = "", cpuTime = "";
   
   try {
-    if (lang === "javascript") {
-      const jsResult = executeJS(harnessCode);
-      if (jsResult.success) {
-        stdout = jsResult.stdout;
-      } else {
+    const result = await executeViaApi(lang, harnessCode, code);
+    stdout = result.stdout;
+    memory = result.memory;
+    cpuTime = result.cpuTime;
+  } catch (e) {
+    if (lang === "javascript" && isAiInterviewerActive) {
+      try {
+        const { executeSandboxedCode } = await import('./modules/code-executor.js');
+        const logs = await executeSandboxedCode(harnessCode, 5000);
+        stdout = logs.join("\n");
+      } catch (sandboxErr) {
         return { 
           allPassed: false, 
-          testResults: testCases.map(() => ({ ran: false, passed: false, error: jsResult.error })), 
-          rawOutput: jsResult.stdout + "\n" + jsResult.error 
+          testResults: testCases.map(() => ({ ran: false, passed: false, error: sandboxErr.message })), 
+          rawOutput: sandboxErr.message 
         };
       }
     } else {
-      const result = await executeViaApi(lang, harnessCode, code);
-      stdout = result.stdout;
-      memory = result.memory;
-      cpuTime = result.cpuTime;
+      return { 
+        allPassed: false, 
+        testResults: testCases.map(() => ({ ran: false, passed: false, error: e.message })), 
+        rawOutput: e.message 
+      };
     }
-  } catch (e) {
-    return { 
-      allPassed: false, 
-      testResults: testCases.map(() => ({ ran: false, passed: false, error: e.message })), 
-      rawOutput: e.message 
-    };
   }
   
   const parsedResults = parseTestResults(stdout, testCases.length);
@@ -3873,24 +3041,6 @@ async function executeCode(code, lang, problem) {
     memory: memory || "N/A",
     cpuTime: cpuTime || "N/A"
   };
-
-  if (lang === 'javascript') {
-    if (typeof window.analyzeComplexity !== 'function') {
-      await new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = 'modules/complexity-client.js';
-        script.onload = resolve;
-        script.onerror = resolve;
-        document.head.appendChild(script);
-      });
-    }
-    if (typeof window.analyzeComplexity === 'function') {
-      const complexity = await window.analyzeComplexity(code);
-      if (complexity) {
-        parsedResults.metrics.complexity = complexity;
-      }
-    }
-  }
   
   return parsedResults;
 }
@@ -3940,11 +3090,9 @@ async function runQuizCode() {
       setOutput(out, "error");
     }
     if (result.metrics && result.metrics.cpuTime) {
-      let metricText = `\n\n⏱️ Execution Time: ${result.metrics.cpuTime} sec\n💾 Memory Used: ${result.metrics.memory} KB`;
-      if (result.metrics.complexity) {
-        metricText += `\n📊 Time Complexity: ${result.metrics.complexity}`;
-      }
+      const metricText = `\n\n⏱️ Execution Time: ${result.metrics.cpuTime} sec\n💾 Memory Used: ${result.metrics.memory} KB`;
       const el = document.getElementById("quizOutputContent");
+      if (el) el.innerHTML += `<pre style="color:var(--accent); margin-top:10px;">${metricText}</pre>`;
       if (el) {
         const metricsEl = document.createElement("pre");
         metricsEl.style.color = "var(--accent)";
@@ -4136,22 +3284,6 @@ function toggleOutputPanel() {
   panel.classList.toggle('collapsed');
   if (icon) { if (panel.classList.contains('collapsed')) { icon.classList.remove('fa-chevron-down'); icon.classList.add('fa-chevron-up'); } else { icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down'); } }
 }
-
-(function bindOutputToggle() {
-  function bind() {
-    const header = document.getElementById('outputHeader');
-    if (header && !header._bound) {
-      header.addEventListener('click', toggleOutputPanel);
-      header._bound = true;
-    }
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind);
-  } else {
-    bind();
-  }
-  new MutationObserver(bind).observe(document.body, { childList: true, subtree: true });
-})();
 
 // ============================================
 // CODING PERSONALITY
@@ -4721,7 +3853,6 @@ function showNextFact() {
 function showDailyFact() {
     const factText = document.getElementById('factText');
     const factDate = document.getElementById('factDate');
-    if (!factText || !factDate) return;
     
     factText.textContent = getDailyFact();
     const today = new Date().toLocaleDateString();
@@ -5481,316 +4612,3 @@ window.addEventListener('load', () => {
     window.syncSpacedRepetitionDown();
   }
 });
-
-// ============================================
-// PROBLEM FILTERING WITH CORRECT COUNT
-// ============================================
-
-/**
- * Get selected difficulty from filter buttons
- * @returns {string} Selected difficulty ('all', 'easy', 'medium', 'hard')
- */
-function getSelectedDifficulty() {
-    const activeFilter = document.querySelector('.filter-btn.active');
-    if (activeFilter) {
-        return activeFilter.dataset.filter || 'all';
-    }
-    return 'all';
-}
-
-/**
- * Update the problem count display
- * @param {Array} filteredProblems - Array of filtered problems
- */
-function updateProblemCount(filteredProblems) {
-    // Update visible count
-    const visibleCountEl = document.getElementById('visible-count');
-    if (visibleCountEl) {
-        const total = filteredProblems.length;
-        visibleCountEl.textContent = total;
-    }
-    
-    // Update total count (if separate)
-    const totalCountEl = document.getElementById('total-count');
-    if (totalCountEl) {
-        // This should show total problems before filtering
-        const allProblems = getAllProblems();
-        totalCountEl.textContent = allProblems.length;
-    }
-    
-    // Update the problem count display (legacy)
-    const countElement = document.querySelector('.problem-count');
-    if (countElement) {
-        const total = filteredProblems.length;
-        countElement.textContent = `${total} problem${total !== 1 ? 's' : ''}`;
-    }
-    
-    // Show/hide empty state
-    const emptyState = document.getElementById('emptyState');
-    if (emptyState) {
-        if (filteredProblems.length === 0) {
-            emptyState.classList.remove('hidden');
-        } else {
-            emptyState.classList.add('hidden');
-        }
-    }
-}
-
-/**
- * Get all problems (from your data source)
- * @returns {Array} All practice problems
- */
-function getAllProblems() {
-    // Use your existing problems data
-    return practiceProblems || window.practiceProblems || [];
-}
-
-/**
- * Filter problems based on selected difficulty
- * @param {string} difficulty - 'all', 'easy', 'medium', 'hard'
- * @param {Array} problems - Problems to filter
- * @returns {Array} Filtered problems
- */
-function filterProblemsByDifficulty(difficulty, problems) {
-    if (difficulty === 'all') {
-        return problems;
-    }
-    return problems.filter(problem => 
-        problem.difficulty.toLowerCase() === difficulty.toLowerCase()
-    );
-}
-
-/**
- * Main filter function - handles filtering AND count update
- */
-function filterProblems() {
-    const selectedDifficulty = getSelectedDifficulty();
-    const allProblems = getAllProblems();
-    
-    // Filter problems
-    const filtered = filterProblemsByDifficulty(selectedDifficulty, allProblems);
-    
-    // Render filtered problems
-    renderProblems(filtered);
-    
-    // Update count
-    updateProblemCount(filtered);
-    
-    // Update URL hash if needed (for bookmarking)
-    if (selectedDifficulty !== 'all') {
-        window.location.hash = `filter=${selectedDifficulty}`;
-    }
-}
-
-/**
- * Get filter from URL hash on page load
- */
-const VALID_PROBLEM_FILTERS = new Set(['all', 'easy', 'medium', 'hard', 'favorites']);
-
-function getFilterFromURL() {
-    const params = new URLSearchParams(window.location.hash.slice(1));
-    const filter = params.get('filter') || 'all';
-    return VALID_PROBLEM_FILTERS.has(filter) ? filter : 'all';
-}
-
-/**
- * Apply filter on page load from URL
- */
-function applyFilterFromURL() {
-    const filter = getFilterFromURL();
-    if (filter !== 'all') {
-        const filterBtn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
-        if (filterBtn) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            filterBtn.classList.add('active');
-        }
-    }
-    filterProblems();
-}
-
-// ============================================
-// RENDER PROBLEMS WITH COUNT UPDATE
-// ============================================
-
-const originalRenderProblems = window.renderProblems;
-if (typeof originalRenderProblems === 'function') {
-    window.renderProblems = function(problems) {
-        originalRenderProblems.call(this, problems);
-    };
-}
-
-// ============================================
-// COMPLETE FILTER IMPLEMENTATION
-// ============================================
-
-// Initialize filter buttons on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize filter buttons
-    initFilterButtons();
-    
-    // Apply filter from URL if any
-    applyFilterFromURL();
-    
-    // Initial render
-    filterProblems();
-});
-
-/**
- * Initialize filter buttons with event listeners
- */
-function initFilterButtons() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    
-    filterButtons.forEach((btn) => {
-        btn.addEventListener('click', function() {
-            filterButtons.forEach((b) => {
-                const isActive = b === this;
-                b.classList.toggle('active', isActive);
-                b.setAttribute('aria-pressed', String(isActive));
-            });
-            
-            // Reset pagination to page 1
-            currentPage = 1;
-            
-            // Filter and render
-            filterProblems();
-        });
-    });
-    
-    // Clear filters button
-    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', function() {
-            // Reset to 'all'
-            filterButtons.forEach((b) => b.classList.remove('active'));
-            const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
-            if (allBtn) allBtn.classList.add('active');
-            
-            // Clear search
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.value = '';
-                currentSearch = '';
-            }
-            
-            // Reset and render
-            currentPage = 1;
-            filterProblems();
-        });
-    }
-}
-
-/**
- * Get selected difficulty from active filter button
- */
-function getSelectedDifficulty() {
-    const activeFilter = document.querySelector('.filter-btn.active');
-    if (activeFilter) {
-        return activeFilter.dataset.filter || 'all';
-    }
-    return 'all';
-}
-
-/**
- * Get all problems
- */
-function getAllProblems() {
-    return practiceProblems || [];
-}
-
-/**
- * Filter problems by difficulty
- */
-function filterProblemsByDifficulty(difficulty, problems) {
-    if (difficulty === 'all') {
-        return problems;
-    }
-    if (difficulty === 'favorites') {
-        return problems.filter(p => userProgress.favoriteProblems.includes(p.id));
-    }
-    return problems.filter(problem => 
-        problem.difficulty.toLowerCase() === difficulty.toLowerCase()
-    );
-}
-
-/**
- * Filter problems with search and difficulty
- */
-function filterProblems() {
-    const selectedDifficulty = getSelectedDifficulty();
-    const allProblems = getAllProblems();
-    const searchTerm = currentSearch || '';
-    
-    // Filter by difficulty
-    let filtered = filterProblemsByDifficulty(selectedDifficulty, allProblems);
-    
-    // Filter by search term
-    if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        filtered = filtered.filter(problem => 
-            problem.title.toLowerCase().includes(term) ||
-            problem.tags.some(tag => tag.toLowerCase().includes(term)) ||
-            (problem.description && problem.description.toLowerCase().includes(term))
-        );
-    }
-    
-    // Update count
-    updateProblemCount(filtered);
-    
-    // Render with pagination
-    renderProblemsWithPagination(filtered);
-}
-
-/**
- * Render problems with pagination
- */
-function renderProblemsWithPagination(filteredProblems) {
-    const totalProblems = filteredProblems.length;
-    const totalPages = Math.max(1, Math.ceil(totalProblems / PROBLEMS_PER_PAGE));
-    
-    if (currentPage > totalPages) currentPage = totalPages;
-    
-    const start = (currentPage - 1) * PROBLEMS_PER_PAGE;
-    const end = Math.min(start + PROBLEMS_PER_PAGE, totalProblems);
-    const pageProblems = filteredProblems.slice(start, end);
-    
-    // Render the problems
-    renderProblems(pageProblems);
-    
-    // Update pagination
-    updatePaginationControls(currentPage, totalPages);
-}
-
-/**
- * Update problem count display
- */
-function updateProblemCount(filteredProblems) {
-    const total = filteredProblems.length;
-    const visibleCountEl = document.getElementById('visible-count');
-    const totalCountEl = document.getElementById('total-count');
-    const problemLabel = document.getElementById('problem-label');
-    const emptyState = document.getElementById('emptyState');
-    
-    if (visibleCountEl) {
-        visibleCountEl.textContent = total;
-    }
-    
-    if (totalCountEl) {
-        const allProblems = getAllProblems();
-        totalCountEl.textContent = allProblems.length;
-    }
-    
-    if (problemLabel) {
-        problemLabel.textContent = total === 1 ? 'problem' : 'problems';
-    }
-    
-    if (emptyState) {
-        emptyState.classList.toggle('hidden', total !== 0);
-    }
-    
-    // Legacy support
-    const countElement = document.querySelector('.problem-count');
-    if (countElement) {
-        countElement.textContent = `${total} problem${total !== 1 ? 's' : ''}`;
-    }
-}
