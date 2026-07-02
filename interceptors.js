@@ -8,6 +8,7 @@
     '/api/leaderboard',
     '/api/problem-notes',
     '/api/recommendations',
+    '/api/csrf-token',
   ];
 
   function shouldRedirectOn401(url) {
