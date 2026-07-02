@@ -287,6 +287,26 @@
         color: var(--border-color);
       }
 
+
+      /* Tag Clickable Styles */
+      .tag {
+        cursor: pointer;
+        transition: all 0.25s ease;
+        user-select: none;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+      }
+
+      .tag:hover {
+
       /* ===== KEYBOARD SHORTCUTS STYLES ===== */
       
       .shortcuts-toggle-btn {
@@ -311,10 +331,56 @@
       }
 
       .shortcuts-toggle-btn:hover {
+
         background: var(--primary);
         color: white;
         border-color: var(--primary);
         transform: translateY(-2px);
+
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+      }
+
+      .tag:active {
+        transform: scale(0.95);
+      }
+
+      .tag:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+
+      .tag::after {
+        content: ' 🔍';
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        font-size: 0.6rem;
+      }
+
+      .tag:hover::after {
+        opacity: 1;
+      }
+
+      .dark .tag {
+        background: #1e293b;
+        border-color: #334155;
+        color: #94a3b8;
+      }
+
+      .dark .tag:hover {
+        background: #7c3aed;
+        color: white;
+        border-color: #7c3aed;
+      }
+
+      @media (max-width: 768px) {
+        .tag {
+          padding: 6px 14px;
+          font-size: 0.8rem;
+          min-height: 32px;
+        }
+        .tag::after {
+          content: '';
+
         box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
       }
 
@@ -603,15 +669,26 @@
         .shortcuts-table kbd {
           font-size: 0.65rem;
           padding: 1px 5px;
+
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
+
+        .tag {
+          transition: none;
+        }
+        .tag:hover {
+          transform: none;
+        }
+        .tag:active {
+
         .shortcuts-toggle-btn {
           transition: none;
         }
         
         .shortcuts-toggle-btn:hover {
+
           transform: none;
         }
       }
@@ -1024,6 +1101,9 @@
           Practice Problems
         </h2>
         <div class="practice-controls">
+
+          <!-- Search with Autocomplete -->
+
           <div class="search-wrapper">
             <div class="search-bar">
               <i class="fas fa-search"></i>
@@ -1065,6 +1145,9 @@
           </div>
         </div>
 
+
+        <!-- Problem Counter Container -->
+
         <div class="problem-counter-container" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
           <div class="problem-stats">
             <span class="problem-count-display">
@@ -1095,6 +1178,9 @@
           </div>
           <p id="ai-recommend-status" class="sr-only" aria-live="polite"></p>
         </div>
+
+
+        <!-- Problems Grid - Tags will be rendered with .tag class for clickability -->
 
         <div class="problems-grid"></div>
 
@@ -1332,6 +1418,13 @@
             id="roadmapBasicTab"
           >
             <i class="fas fa-seedling"></i> Beginner Roadmap
+          </button>
+          <button
+            class="roadmap-tab"
+            data-tab="advanced"
+            id="roadmapAdvancedTab"
+          >
+            <i class="fas fa-fire"></i> Advanced Roadmap
           </button>
           <button
             class="roadmap-tab"
@@ -2056,9 +2149,8 @@
                       <i class="fas fa-indent"></i><span class="btn-text"> Format</span>
                     </button>
                     <button class="editor-btn" id="aiInterviewerToggle" type="button" onclick="toggleAiInterviewer()" title="Invite AI Interviewer" aria-pressed="false" style="color: #10b981; border: 1px solid #10b981;">
-                     <i class="fas fa-user-tie"></i><span class="btn-text"> AI Interviewer</span>
+                      <i class="fas fa-user-tie"></i><span class="btn-text"> AI Interviewer</span>
                     </button>
-                  
                     <button
                       class="editor-btn"
                       onclick="toggleLineComment()"
@@ -2094,11 +2186,19 @@
                     <span>Output</span>
                     <i class="fas fa-chevron-down" id="outputToggleIcon"></i>
                   </button>
+
+                </div>
+                <div class="output-content" id="quizOutputContent">
+                  <p class="output-placeholder">
+                    Run your code to see output...
+                  </p>
+
                   <div class="output-content" id="quizOutputContent">
                     <p class="output-placeholder">
                       Run your code to see output...
                     </p>
                   </div>
+
                 </div>
               </div>
             </div>
@@ -2327,11 +2427,17 @@
           </div>
         </div>
         
+
+        <!-- Languages Section -->
+
         <div class="profile-languages big-box" style="margin-top: 1.5rem; padding: 1.5rem; text-align: left; border-radius: var(--border-radius); border: 1px solid var(--glass-border); background: var(--dark-card);">
           <h4 style="margin: 0 0 1rem 0; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--text-light); display: flex; align-items: center; gap: 0.5rem;">
             <span>💻</span> Known Languages
           </h4>
           <div id="profileLanguagesSection" class="languages-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+
+            <!-- Dynamic chips -->
+
           </div>
         </div>
       </div>
@@ -2392,6 +2498,9 @@
               role="alert"
             ></div>
 
+
+            <!-- Current Password -->
+
             <div class="password-field">
               <label for="currentPassword">Current Password</label>
               <div class="password-input-wrapper">
@@ -2409,6 +2518,9 @@
                 </button>
               </div>
             </div>
+
+
+            <!-- New Password -->
 
             <div class="password-field">
               <label for="newPassword">New Password</label>
@@ -2446,6 +2558,9 @@
                 <li id="ruleSpecial">One special character</li>
               </ul>
             </div>
+
+
+            <!-- Confirm Password -->
 
             <div class="password-field">
               <label for="confirmNewPassword">
@@ -2581,6 +2696,24 @@
       loadPartial("footer-placeholder", "/partials/footer.html");
     </script>
     
+
+    <!-- Keyboard Shortcut Modal -->
+    <div id="shortcutModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:999;">
+      <div style="background:white; padding:30px; border-radius:12px; max-width:400px; width:90%;">
+        <h3>⌨️ Keyboard Shortcuts</h3>
+        <div style="margin:15px 0;">
+          <div style="display:flex; justify-content:space-between; padding:6px 0;"><span>Search</span><kbd>Ctrl+K</kbd></div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0;"><span>Home</span><kbd>Alt+H</kbd></div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0;"><span>Topics</span><kbd>Alt+T</kbd></div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0;"><span>Practice</span><kbd>Alt+P</kbd></div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0;"><span>Quiz</span><kbd>Alt+Q</kbd></div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0;"><span>Dashboard</span><kbd>Alt+D</kbd></div>
+        </div>
+        <button onclick="closeShortcutModal()" style="padding:8px 20px; background:#7c3aed; color:white; border:none; border-radius:6px; cursor:pointer;">Close</button>
+      </div>
+    </div>
+
+
     <!-- Footer Shortcut Trigger -->
     <footer>
       <button onclick="openShortcutModal()" style="background:none; border:none; color:#6b7280; cursor:pointer; text-decoration:underline;">

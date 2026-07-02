@@ -9895,6 +9895,307 @@ mark.search-highlight {
     }
   }
 }
+
+
+/* ===== QUIZ TIMER STYLES ===== */
+
+.quiz-timer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.quiz-timer-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.quiz-timer-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.quiz-timer-label i {
+    margin-right: 6px;
+    color: var(--primary);
+}
+
+.quiz-timer-display {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    padding: 4px 16px;
+    border-radius: 8px;
+    background: var(--bg-primary);
+    min-width: 80px;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Timer States */
+.quiz-timer-display.time-warning {
+    color: #eab308;
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.quiz-timer-display.time-critical {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    animation: timerPulse 0.5s ease-in-out infinite;
+}
+
+.quiz-timer-display.times-up {
+    color: #ef4444;
+    font-weight: 800;
+    background: rgba(239, 68, 68, 0.15);
+    border: 2px solid #ef4444;
+    animation: timerPulse 0.5s ease-in-out 3;
+}
+
+@keyframes timerPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.7;
+    }
+}
+
+/* ===== MOBILE RESPONSIVE - FIX FOR ISSUE #1383 ===== */
+
+/* Tablets and smaller */
+@media (max-width: 768px) {
+    .quiz-timer-container {
+        padding: 10px 16px;
+        gap: 10px;
+    }
+    
+    .quiz-timer-label {
+        font-size: 0.85rem;
+    }
+    
+    .quiz-timer-display {
+        font-size: 1.1rem;
+        padding: 4px 14px;
+        min-width: 70px;
+    }
+}
+
+/* Mobile phones - MAIN FIX */
+@media (max-width: 480px) {
+    .quiz-timer-container {
+        padding: 12px 14px;
+        gap: 8px;
+        border-radius: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .quiz-timer-wrapper {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .quiz-timer-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .quiz-timer-label i {
+        font-size: 0.9rem;
+    }
+    
+    /* LARGER TIMER TEXT ON MOBILE - Main fix */
+    .quiz-timer-display {
+        font-size: 1.5rem;
+        font-weight: 700;
+        padding: 8px 16px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 8px;
+        color: #ffffff;
+        min-width: 80px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        letter-spacing: 0.5px;
+    }
+    
+    /* High contrast with colored borders */
+    .quiz-timer-display.time-warning {
+        color: #facc15;
+        background: rgba(0, 0, 0, 0.75);
+        border-color: rgba(250, 204, 21, 0.5);
+        text-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+    }
+    
+    .quiz-timer-display.time-critical {
+        color: #f87171;
+        background: rgba(0, 0, 0, 0.8);
+        border-color: rgba(239, 68, 68, 0.6);
+        text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        animation: timerPulseMobile 0.5s ease-in-out infinite;
+    }
+    
+    .quiz-timer-display.times-up {
+        color: #ff6b6b;
+        background: rgba(0, 0, 0, 0.85);
+        border-color: #ef4444;
+        text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+        animation: timerPulseMobile 0.5s ease-in-out 3;
+    }
+    
+    @keyframes timerPulseMobile {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.08);
+            opacity: 0.8;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+        }
+    }
+}
+
+/* Small phones (iPhone SE, etc.) */
+@media (max-width: 380px) {
+    .quiz-timer-display {
+        font-size: 1.3rem;
+        padding: 6px 12px;
+        min-width: 70px;
+    }
+    
+    .quiz-timer-container {
+        padding: 10px 12px;
+    }
+    
+    .quiz-timer-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* Dark Theme */
+.dark .quiz-timer-container {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+.dark .quiz-timer-display {
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+.dark .quiz-timer-display.time-warning {
+    background: rgba(0, 0, 0, 0.8);
+    color: #facc15;
+    border-color: rgba(234, 179, 8, 0.4);
+}
+
+.dark .quiz-timer-display.time-critical {
+    background: rgba(0, 0, 0, 0.85);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.dark .quiz-timer-display.times-up {
+    background: rgba(0, 0, 0, 0.9);
+    color: #ff6b6b;
+    border-color: #ef4444;
+}
+
+/* Light Theme - Ensure contrast */
+.light-mode .quiz-timer-display {
+    background: rgba(255, 255, 255, 0.9);
+    color: #1e293b;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .quiz-timer-display.time-warning {
+    background: rgba(255, 255, 255, 0.95);
+    color: #ca8a04;
+    border-color: rgba(234, 179, 8, 0.4);
+}
+
+.light-mode .quiz-timer-display.time-critical {
+    background: rgba(255, 255, 255, 0.95);
+    color: #dc2626;
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.light-mode .quiz-timer-display.times-up {
+    background: rgba(255, 255, 255, 0.95);
+    color: #dc2626;
+    border-color: #ef4444;
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .quiz-timer-display.time-critical {
+        animation: none;
+    }
+    
+    .quiz-timer-display.times-up {
+        animation: none;
+    }
+    
+    @keyframes timerPulseMobile {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+}
+
+/* Print styles */
+@media print {
+    .quiz-timer-container {
+        border: 1px solid #ccc;
+        background: white;
+    }
+    
+    .quiz-timer-display {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+/* ===== CLICKABLE TAGS ===== */
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.tag:hover {
+
+
 /* ===== KEYBOARD SHORTCUTS ===== */
 
 /* Shortcuts Toggle Button */
@@ -9920,10 +10221,175 @@ mark.search-highlight {
 }
 
 .shortcuts-toggle-btn:hover {
+
     background: var(--primary);
     color: white;
     border-color: var(--primary);
     transform: translateY(-2px);
+
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.tag:active {
+    transform: scale(0.95);
+}
+
+.tag:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Tag with click indicator */
+.tag::after {
+    content: ' 🔍';
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-size: 0.6rem;
+}
+
+.tag:hover::after {
+    opacity: 1;
+}
+
+/* Tag variants */
+.tag.easy {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.tag.easy:hover {
+    background: #22c55e;
+    color: white;
+    border-color: #22c55e;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.tag.medium {
+    background: rgba(234, 179, 8, 0.1);
+    color: #eab308;
+    border-color: rgba(234, 179, 8, 0.2);
+}
+
+.tag.medium:hover {
+    background: #eab308;
+    color: white;
+    border-color: #eab308;
+    box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
+}
+
+.tag.hard {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.tag.hard:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Dark Theme */
+.dark .tag {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+.dark .tag:hover {
+    background: #7c3aed;
+    color: white;
+    border-color: #7c3aed;
+}
+
+.dark .tag.easy {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.dark .tag.easy:hover {
+    background: #22c55e;
+    color: white;
+    border-color: #22c55e;
+}
+
+.dark .tag.medium {
+    background: rgba(234, 179, 8, 0.15);
+    color: #facc15;
+    border-color: rgba(234, 179, 8, 0.2);
+}
+
+.dark .tag.medium:hover {
+    background: #eab308;
+    color: white;
+    border-color: #eab308;
+}
+
+.dark .tag.hard {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.dark .tag.hard:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+/* Tag tooltip */
+.tag .tag-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
+    pointer-events: none;
+}
+
+.tag:hover .tag-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mobile - larger touch target */
+@media (max-width: 768px) {
+    .tag {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        min-height: 32px;
+    }
+    
+    .tag::after {
+        content: '';
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .tag {
+        transition: none;
+    }
+    
+    .tag:hover {
+        transform: none;
+    }
+    
+    .tag:active {
+        transform: none;
+    }
     box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
 }
 
@@ -10235,4 +10701,12 @@ mark.search-highlight {
 /* Modal Open State */
 body.modal-open {
     overflow: hidden;
+
+  }
+
+
 }
+
+}
+
+

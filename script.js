@@ -3869,6 +3869,12 @@ function showDailyFact() {
     const factText = document.getElementById('factText');
     const factDate = document.getElementById('factDate');
     
+    // Add null checks
+    if (!factText || !factDate) {
+        console.warn('Daily fact elements not found');
+        return;
+    }
+    
     factText.textContent = getDailyFact();
     const today = new Date().toLocaleDateString();
     factDate.textContent = `📅 Fact of the day • ${today}`;

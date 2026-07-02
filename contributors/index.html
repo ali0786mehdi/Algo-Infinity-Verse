@@ -160,8 +160,12 @@
   <script src="/theme.js"></script>
   <script src="/script.js"></script>
   <script>
-    loadPartial('navbar-placeholder', '/partials/navbar.html');
-    loadPartial('footer-placeholder', '/partials/footer.html');
+    window.addEventListener("DOMContentLoaded", async () => {
+    await loadPartial("navbar-placeholder", "/partials/navbar.html");
+    await loadPartial("footer-placeholder", "/partials/footer.html");
+
+    loadContributors();
+});
   </script>
   <script>
     const REPO_OWNER = 'Eshajha19';

@@ -30,8 +30,12 @@ self.addEventListener('fetch', (event) => {
 
   function tryCache(request, response, cacheName) {
     try {
-      const cloned = response.clone();
-      caches.open(cacheName).then((cache) => cache.put(request, cloned)).catch(() => {});
+
+
+      if (request.method === 'GET') { // Only cache GET requests
+        const cloned = response.clone();
+        caches.open(cacheName).then((cache) => cache.put(request, cloned)).catch(() => {});
+      }
     } catch (e) {}
   }
 
@@ -52,6 +56,11 @@ self.addEventListener('fetch', (event) => {
 
   // API
   if (url.pathname.startsWith('/api/')) {
+    if (event.request.method !== 'GET') {
+      event.respondWith(fetch(event.request));
+      return;
+    }
+
     event.respondWith(
       fetch(event.request)
         .then((res) => {

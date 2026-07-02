@@ -4,6 +4,7 @@ import http from "http";
 import { execFile } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
+import { FieldValue } from "firebase-admin/firestore";
 import { initializeFirebase, getDb, COLLECTIONS } from "./firebase.js";
 import { verifyCsrfToken } from "./utils/csrf-verify.js";
 import multer from "multer";
@@ -1373,11 +1374,15 @@ if (pathname === "/api/session" && req.method === "GET") {
         createdAt: new Date().toISOString(),
         isDeactivated: false,
         deactivatedAt: null,
-        emailVerified: true,
+        emailVerified: false,
         verifyToken,
         verifyTokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
       };
       await createUser(user);
+
+      sendVerificationEmail(email, user.name, verifyToken).catch((err) =>
+        console.error("[email] Signup verification failed:", err)
+      );
 
       const token = createAccessToken(user);
       const refreshToken = createRefreshToken(user);
