@@ -12,6 +12,12 @@ function togglePassword(id) {
 
 }
 
+document.querySelectorAll(".eye").forEach((eye) => {
+    eye.addEventListener("click", function () {
+        togglePassword(this.dataset.target);
+    });
+});
+
 // Optional Save Changes Button
 
 const saveBtn = document.querySelector(".btn");

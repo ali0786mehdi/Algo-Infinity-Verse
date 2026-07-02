@@ -283,11 +283,11 @@ function renderGraph() {
                 // Click label to checkout branch
                 label.style.cursor = 'pointer';
                 label.style.pointerEvents = 'auto';
-                label.onclick = () => {
+                label.addEventListener("click", () => {
                     const restored = git.checkout(bName);
                     editor.setValue(restored.code);
                     updateUI();
-                };
+                });
 
                 els.gitNodes.appendChild(label);
             }

@@ -50,7 +50,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>📊 Acceptance Prediction</h3>
-                    <button class="modal-close" type="button" onclick="closePredictionModal()">&times;</button>
+                    <button id="closePredictionBtn" class="modal-close" type="button">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div id="predictionResults">
@@ -220,6 +220,10 @@
         document.getElementById('predictBtn').addEventListener('click', () => {
             document.getElementById('predictionModal').style.display = 'block';
         });
+
+        document
+            .getElementById('closePredictionBtn')
+            .addEventListener('click', closePredictionModal);
 
         function closePredictionModal() {
             document.getElementById('predictionModal').style.display = 'none';

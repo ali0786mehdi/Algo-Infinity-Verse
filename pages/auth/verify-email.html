@@ -117,7 +117,7 @@
             <i class="fas fa-paper-plane"></i>
             <span>Resend Email</span>
           </button>
-          <button class="resend-btn" type="button" onclick="location.href='/login'">
+          <button class="resend-btn" type="button" id="backToLoginBtn">
             <i class="fas fa-arrow-left"></i> Back to Login
           </button>
         </div>
@@ -148,10 +148,10 @@
         <h1>Link Expired</h1>
         <p id="errorMsg">This verification link is invalid or has expired. Please request a new one.</p>
         <div class="verify-actions">
-          <button class="btn btn-primary" type="button" onclick="showPending()">
+          <button class="btn btn-primary" type="button" id="requestNewLinkBtn">
             <i class="fas fa-paper-plane"></i> Request New Link
           </button>
-          <button class="resend-btn" type="button" onclick="location.href='/login'">
+          <button class="resend-btn" type="button" id="errorBackToLoginBtn">
             Back to Login
           </button>
         </div>
@@ -179,6 +179,28 @@
       }
 
       function showPending() { show("pendingView"); }
+
+      const backToLoginBtn = document.getElementById("backToLoginBtn");
+
+      if (backToLoginBtn) {
+          backToLoginBtn.addEventListener("click", () => {
+              location.href = "/login";
+          });
+      }
+
+      const errorBackToLoginBtn = document.getElementById("errorBackToLoginBtn");
+
+      if (errorBackToLoginBtn) {
+          errorBackToLoginBtn.addEventListener("click", () => {
+              location.href = "/login";
+          });
+      }
+
+      const requestNewLinkBtn = document.getElementById("requestNewLinkBtn");
+
+      if (requestNewLinkBtn) {
+          requestNewLinkBtn.addEventListener("click", showPending);
+      }
 
       function setStatus(msg, type) {
         const el = document.getElementById("statusMsg");

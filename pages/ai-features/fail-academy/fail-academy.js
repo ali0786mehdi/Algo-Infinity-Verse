@@ -132,7 +132,7 @@ function renderSidebar() {
     academyProblems.forEach(p => {
         const li = document.createElement('li');
         li.className = `prob-item ${currentProblem && currentProblem.id === p.id ? 'active' : ''}`;
-        li.onclick = () => loadProblem(p.id);
+        li.addEventListener("click", () => loadProblem(p.id));
         li.innerHTML = `
             <span class="p-id">${p.id}</span>
             <span class="p-title">${p.title}</span>
@@ -160,7 +160,7 @@ function loadProblem(id) {
         const btn = document.createElement('button');
         btn.className = 'approach-btn';
         btn.textContent = app.name;
-        btn.onclick = () => selectApproach(app.id, btn);
+        btn.addEventListener("click", () => selectApproach(app.id, btn));
         els.approachesGrid.appendChild(btn);
     });
 

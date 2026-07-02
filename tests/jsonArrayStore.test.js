@@ -9,6 +9,7 @@ jest.unstable_mockModule('../backend/jobs/queue.js', () => ({
   getBatchProgress: jest.fn(),
   batchStore: new Map(),
   bulkAuditQueue: { add: jest.fn(), on: jest.fn() },
+  MAX_BULK_AUDIT_URLS: 50,
   default: {},
 }));
 jest.unstable_mockModule('../backend/jobs/worker.js', () => ({ default: {} }));

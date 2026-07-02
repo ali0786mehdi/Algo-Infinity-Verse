@@ -104,7 +104,7 @@
             <span class="quiz-topic-badge" id="quizTopicBadge"></span>
             <span class="quiz-difficulty" id="quizDifficulty"></span>
             <h3 id="quizTitle">Problem Title</h3>
-            <button type="button" class="quiz-modal-close" id="quizModalClose" aria-label="Close" onclick="closeQuizEditor()">&times;</button>
+            <button type="button" class="quiz-modal-close" id="quizModalClose" aria-label="Close">&times;</button>
           </div>
         </div>
         <div class="quiz-modal-body">
@@ -185,16 +185,33 @@
                 <div class="code-editor">
                   <textarea id="codeEditor" class="code-textarea" spellcheck="false"></textarea>
                 </div>
+                <div class="output-panel" id="outputPanel">
+                  <button
+                    type="button"
+                    class="output-header"
+                    id="outputHeader"
+                    aria-controls="quizOutputContent"
+                    aria-expanded="true"
+                  >
+                    <span>Output</span>
+                    <i class="fas fa-chevron-down" id="outputToggleIcon"></i>
+                  </button>
+                  <div class="output-content" id="quizOutputContent">
+                    <p class="output-placeholder">
+                      Run your code to see output...
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div class="quiz-modal-footer" style="padding: 1rem; border-top: 1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center; background: rgba(0,0,0,0.2);">
           <div style="display:flex; gap:0.5rem;">
-            <button class="btn btn-outline" onclick="runQuizCode()">
+            <button class="btn btn-outline" id="quizRunBtn">
               <i class="fas fa-play"></i> Run
             </button>
-            <button class="btn btn-primary" onclick="submitQuizCode()">
+            <button class="btn btn-primary" id="quizSubmitBtn">
               <i class="fas fa-paper-plane"></i> Submit
             </button>
           </div>

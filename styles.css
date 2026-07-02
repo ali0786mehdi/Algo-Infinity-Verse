@@ -1051,6 +1051,32 @@ html.light-mode .recent-item.selected {
   display: none;
 }
 
+/* ===== LEARN & INTERVIEW DROPDOWN — SCROLLABLE (Issue #1078) ===== */
+/* Desktop: show a thin scrollbar so users know the long lists are scrollable  */
+.nav-learn-dropdown .dropdown-menu,
+.nav-interview-dropdown .dropdown-menu {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}
+
+.nav-learn-dropdown .dropdown-menu::-webkit-scrollbar,
+.nav-interview-dropdown .dropdown-menu::-webkit-scrollbar {
+  display: block;
+  width: 4px;
+}
+
+.nav-learn-dropdown .dropdown-menu::-webkit-scrollbar-track,
+.nav-interview-dropdown .dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav-learn-dropdown .dropdown-menu::-webkit-scrollbar-thumb,
+.nav-interview-dropdown .dropdown-menu::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+
 .dropdown-menu-end {
   left: auto;
   right: 0;
@@ -1310,6 +1336,30 @@ html.light-mode .recent-item.selected {
     max-height: 500px;
     padding: 0.5rem 0;
   }
+
+  /* Mobile: Learn and Interview have 100+ items — make them independently scrollable */
+  .nav-learn-dropdown.open .dropdown-menu,
+  .nav-interview-dropdown.open .dropdown-menu {
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+  }
+
+  .nav-learn-dropdown.open .dropdown-menu::-webkit-scrollbar,
+  .nav-interview-dropdown.open .dropdown-menu::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .nav-learn-dropdown.open .dropdown-menu::-webkit-scrollbar-thumb,
+  .nav-interview-dropdown.open .dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
 
   .dropdown-item {
     padding: 0.875rem 1.5rem;
@@ -7280,7 +7330,7 @@ html.light-mode .dropdown-menu {
 }
 
 /* OUTPUT HEADER */
-.output-header {
+.perl-output-card .output-header {
   display: flex;
   justify-content: space-between;
   color: #fff;
@@ -9597,7 +9647,6 @@ mark.search-highlight {
   border-bottom-color: var(--accent);
 }
 
-
 /* ===== PROBLEM STATS ===== */
 
 .problem-stats {
@@ -10171,6 +10220,13 @@ mark.search-highlight {
     border-color: #334155;
 }
 
+/* Mobile - hide tooltip on touch devices */
+@media (hover: none) {
+    .back-to-top::after {
+        display: none;
+
+    }
+}
 .dark .shortcuts-tip kbd {
     background: #0f172a;
     border-color: #334155;

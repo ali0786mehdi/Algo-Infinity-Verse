@@ -183,22 +183,35 @@ document.addEventListener('DOMContentLoaded', () => {
       el.innerHTML = `
         <div style="font-weight: 600; color: var(--text-muted); width: 20px;">${index + 1}.</div>
         <div class="test-case-content">
-          <input type="text" placeholder="Input (e.g. nums = [2,7,11,15], target = 9)" value="${ex.input}" onchange="updateExample(${ex.id}, 'input', this.value)" required style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">
-          <input type="text" placeholder="Output (e.g. [0,1])" value="${ex.output}" onchange="updateExample(${ex.id}, 'output', this.value)" required style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">
-          <textarea placeholder="Explanation (Optional)" onchange="updateExample(${ex.id}, 'explanation', this.value)" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">${ex.explanation}</textarea>
+          <input type="text" placeholder="Input (e.g. nums = [2,7,11,15], target = 9)" value="${ex.input}" data-id="${ex.id}" data-field="input" required style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">
+          <input type="text" placeholder="Output (e.g. [0,1])" value="${ex.output}" data-id="${ex.id}" data-field="output" required style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">
+          <textarea placeholder="Explanation (Optional)" data-id="${ex.id}" data-field="explanation" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">${ex.explanation}</textarea>
         </div>
-        <button type="button" class="remove-btn" onclick="removeExampleHandler(${ex.id})"><i class="fas fa-trash"></i></button>
+        <button type="button" class="remove-btn"><i class="fas fa-trash"></i></button>
       `;
+        el.querySelector('input[data-field="input"]').addEventListener("input", (e) => {
+            updateExample(ex.id, "input", e.target.value);
+        });
+        el.querySelector('input[data-field="output"]').addEventListener("input", (e) => {
+            updateExample(ex.id, "output", e.target.value);
+        });
+
+        el.querySelector('textarea[data-field="explanation"]').addEventListener("input", (e) => {
+            updateExample(ex.id, "explanation", e.target.value);
+        });
+
+        el.querySelector(".remove-btn").addEventListener("click", () => {
+            removeExample(ex.id);
+        });
       examplesContainer.appendChild(el);
     });
   }
 
-  window.updateExample = (id, field, value) => {
-    const ex = examples.find(e => e.id === id);
-    if (ex) ex[field] = value;
-    saveDraft();
-  };
-  window.removeExampleHandler = removeExample;
+    function updateExample(id, field, value) {
+        const ex = examples.find(e => e.id === id);
+        if (ex) ex[field] = value;
+        saveDraft();
+    }
 
   // --- Dynamic Test Cases (Drag & Drop) ---
   function addTestCase(data = { input: '', expected: '' }) {
@@ -224,11 +237,22 @@ document.addEventListener('DOMContentLoaded', () => {
       li.innerHTML = `
         <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
         <div class="test-case-content">
-          <input type="text" placeholder="Raw Input Arguments (e.g. [[2,7], 9])" value="${tc.input}" onchange="updateTestCase(${tc.id}, 'input', this.value)" required style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">
-          <input type="text" placeholder="Raw Expected Output (e.g. [0,1])" value="${tc.expected}" onchange="updateTestCase(${tc.id}, 'expected', this.value)" required style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">
+          <input type="text" placeholder="Raw Input Arguments (e.g. [[2,7], 9])" value="${tc.input}" data-id="${tc.id}" data-field="input" required style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">
+          <input type="text" placeholder="Raw Expected Output (e.g. [0,1])" value="${tc.expected}" data-id="${tc.id}" data-field="expected" required style="width: 100%; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 4px; color: var(--text);">
         </div>
-        <button type="button" class="remove-btn" onclick="removeTestCaseHandler(${tc.id})"><i class="fas fa-trash"></i></button>
+        <button type="button" class="remove-btn"><i class="fas fa-trash"></i></button>
       `;
+        li.querySelector('input[data-field="input"]').addEventListener("input", (e) => {
+            updateTestCase(tc.id, "input", e.target.value);
+        });
+
+        li.querySelector('input[data-field="expected"]').addEventListener("input", (e) => {
+            updateTestCase(tc.id, "expected", e.target.value);
+        });
+
+        li.querySelector(".remove-btn").addEventListener("click", () => {
+            removeTestCase(tc.id);
+        });
 
       // Drag events
       li.addEventListener('dragstart', handleDragStart);
@@ -241,12 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  window.updateTestCase = (id, field, value) => {
-    const tc = testCases.find(t => t.id === id);
-    if (tc) tc[field] = value;
-    saveDraft();
-  };
-  window.removeTestCaseHandler = removeTestCase;
+    function updateTestCase(id, field, value) {
+        const tc = testCases.find(t => t.id === id);
+        if (tc) tc[field] = value;
+        saveDraft();
+    }
 
   // --- Drag & Drop Handlers ---
   function handleDragStart(e) {
@@ -313,16 +336,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Only prompt if there is actual data filled out
         if (state.title || state.description || state.examples.length > 1) {
           draftToast.classList.add('show');
-          
-          document.getElementById('restoreDraftBtn').onclick = () => {
-            restoreDraft(state);
-            draftToast.classList.remove('show');
-          };
-          
-          document.getElementById('discardDraftBtn').onclick = () => {
-            localStorage.removeItem(DRAFT_KEY);
-            draftToast.classList.remove('show');
-          };
+
+            document.getElementById('restoreDraftBtn').addEventListener('click', () => {
+                restoreDraft(state);
+                draftToast.classList.remove('show');
+            });
+
+            document.getElementById('discardDraftBtn').addEventListener('click', () => {
+                localStorage.removeItem(DRAFT_KEY);
+                draftToast.classList.remove('show');
+            });
         }
       } catch (e) {
         console.warn("Corrupted draft found, ignoring.");

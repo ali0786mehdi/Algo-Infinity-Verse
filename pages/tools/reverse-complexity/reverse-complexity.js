@@ -243,7 +243,7 @@ function loadChallenge() {
         const card = document.createElement('div');
         card.className = 'option-card card-glass';
         card.innerHTML = `<pre class="code-snippet"><code>${escapeHTML(option)}</code></pre>`;
-        card.onclick = () => selectOption(index);
+        card.addEventListener('click', () => selectOption(index));
         optionsGrid.appendChild(card);
     });
 
@@ -305,11 +305,11 @@ function showFeedback(isCorrect, explanation) {
 }
 
 // Advance to next challenge
-document.getElementById('next-btn').onclick = () => {
+document.getElementById('next-btn').addEventListener('click', () => {
     document.getElementById('feedback-modal').classList.add('hidden');
     gameState.currentIndex++;
     loadChallenge();
-};
+});
 
 // End Game & Persist Score
 function endGame() {

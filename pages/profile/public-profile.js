@@ -80,4 +80,12 @@ function shareProfile() {
 }
 
 // Load profile
-fetchProfile();
+document.addEventListener("DOMContentLoaded", () => {
+    const shareBtn = document.getElementById("shareProfileBtn");
+
+    if (shareBtn) {
+        shareBtn.addEventListener("click", shareProfile);
+    }
+
+    fetchProfile();
+});

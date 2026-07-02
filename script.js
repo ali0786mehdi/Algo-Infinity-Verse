@@ -316,11 +316,11 @@ const practiceProblems = [
   { id: 11, title: "Invert Binary Tree", difficulty: "easy", tags: ["Trees", "DFS"], acceptance: "68.5%", category: "trees", description: "Given a binary tree represented as a level-order array, invert it and return the inverted level-order array.", constraints: ["0 ≤ arr.length ≤ 100", "-100 ≤ arr[i] ≤ 100"], followUp: "Can you solve it both recursively and iteratively using a queue or stack?", functionName: "invertTree", params: ["root"], guide: "root: level-order array of integers representing the binary tree (null for missing nodes)\nreturns: level-order array of the inverted binary tree (swapped left/right children)\n\nHint: Recursively swap left and right children at each node. Base case: when root is null or empty.", testCases: [{ input: [[4,2,7,1,3,6,9]], expected: [4,7,2,9,6,3,1] }, { input: [[2,1,3]], expected: [2,3,1] }, { input: [[]], expected: [] }] },
   { id: 12, title: "Validate BST", difficulty: "medium", tags: ["Trees", "Recursion"], acceptance: "28.4%", category: "trees", description: "Given a binary tree represented as a level-order array (null for missing children), determine if it is a valid BST.", constraints: ["1 ≤ arr.length ≤ 10⁴", "-2³¹ ≤ arr[i] ≤ 2³¹ - 1"], followUp: "Can you solve it without recursion?", functionName: "isValidBST", testCases: [{ input: [[2,1,3]], expected: true }, { input: [[5,1,4,null,null,3,6]], expected: false }] },
   { id: 13, title: "Number of Islands", difficulty: "medium", tags: ["Graphs", "DFS"], acceptance: "54.8%", category: "graphs", description: "Given an m x n 2D binary grid which represents a map of '1's (land) and '0's (water), return the number of islands.", constraints: ["1 ≤ m, n ≤ 300", "grid[i][j] is '0' or '1'"], followUp: "Can you solve it using both DFS and Union-Find?", functionName: "numIslands", testCases: [{ input: [[["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]], expected: 1 }, { input: [[["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]], expected: 3 }, { input: [[["0"]]], expected: 0 }] },
-  { id: 14, title: "House Robber", difficulty: "medium", tags: ["DP", "Arrays"], acceptance: "42.3%", category: "dp", description: "You are a professional robber planning to rob houses along a street. Return the maximum amount of money you can rob without robbing two adjacent houses.", constraints: ["1 ≤ nums.length ≤ 100", "0 ≤ nums[i] ≤ 400"], followUp: "What if the houses are arranged in a circle?", functionName: "rob", testCases: [{ input: [[1,2,3,1]], expected: 4 }, { input: [[2,7,9,3,1]], expected: 12 }, { input: [[2,1,1,2]], expected: 4 }] },
+  { id: 14, title: "House Robber", difficulty: "medium", tags: ["DP", "Arrays"], acceptance: "42.3%", category: "dp", description: "You are a professional robber planning to rob houses along a street. Return the maximum amount of money you can rob without robbing two adjacent houses.", constraints: ["1 ≤ nums.length ≤ 100", "0 ≤ nums[i] ≤ 400"], followUp: "What if the houses are arranged in a circle?", functionName: "rob", params: ["nums"], guide: "nums: array of non-negative integers representing money in each house\nreturns: maximum amount that can be robbed tonight without alerting the police\n\nHint: Use dynamic programming. At each house i, decide to rob it (add nums[i] to dp[i-2]) or skip it (keep dp[i-1]). The optimal is max(rob, skip).", testCases: [{ input: [[1,2,3,1]], expected: 4 }, { input: [[2,7,9,3,1]], expected: 12 }, { input: [[2,1,1,2]], expected: 4 }] },
   { id: 15, title: "Course Schedule", difficulty: "medium", tags: ["Graphs", "Topological Sort"], acceptance: "44.7%", category: "graphs", description: "There are numCourses courses. Given prerequisites, return true if you can finish all courses.", constraints: ["1 ≤ numCourses ≤ 2000", "0 ≤ prerequisites.length ≤ 5000", "prerequisites[i].length == 2"], followUp: "Can you return the actual valid course order?", functionName: "canFinish", testCases: [{ input: [2, [[1,0]]], expected: true }, { input: [2, [[1,0],[0,1]]], expected: false }] },
   { id: 16, title: "Best Time to Buy and Sell Stock", difficulty: "easy", tags: ["Arrays", "Greedy"], acceptance: "54.3%", category: "arrays", description: "Given an array prices where prices[i] is the price of a given stock on the iᵗʰ day, return the maximum profit.", constraints: ["1 ≤ prices.length ≤ 10⁵", "0 ≤ prices[i] ≤ 10⁴"], followUp: "Can you solve it in O(n) time and O(1) space?", functionName: "maxProfit", testCases: [{ input: [[7,1,5,3,6,4]], expected: 5 }, { input: [[7,6,4,3,1]], expected: 0 }, { input: [[2,4,1]], expected: 2 }] },
-  { id: 17, title: "Move Zeroes", difficulty: "easy", tags: ["Arrays", "Two Pointers"], acceptance: "60.1%", category: "arrays", description: "Given an integer array nums, move all 0s to the end of it while maintaining the relative order of the non-zero elements.", constraints: ["1 ≤ nums.length ≤ 10⁴", "−2³¹ ≤ nums[i] ≤ 2³¹ − 1"], followUp: "Can you minimize the total number of operations?", functionName: "moveZeroes", testCases: [{ input: [[0,1,0,3,12]], expected: [1,3,12,0,0] }, { input: [[0]], expected: [0] }, { input: [[1,0]], expected: [1,0] }] },
-  { id: 18, title: "Valid Anagram", difficulty: "easy", tags: ["Strings", "Hash Table"], acceptance: "63.4%", category: "strings", description: "Given two strings s and t, return true if t is an anagram of s.", constraints: ["1 ≤ s.length, t.length ≤ 5 × 10⁴", "s and t consist of lowercase English letters only"], followUp: "What if the inputs contain Unicode characters?", functionName: "isAnagram", testCases: [{ input: ["anagram", "nagaram"], expected: true }, { input: ["rat", "car"], expected: false }, { input: ["a", "a"], expected: true }] },
+  { id: 17, title: "Move Zeroes", difficulty: "easy", tags: ["Arrays", "Two Pointers"], acceptance: "60.1%", category: "arrays", description: "Given an integer array nums, move all 0s to the end of it while maintaining the relative order of the non-zero elements.", constraints: ["1 ≤ nums.length ≤ 10⁴", "−2³¹ ≤ nums[i] ≤ 2³¹ − 1"], followUp: "Can you minimize the total number of operations?", functionName: "moveZeroes", params: ["nums"], guide: "nums: integer array to move zeroes in-place\nreturns: array with all zeroes moved to the end while preserving relative order of non-zero elements\n\nHint: Use two-pointer technique. One pointer (nonZeroIndex) tracks where the next non-zero should go. Iterate through the array, moving non-zero elements forward, then fill remaining positions with zero.", testCases: [{ input: [[0,1,0,3,12]], expected: [1,3,12,0,0] }, { input: [[0]], expected: [0] }, { input: [[1,0]], expected: [1,0] }] },
+  { id: 18, title: "Valid Anagram", difficulty: "easy", tags: ["Strings", "Hash Table"], acceptance: "63.4%", category: "strings", description: "Given two strings s and t, return true if t is an anagram of s.", constraints: ["1 ≤ s.length, t.length ≤ 5 × 10⁴", "s and t consist of lowercase English letters only"], followUp: "What if the inputs contain Unicode characters?", functionName: "isAnagram", params: ["string1", "string2"], guide: "string1: first input string\nstring2: second input string\nreturns: true if string2 is an anagram of string1 (same characters, different order), false otherwise\n\nHint: Use a frequency counter array of size 26 for lowercase English letters. Count occurrences of each character in s (+1) and t (-1). If all counts are zero at the end, it is a valid anagram.", testCases: [{ input: ["anagram", "nagaram"], expected: true }, { input: ["rat", "car"], expected: false }, { input: ["a", "a"], expected: true }] },
   { id: 19, title: "Single Number", difficulty: "easy", tags: ["Arrays", "Bit Manipulation"], acceptance: "70.2%", category: "arrays", description: "Given a non-empty array of integers nums, every element appears twice except for one. Find that single one.", constraints: ["1 ≤ nums.length ≤ 3 × 10⁴", "-3 × 10⁴ ≤ nums[i] ≤ 3 × 10⁴"], followUp: "Can you solve it using XOR bit manipulation?", functionName: "singleNumber", testCases: [{ input: [[2,2,1]], expected: 1 }, { input: [[4,1,2,1,2]], expected: 4 }, { input: [[1]], expected: 1 }] },
   { id: 20, title: "Intersection of Two Arrays", difficulty: "easy", tags: ["Arrays", "Hash Set"], acceptance: "72.8%", category: "arrays", description: "Given two integer arrays nums1 and nums2, return an array of their intersection (sorted, unique).", constraints: ["1 ≤ nums1.length, nums2.length ≤ 1000", "0 ≤ nums1[i], nums2[i] ≤ 1000"], followUp: "What if the arrays are already sorted?", functionName: "intersection", testCases: [{ input: [[1,2,2,1], [2,2]], expected: [2] }, { input: [[4,9,5], [9,4,9,8,4]], expected: [4,9] }] },
   { id: 21, title: "Check If Array Is Sorted", difficulty: "easy", tags: ["Arrays"], acceptance: "78.5%", category: "arrays", description: "Given an array of integers nums, return true if it is sorted in non-decreasing order.", constraints: ["1 ≤ nums.length ≤ 10⁴", "−10⁹ ≤ nums[i] ≤ 10⁹"], followUp: "Can you solve it in O(n) time complexity and O(1) space?", functionName: "isSorted", testCases: [{ input: [[1,2,3,4]], expected: true }, { input: [[5,4,3,2,1]], expected: false }, { input: [[1,1,2,2,3]], expected: true }] },
@@ -735,6 +735,14 @@ function initNavbar() {
   const navLinks = document.getElementById("navLinks");
   if (!menuToggle || !navLinks || navbarInitialized) return;
   navbarInitialized = true;
+
+  // Hide Home link on homepage
+  const homeLink = document.querySelector('.nav-link[href="/index.html#home"]');
+  if (homeLink) {
+    const isHomePage = document.body.getAttribute('data-page') === 'index';
+    homeLink.closest('.nav-item').style.display = isHomePage ? 'none' : '';
+  }
+
   let overlay = document.querySelector(".nav-overlay");
   if (!overlay) { overlay = document.createElement("div"); overlay.className = "nav-overlay"; document.body.appendChild(overlay); }
   const toggleMenu = (open) => {
@@ -1245,6 +1253,8 @@ function restoreQuizResults() {
 // PRACTICE SECTION - PAGINATION FIXED
 // ============================================
 function initPracticeSection() {
+  if (window.__practiceInitialized) return;
+  window.__practiceInitialized = true;
   const problemsGrid = document.querySelector(".problems-grid");
   if (!problemsGrid) return;
 
@@ -2456,6 +2466,16 @@ function openQuizEditor(problem) {
   const outputIcon = document.getElementById('outputToggleIcon');
   if (outputPanel) outputPanel.classList.remove('collapsed');
   if (outputIcon) { outputIcon.classList.remove('fa-chevron-up'); outputIcon.classList.add('fa-chevron-down'); }
+
+  // CSP-safe button bindings (guard prevents duplicate listeners)
+  if (!window.__quizButtonsBound) {
+    window.__quizButtonsBound = true;
+    document.getElementById('quizRunBtn')?.addEventListener('click', runQuizCode);
+    document.getElementById('quizSubmitBtn')?.addEventListener('click', submitQuizCode);
+    document.getElementById('quizModalClose')?.addEventListener('click', closeQuizEditor);
+    document.getElementById('outputHeader')?.addEventListener('click', toggleOutputPanel);
+  }
+
   modal.classList.add("active");
   updateLineNumbers();
   syncScroll();
@@ -2586,7 +2606,7 @@ function getDefaultCode(lang, problem) {
 }
 
 function generateExamples(problem) {
-  const examples = { 1: `<strong>Example 1:</strong><br>Input: nums = [2,7,11,15], target = 9<br>Output: [0,1]<br><br><strong>Follow-up:</strong> Can you solve it in O(n) using a Hash Map?`, 2: `<strong>Example 1:</strong><br>Input: s = "()"<br>Output: true<br><br><strong>Follow-up:</strong> Can you solve it in O(n) using a Stack?`, 3: `<strong>Example 1:</strong><br>Input: list1 = [1,2,4], list2 = [1,3,4]<br>Output: [1,1,2,3,4,4]<br><br><strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`, 4: `<strong>Example 1:</strong><br>Input: nums = [-2,1,-3,4,-1,2,1,-5,4]<br>Output: 6<br><br><strong>Follow-up:</strong> Can you solve it using Kadane's Algorithm in O(n)?`, 6: `<strong>Example 1:</strong><br>Input: adjList = [[2,4],[1,3],[2,4],[1,3]]<br>Output: [[2,4],[1,3],[2,4],[1,3]]<br><br><strong>Follow-up:</strong> Can you solve it using both BFS and DFS approaches?`, 7: `<strong>Example 1:</strong><br>Input: nums = [10,9,2,5,3,7,101,18]<br>Output: 4<br><br><strong>Follow-up:</strong> Can you improve from O(n²) to O(n log n) using binary search?`, 9: `<strong>Example 1:</strong><br>Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]<br>Output: 6<br><br><strong>Follow-up:</strong> Can you solve it in O(n) time and O(1) space using the two-pointer technique?`, 10: `<strong>Example 1:</strong><br>Input: head = [1,2,3,4,5]<br>Output: [5,4,3,2,1]<br><br><strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`, 11: `<strong>Example 1:</strong><br>Input: root = [4,2,7,1,3,6,9]<br>Output: [4,7,2,9,6,3,1]<br><br><strong>Follow-up:</strong> Can you solve it both recursively and iteratively using a queue or stack?` };
+  const examples = { 1: `<strong>Example 1:</strong><br>Input: nums = [2,7,11,15], target = 9<br>Output: [0,1]<br><br><strong>Follow-up:</strong> Can you solve it in O(n) using a Hash Map?`, 2: `<strong>Example 1:</strong><br>Input: s = "()"<br>Output: true<br><br><strong>Follow-up:</strong> Can you solve it in O(n) using a Stack?`, 3: `<strong>Example 1:</strong><br>Input: list1 = [1,2,4], list2 = [1,3,4]<br>Output: [1,1,2,3,4,4]<br><br><strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`, 4: `<strong>Example 1:</strong><br>Input: nums = [-2,1,-3,4,-1,2,1,-5,4]<br>Output: 6<br><br><strong>Follow-up:</strong> Can you solve it using Kadane's Algorithm in O(n)?`, 6: `<strong>Example 1:</strong><br>Input: adjList = [[2,4],[1,3],[2,4],[1,3]]<br>Output: [[2,4],[1,3],[2,4],[1,3]]<br><br><strong>Follow-up:</strong> Can you solve it using both BFS and DFS approaches?`, 7: `<strong>Example 1:</strong><br>Input: nums = [10,9,2,5,3,7,101,18]<br>Output: 4<br><br><strong>Follow-up:</strong> Can you improve from O(n²) to O(n log n) using binary search?`, 9: `<strong>Example 1:</strong><br>Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]<br>Output: 6<br><br><strong>Follow-up:</strong> Can you solve it in O(n) time and O(1) space using the two-pointer technique?`, 10: `<strong>Example 1:</strong><br>Input: head = [1,2,3,4,5]<br>Output: [5,4,3,2,1]<br><br><strong>Follow-up:</strong> Can you solve it both iteratively and recursively?`, 11: `<strong>Example 1:</strong><br>Input: root = [4,2,7,1,3,6,9]<br>Output: [4,7,2,9,6,3,1]<br><br><strong>Follow-up:</strong> Can you solve it both recursively and iteratively using a queue or stack?`, 12: `<strong>Example 1:</strong><br>Input: root = [2,1,3]<br>Output: true<br><br><strong>Follow-up:</strong> Can you solve it without recursion using iterative inorder traversal?`, 14: `<strong>Example 1:</strong><br>Input: nums = [1,2,3,1]<br>Output: 4<br><br><strong>Follow-up:</strong> Can you solve it in O(n) time and O(1) space using DP with two variables?` };
   return examples[problem.id] || "<strong>Example:</strong><br>Solve this problem";
 }
 
@@ -2768,9 +2788,8 @@ function genJavaHarness(code, fn, tcs, isClass) {
       else callArgs += valToLit(tcs[i].input[j], inTypes[j]);
     }
     s += '      ' + javaType + ' __r = new Solution().' + fn + '(' + callArgs + ');\n';
-    let pExpr = 'false';
     if (outType === 'int[]') {
-      pExpr = '__eq(__r, new int[]{' + tcs[i].expected.map(x => x === null || x === undefined ? 0 : x).join(',') + '})';
+      s += '      boolean __p = __eq(__r, new int[]{' + tcs[i].expected.map(x => x === null || x === undefined ? 0 : x).join(',') + '});\n';
     } else if (outType === 'int[][]') {
       s += '      boolean __p = __eq(__r, new int[][]{' + tcs[i].expected.map(row => '{' + row.join(',') + '}').join(',') + '});\n';
     } else {
@@ -2911,9 +2930,8 @@ function genSwiftHarness(code, fn, tcs, isClass) {
       else callArgs += valToLit(tcs[i].input[j], inTypes[j]);
     }
     s += '  let __r = ' + fn + '(' + callArgs + ')\n';
-    let pExpr = 'false';
     if (outType === 'int[]') {
-      pExpr = '__r == [' + tcs[i].expected.map(x => x === null || x === undefined ? 0 : x).join(',') + ']';
+      s += '  let __p = __r == [' + tcs[i].expected.map(x => x === null || x === undefined ? 0 : x).join(',') + ']\n';
     } else if (outType === 'int[][]') {
       s += '  let __p = __r == [' + tcs[i].expected.map(row => '[' + row.join(',') + ']').join(',') + ']\n';
     } else {
@@ -3093,14 +3111,6 @@ async function runQuizCode() {
       const metricText = `\n\n⏱️ Execution Time: ${result.metrics.cpuTime} sec\n💾 Memory Used: ${result.metrics.memory} KB`;
       const el = document.getElementById("quizOutputContent");
       if (el) el.innerHTML += `<pre style="color:var(--accent); margin-top:10px;">${metricText}</pre>`;
-      if (el) {
-        const metricsEl = document.createElement("pre");
-        metricsEl.style.color = "var(--accent)";
-        metricsEl.style.marginTop = "10px";
-        metricsEl.setAttribute("aria-label", "Execution metrics");
-        metricsEl.textContent = metricText;
-        el.appendChild(metricsEl);
-      }
     }
   } catch (e) {
     renderTestCases(testCases);
@@ -3280,9 +3290,12 @@ function toggleLineComment() {
 function toggleOutputPanel() {
   const panel = document.getElementById('outputPanel');
   const icon = document.getElementById('outputToggleIcon');
+  const header = document.getElementById('outputHeader');
   if (!panel) return;
   panel.classList.toggle('collapsed');
-  if (icon) { if (panel.classList.contains('collapsed')) { icon.classList.remove('fa-chevron-down'); icon.classList.add('fa-chevron-up'); } else { icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down'); } }
+  const collapsed = panel.classList.contains('collapsed');
+  if (icon) { icon.classList.toggle('fa-chevron-down', !collapsed); icon.classList.toggle('fa-chevron-up', collapsed); }
+  if (header) header.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
 }
 
 // ============================================
@@ -3631,10 +3644,17 @@ function updateCurrentLineHighlight() {
 }
 
 // Initialize quiz editor
+function wireQuizButtons() {
+  const runBtn = document.getElementById('quizRunBtn');
+  const submitBtn = document.getElementById('quizSubmitBtn');
+  if (runBtn && !runBtn._quizWired) { runBtn.addEventListener('click', runQuizCode); runBtn._quizWired = true; }
+  if (submitBtn && !submitBtn._quizWired) { submitBtn.addEventListener('click', submitQuizCode); submitBtn._quizWired = true; }
+}
+
 function initializeQuizEditor() {
   const editor = document.getElementById('codeEditor');
   const languageSelect = document.getElementById('languageSelect');
-  if (!editor || editor.dataset.initialized === 'true') return;
+  if (!editor || editor.dataset.initialized === 'true') { wireQuizButtons(); return; }
   editor.dataset.initialized = 'true';
   const syncEditorState = () => { updateSyntaxHighlight(); updateLineNumbers(); syncScroll(); };
   editor.addEventListener('input', () => { syncEditorState(); if (currentProblem) saveEditorDraft(currentProblem.id, editor.value, getProblemSignature(currentProblem)); });
@@ -3647,10 +3667,7 @@ function initializeQuizEditor() {
     else if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); runQuizCode(); }
     else if (e.ctrlKey && e.key === 's') { e.preventDefault(); submitQuizCode(); }
   });
-  const runBtn = document.getElementById('quizRunBtn');
-  const submitBtn = document.getElementById('quizSubmitBtn');
-  if (runBtn) runBtn.addEventListener('click', runQuizCode);
-  if (submitBtn) submitBtn.addEventListener('click', submitQuizCode);
+  wireQuizButtons();
   if (languageSelect) languageSelect.addEventListener('change', () => { const editor = document.getElementById('codeEditor'); if (editor && currentProblem) { editor.value = getDefaultCode(languageSelect.value, currentProblem); editor.scrollTop = 0; editor.scrollLeft = 0; } syncEditorState(); updateEditorDisplayMode(); });
   syncEditorState();
   initEditorZoom(editor);
@@ -3695,15 +3712,12 @@ window.addEventListener('hashchange', () => {
       const id = element.id ? element.id.toLowerCase() : '';
       const className = element.className ? element.className.toString().toLowerCase() : '';
       if (id.includes('quiz') || className.includes('quiz') || id.includes('assistant')) {
-        element.style.display = 'none';
-      if (id.includes('quiz') || className.includes('quiz') || id.includes('assistant')) {
         element.dataset.routeHidden = 'true';
         element.style.display = 'none';
       } else if (element.dataset.routeHidden === 'true') {
         delete element.dataset.routeHidden;
         element.classList.remove('hidden');
         element.style.display = '';
-      }
       }
     });
     if (typeof tQuiz !== 'undefined' && tQuiz !== null) tQuiz = null;
@@ -4612,3 +4626,304 @@ window.addEventListener('load', () => {
     window.syncSpacedRepetitionDown();
   }
 });
+
+// ============================================
+// PROBLEM FILTERING WITH CORRECT COUNT
+// ============================================
+
+/**
+ * Update the problem count display
+ * @param {Array} filteredProblems - Array of filtered problems
+ */
+function updateProblemCount(filteredProblems) {
+    // Update visible count
+    const visibleCountEl = document.getElementById('visible-count');
+    if (visibleCountEl) {
+        const total = filteredProblems.length;
+        visibleCountEl.textContent = total;
+    }
+    
+    // Update total count (if separate)
+    const totalCountEl = document.getElementById('total-count');
+    if (totalCountEl) {
+        // This should show total problems before filtering
+        const allProblems = getAllProblems();
+        totalCountEl.textContent = allProblems.length;
+    }
+    
+    // Update the problem count display (legacy)
+    const countElement = document.querySelector('.problem-count');
+    if (countElement) {
+        const total = filteredProblems.length;
+        countElement.textContent = `${total} problem${total !== 1 ? 's' : ''}`;
+    }
+    
+    // Show/hide empty state
+    const emptyState = document.getElementById('emptyState');
+    if (emptyState) {
+        if (filteredProblems.length === 0) {
+            emptyState.classList.remove('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+        }
+    }
+}
+
+/**
+ * Get all problems (from your data source)
+ * @returns {Array} All practice problems
+ */
+function getAllProblems() {
+    // Use your existing problems data
+    return practiceProblems || window.practiceProblems || [];
+}
+
+/**
+ * Filter problems based on selected difficulty
+ * @param {string} difficulty - 'all', 'easy', 'medium', 'hard'
+ * @param {Array} problems - Problems to filter
+ * @returns {Array} Filtered problems
+ */
+function filterProblemsByDifficulty(difficulty, problems) {
+    if (difficulty === 'all') {
+        return problems;
+    }
+    return problems.filter(problem => 
+        problem.difficulty.toLowerCase() === difficulty.toLowerCase()
+    );
+}
+
+/**
+ * Main filter function - handles filtering AND count update
+ */
+function filterProblems() {
+    const selectedDifficulty = getSelectedDifficulty();
+    const allProblems = getAllProblems();
+    
+    // Filter problems
+    const filtered = filterProblemsByDifficulty(selectedDifficulty, allProblems);
+    
+    // Render filtered problems
+    renderProblems(filtered);
+    
+    // Update count
+    updateProblemCount(filtered);
+    
+    // Update URL hash if needed (for bookmarking)
+    if (selectedDifficulty !== 'all') {
+        window.location.hash = `filter=${selectedDifficulty}`;
+    }
+}
+
+/**
+ * Get filter from URL hash on page load
+ */
+const VALID_PROBLEM_FILTERS = new Set(['all', 'easy', 'medium', 'hard', 'favorites']);
+
+function getFilterFromURL() {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    const filter = params.get('filter') || 'all';
+    return VALID_PROBLEM_FILTERS.has(filter) ? filter : 'all';
+}
+
+/**
+ * Apply filter on page load from URL
+ */
+function applyFilterFromURL() {
+    const filter = getFilterFromURL();
+    if (filter !== 'all') {
+        const filterBtn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
+        if (filterBtn) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            filterBtn.classList.add('active');
+        }
+    }
+    filterProblems();
+}
+
+// ============================================
+// RENDER PROBLEMS WITH COUNT UPDATE
+// ============================================
+
+const originalRenderProblems = window.renderProblems;
+if (typeof originalRenderProblems === 'function') {
+    window.renderProblems = function(problems) {
+        originalRenderProblems.call(this, problems);
+    };
+}
+
+// ============================================
+// COMPLETE FILTER IMPLEMENTATION
+// ============================================
+
+// Initialize filter buttons on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize filter buttons
+    initFilterButtons();
+    
+    // Apply filter from URL if any
+    applyFilterFromURL();
+    
+    // Initial render
+    filterProblems();
+});
+
+/**
+ * Initialize filter buttons with event listeners
+ */
+function initFilterButtons() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    filterButtons.forEach((btn) => {
+        btn.addEventListener('click', function() {
+            filterButtons.forEach((b) => {
+                const isActive = b === this;
+                b.classList.toggle('active', isActive);
+                b.setAttribute('aria-pressed', String(isActive));
+            });
+            
+            // Reset pagination to page 1
+            currentPage = 1;
+            
+            // Filter and render
+            filterProblems();
+        });
+    });
+    
+    // Clear filters button
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function() {
+            // Reset to 'all'
+            filterButtons.forEach((b) => b.classList.remove('active'));
+            const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+            if (allBtn) allBtn.classList.add('active');
+            
+            // Clear search
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+                currentSearch = '';
+            }
+            
+            // Reset and render
+            currentPage = 1;
+            filterProblems();
+        });
+    }
+}
+
+/**
+ * Get selected difficulty from active filter button
+ */
+function getSelectedDifficulty() {
+    const activeFilter = document.querySelector('.filter-btn.active');
+    if (activeFilter) {
+        return activeFilter.dataset.filter || 'all';
+    }
+    return 'all';
+}
+
+/**
+ * Get all problems
+ */
+function getAllProblems() {
+    return practiceProblems || [];
+}
+
+/**
+ * Filter problems by difficulty
+ */
+function filterProblemsByDifficulty(difficulty, problems) {
+    if (difficulty === 'all') {
+        return problems;
+    }
+    if (difficulty === 'favorites') {
+        return problems.filter(p => userProgress.favoriteProblems.includes(p.id));
+    }
+    return problems.filter(problem => 
+        problem.difficulty.toLowerCase() === difficulty.toLowerCase()
+    );
+}
+
+/**
+ * Filter problems with search and difficulty
+ */
+function filterProblems() {
+    const selectedDifficulty = getSelectedDifficulty();
+    const allProblems = getAllProblems();
+    const searchTerm = currentSearch || '';
+    
+    // Filter by difficulty
+    let filtered = filterProblemsByDifficulty(selectedDifficulty, allProblems);
+    
+    // Filter by search term
+    if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        filtered = filtered.filter(problem => 
+            problem.title.toLowerCase().includes(term) ||
+            problem.tags.some(tag => tag.toLowerCase().includes(term)) ||
+            (problem.description && problem.description.toLowerCase().includes(term))
+        );
+    }
+    
+    // Update count
+    updateProblemCount(filtered);
+    
+    // Render with pagination
+    renderProblemsWithPagination(filtered);
+}
+
+/**
+ * Render problems with pagination
+ */
+function renderProblemsWithPagination(filteredProblems) {
+    const totalProblems = filteredProblems.length;
+    const totalPages = Math.max(1, Math.ceil(totalProblems / PROBLEMS_PER_PAGE));
+    
+    if (currentPage > totalPages) currentPage = totalPages;
+    
+    const start = (currentPage - 1) * PROBLEMS_PER_PAGE;
+    const end = Math.min(start + PROBLEMS_PER_PAGE, totalProblems);
+    const pageProblems = filteredProblems.slice(start, end);
+    
+    // Render the problems
+    renderProblems(pageProblems);
+    
+    // Update pagination
+    updatePaginationControls(currentPage, totalPages);
+}
+
+/**
+ * Update problem count display
+ */
+function updateProblemCount(filteredProblems) {
+    const total = filteredProblems.length;
+    const visibleCountEl = document.getElementById('visible-count');
+    const totalCountEl = document.getElementById('total-count');
+    const problemLabel = document.getElementById('problem-label');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (visibleCountEl) {
+        visibleCountEl.textContent = total;
+    }
+    
+    if (totalCountEl) {
+        const allProblems = getAllProblems();
+        totalCountEl.textContent = allProblems.length;
+    }
+    
+    if (problemLabel) {
+        problemLabel.textContent = total === 1 ? 'problem' : 'problems';
+    }
+    
+    if (emptyState) {
+        emptyState.classList.toggle('hidden', total !== 0);
+    }
+    
+    // Legacy support
+    const countElement = document.querySelector('.problem-count');
+    if (countElement) {
+        countElement.textContent = `${total} problem${total !== 1 ? 's' : ''}`;
+    }
+}

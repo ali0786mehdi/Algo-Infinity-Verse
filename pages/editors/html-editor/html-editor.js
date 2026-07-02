@@ -290,7 +290,7 @@ const HTML_EXAMPLES = {
 </head>
 <body>
   <h2>Sign Up Form</h2>
-  <form onsubmit="alert('Form submitted! (Demo only)'); return false;">
+  <form id="demo-signup-form">
     <label for="name">Full Name</label>
     <input type="text" id="name" placeholder="Alice Johnson" required />
 
@@ -511,6 +511,15 @@ function initHtmlEditor() {
     setTimeout(() => { saveBtn.innerHTML = '<i class="fas fa-save"></i>'; }, 2000);
     logInfo("Code saved to browser storage.");
   });
+
+    const demoForm = document.getElementById("demo-signup-form");
+
+    if (demoForm) {
+        demoForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            alert("Form submitted! (Demo only)");
+        });
+    }
 
   /* Editor events — only re-render automatically when live preview is on */
   editor.on("change", () => {

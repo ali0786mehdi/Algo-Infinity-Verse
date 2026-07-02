@@ -425,20 +425,45 @@ function renderList() {
       </div>
       <h4 class="iep-card-title">${escapeHtml(exp.title)}</h4>
       <div class="iep-card-content" id="iepContent-${exp.id}">${escapeHtml(contentPreview)}</div>
-      ${isTruncated ? `<button class="iep-read-more" onclick="toggleExpand(${exp.id})">Read more</button>` : ''}
+      ${isTruncated ? `<button class="iep-read-more" data-id="${exp.id}">Read more</button>` : ''}
       ${topicsHtml}
       <div class="iep-card-footer">
         <div class="iep-card-actions">
-          <button class="iep-upvote-btn ${exp.userVote === 1 ? 'voted' : ''}" onclick="handleUpvote(${exp.id})">
+          <button class="iep-upvote-btn ${exp.userVote === 1 ? 'voted' : ''}" data-action="upvote" data-id="${exp.id}">
             <i class="fas fa-arrow-up"></i>
             <span>${exp.upvotes || 0}</span>
           </button>
-          <button class="iep-upvote-btn" onclick="openModal(${exp.id})">
+          <button class="iep-upvote-btn" data-action="view" data-id="${exp.id}">
             <i class="fas fa-eye"></i> View Details
           </button>
         </div>
       </div>
     `;
+      card.querySelectorAll('button[data-action]').forEach(button => {
+          button.addEventListener('click', (e) => {
+              e.stopPropagation();
+
+              const id = Number(button.dataset.id);
+
+              if (button.dataset.action === 'upvote') {
+                  handleUpvote(id);
+              }
+
+              if (button.dataset.action === 'view') {
+                  openModal(id);
+              }
+          });
+      });
+
+
+      const readMoreBtn = card.querySelector('.iep-read-more');
+
+      if (readMoreBtn) {
+          readMoreBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              toggleExpand(Number(readMoreBtn.dataset.id));
+          });
+      }
     card.addEventListener('click', (e) => {
       const target = e.target.closest('button, a, .iep-tag, .iep-card-company, .iep-diff-badge, .iep-status-badge');
       if (!target) openModal(exp.id);
@@ -501,8 +526,8 @@ function openModal(id) {
   if (!exp) return;
 
   const overlay = document.createElement('div');
-  overlay.className = 'iep-modal-overlay';
-  overlay.onclick = (e) => { if (e.target === overlay) closeModal(overlay); };
+  overlay.className = 'iep-modal-overlay';overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {closeModal(overlay);}});
 
   const companyIcon = getCompanyIcon(exp.company);
   const topicsHtml = exp.topics && exp.topics.length > 0
@@ -519,7 +544,7 @@ function openModal(id) {
     <div class="iep-modal">
       <div class="iep-modal-header">
         <h2>${escapeHtml(exp.title)}</h2>
-        <button class="iep-modal-close" onclick="closeModal(this.closest('.iep-modal-overlay'))">&times;</button>
+        <button class="iep-modal-close" data-action="close-modal">&times;</button>
       </div>
       <div class="iep-modal-meta">
         <span class="iep-card-company">${companyIcon} ${escapeHtml(exp.company)}</span>
@@ -540,6 +565,11 @@ function openModal(id) {
 
   document.body.appendChild(overlay);
   document.body.style.overflow = 'hidden';
+    const closeButton = overlay.querySelector('[data-action="close-modal"]');
+
+    closeButton.addEventListener('click', () => {
+        closeModal(overlay);
+    });
 
   function escapeHandler(e) {
     if (e.key === 'Escape') closeModal(overlay);

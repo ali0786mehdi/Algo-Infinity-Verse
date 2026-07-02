@@ -131,7 +131,7 @@ function renderSidebar() {
     crimeCases.forEach(c => {
         const li = document.createElement('li');
         li.className = `case-item ${currentCase && currentCase.id === c.id ? 'active' : ''} ${solvedCases.has(c.id) ? 'solved' : ''}`;
-        li.onclick = () => loadCase(c.id);
+        li.addEventListener("click", () => loadCase(c.id));
         
         li.innerHTML = `
             <span class="c-id">FILE #${c.id}</span>
@@ -186,7 +186,7 @@ function loadCase(id) {
             btn.disabled = true;
             if (idx === currentCase.correctIndex) btn.classList.add('correct');
         } else {
-            btn.onclick = () => handleAccusation(idx, btn);
+            btn.addEventListener("click", () => handleAccusation(idx, btn));
         }
         
         elements.suspectsGrid.appendChild(btn);
@@ -244,7 +244,7 @@ function showFeedback(isCorrect) {
         const retryBtn = document.createElement('button');
         retryBtn.className = 'btn-next-case';
         retryBtn.innerHTML = '<i class="fas fa-redo"></i> Re-investigate';
-        retryBtn.onclick = () => loadCase(currentCase.id);
+        retryBtn.addEventListener("click", () => loadCase(currentCase.id));
         
         // Remove old retry button if exists
         const existing = elements.feedbackPanel.querySelector('.fa-redo');

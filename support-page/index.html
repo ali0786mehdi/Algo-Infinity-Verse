@@ -26,6 +26,190 @@
         } catch (e) {}
       })();
     </script>
+
+    <style>
+        /* Skeleton Loader Styles for Support Page */
+        .skeleton-support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .skeleton-support-grid.visible {
+            opacity: 1;
+        }
+
+        .skeleton-support-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            min-height: 300px;
+            animation: skeletonPulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton-support-card .skeleton-title {
+            width: 60%;
+            height: 28px;
+            background: var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .skeleton-support-card .skeleton-line {
+            height: 14px;
+            background: var(--border-color);
+            border-radius: 6px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-support-card .skeleton-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            animation: skeletonShimmer 2s infinite;
+            transform: translateX(-100%);
+        }
+
+        .skeleton-support-card .skeleton-line-lg {
+            width: 80%;
+            height: 18px;
+        }
+
+        .skeleton-support-card .skeleton-line-md {
+            width: 60%;
+            height: 12px;
+        }
+
+        .skeleton-support-card .skeleton-line-sm {
+            width: 40%;
+            height: 10px;
+        }
+
+        .skeleton-support-card .skeleton-line-xs {
+            width: 30%;
+            height: 8px;
+        }
+
+        .skeleton-support-card .skeleton-button {
+            width: 120px;
+            height: 44px;
+            background: var(--border-color);
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .skeleton-support-card .skeleton-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--border-color);
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .skeleton-support-card .skeleton-faq {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 1rem;
+        }
+
+        .skeleton-support-card .skeleton-faq-item {
+            height: 40px;
+            background: var(--border-color);
+            border-radius: 8px;
+        }
+
+        @keyframes skeletonPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes skeletonShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Dark theme skeleton */
+        .dark .skeleton-support-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(51, 65, 85, 0.5);
+        }
+
+        .dark .skeleton-support-card .skeleton-title,
+        .dark .skeleton-support-card .skeleton-line,
+        .dark .skeleton-support-card .skeleton-button,
+        .dark .skeleton-support-card .skeleton-icon,
+        .dark .skeleton-support-card .skeleton-faq-item {
+            background: #334155;
+        }
+
+        .dark .skeleton-support-card .skeleton-line::after {
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.05),
+                transparent
+            );
+        }
+
+        @media (max-width: 768px) {
+            .skeleton-support-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .skeleton-support-card {
+                padding: 1.5rem;
+                min-height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .skeleton-support-card {
+                padding: 1.25rem;
+                min-height: 200px;
+            }
+            
+            .skeleton-support-card .skeleton-title {
+                height: 22px;
+            }
+            
+            .skeleton-support-card .skeleton-line {
+                height: 12px;
+            }
+            
+            .skeleton-support-card .skeleton-button {
+                height: 38px;
+                width: 100px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .skeleton-support-card {
+                animation: none;
+            }
+            
+            .skeleton-support-card .skeleton-line::after {
+                animation: none;
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body data-page="support">
     <!-- Navbar Placeholder -->
@@ -41,7 +225,55 @@
             <p class="section-subtitle">
                 Get help and report bugs
             </p>
-            <div class="support-grid">
+            
+            <!-- Skeleton Loader -->
+            <div id="skeletonLoader" class="skeleton-support-grid visible">
+                <!-- Card 1 - Support Request -->
+                <div class="skeleton-support-card">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-line skeleton-line-lg"></div>
+                    <div class="skeleton-line skeleton-line-md"></div>
+                    <div class="skeleton-line skeleton-line-sm"></div>
+                    <div class="skeleton-line skeleton-line-xs"></div>
+                    <div class="skeleton-button"></div>
+                </div>
+                
+                <!-- Card 2 - Bug Report -->
+                <div class="skeleton-support-card">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-line skeleton-line-lg"></div>
+                    <div class="skeleton-line skeleton-line-md"></div>
+                    <div class="skeleton-line skeleton-line-sm"></div>
+                    <div class="skeleton-button"></div>
+                </div>
+                
+                <!-- Card 3 - FAQs -->
+                <div class="skeleton-support-card">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-faq">
+                        <div class="skeleton-faq-item"></div>
+                        <div class="skeleton-faq-item"></div>
+                        <div class="skeleton-faq-item"></div>
+                        <div class="skeleton-faq-item"></div>
+                    </div>
+                </div>
+                
+                <!-- Card 4 - Contact -->
+                <div class="skeleton-support-card">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-line skeleton-line-lg"></div>
+                    <div class="skeleton-line skeleton-line-md"></div>
+                    <div class="skeleton-line skeleton-line-sm"></div>
+                    <div class="skeleton-line skeleton-line-xs"></div>
+                </div>
+            </div>
+
+            <!-- Actual Content -->
+            <div id="supportContent" class="support-grid" style="display: none;">
                 <!-- Support Request Card -->
                 <div class="support-card">
                     <h2>Support Request</h2>
@@ -193,7 +425,6 @@
                     element.innerHTML = html;
                     // Re-initialize navbar after loading
                     if (elementId === 'navbar-placeholder') {
-                        // Wait for navbar to be loaded then init
                         if (typeof initNavbar === 'function') {
                             setTimeout(initNavbar, 100);
                         }
@@ -208,6 +439,47 @@
         loadPartial('navbar-placeholder', '/partials/navbar.html');
         loadPartial('footer-placeholder', '/partials/footer.html');
 
+        // --- Skeleton Loader ---
+        function showSkeleton() {
+            const skeleton = document.getElementById('skeletonLoader');
+            const content = document.getElementById('supportContent');
+            
+            if (skeleton) {
+                skeleton.style.display = 'grid';
+                skeleton.classList.add('visible');
+            }
+            if (content) {
+                content.style.display = 'none';
+            }
+        }
+
+        function hideSkeleton() {
+            const skeleton = document.getElementById('skeletonLoader');
+            const content = document.getElementById('supportContent');
+            
+            if (skeleton) {
+                skeleton.style.display = 'none';
+                skeleton.classList.remove('visible');
+            }
+            if (content) {
+                content.style.display = 'grid';
+                // Add fade-in animation
+                content.style.animation = 'fadeInUp 0.5s ease';
+            }
+        }
+
+        // Initialize with skeleton
+        document.addEventListener('DOMContentLoaded', function() {
+            showSkeleton();
+            
+            // Simulate loading (remove in production)
+            setTimeout(() => {
+                hideSkeleton();
+            }, 1000);
+        });
+
+        // --- Form Handlers ---
+
         // Handle Support Form Submission
         document.getElementById('supportForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -217,7 +489,7 @@
             const message = document.getElementById('supportMessage').value.trim();
 
             if (!name || !email || !subject || !message) {
-                alert('Please fill in all required fields.');
+                showToast('Please fill in all required fields.', 'error');
                 return;
             }
 
@@ -227,7 +499,7 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
             setTimeout(() => {
-                alert('✅ Support request submitted successfully!\nWe\'ll get back to you within 24-48 hours.');
+                showToast('✅ Support request submitted successfully! We\'ll get back to you within 24-48 hours.', 'success');
                 this.reset();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Request';
@@ -242,7 +514,7 @@
             const file = document.getElementById('bugFile').files[0];
 
             if (!bugType || !description) {
-                alert('Please fill in all required fields.');
+                showToast('Please fill in all required fields.', 'error');
                 return;
             }
 
@@ -251,18 +523,63 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
 
             setTimeout(() => {
-                let message = '🐛 Bug report submitted successfully!\n\n';
-                message += `Type: ${bugType}\n`;
-                message += `Description: ${description.substring(0, 50)}...\n`;
-                if (file) {
-                    message += `File attached: ${file.name}`;
-                }
-                alert(message);
+                let message = '🐛 Bug report submitted successfully!';
+                showToast(message, 'success');
                 this.reset();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-bug"></i> Report Bug';
             }, 1500);
         });
+
+        // --- Toast Notification ---
+        function showToast(message, type = 'info') {
+            // Check if toast function exists
+            if (typeof toast !== 'undefined' && toast.show) {
+                toast.show(message, type);
+                return;
+            }
+            
+            // Fallback toast
+            const existingToast = document.querySelector('.message-box');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `message-box ${type}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button class="message-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto dismiss after 4 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('hiding');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 4000);
+        }
+
+        // Make showToast globally available
+        window.showToast = showToast;
+
+        // Add fadeInUp animation if not exists
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
