@@ -3505,7 +3505,7 @@ if (process.env.VERCEL === "1") {
   db = initializeFirebase();
   useFirestore = !!db;
   if (!process.env.SESSION_SECRET) {
-    console.error("FATAL: SESSION_SECRET is required on Vercel. Set it in the Vercel dashboard under Project Settings > Environment Variables.");
+    throw new Error("FATAL: SESSION_SECRET is required on Vercel. Set it in the Vercel dashboard under Project Settings > Environment Variables.");
   }
 }
 

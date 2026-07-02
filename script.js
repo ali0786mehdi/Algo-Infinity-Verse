@@ -1286,7 +1286,7 @@ function initPracticeSection() {
         aiRecommendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding...';
         aiRecommendBtn.disabled = true;
         
-        const res = await fetch("/api/recommendations/next");
+        const res = await fetch("/api/recommendations/next", { credentials: "include" });
         if (res.status === 401) {
            alert("Please log in to get AI recommendations.");
            return;
@@ -2971,12 +2971,13 @@ async function executeViaApi(lang, code, originalCode) {
   // Make sure this points to your new secure Node.js route
   const response = await fetch(`${API_BASE}/api/execute`, {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ 
-      sourceCode: code, 
+    body: JSON.stringify({
+      sourceCode: code,
       originalCode: originalCode,
-      language: lang, 
-      stdin: "" 
+      language: lang,
+      stdin: ""
     })
   });
   
@@ -4471,6 +4472,7 @@ window.saveActiveProblemNotes = async function() {
   try {
     const res = await fetch(`/api/problem-notes/${currentProblem.id}`, {
       method: "PUT",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(noteData)
     });
@@ -4492,7 +4494,7 @@ window.saveActiveProblemNotes = async function() {
 window.syncProblemNotesDown = async function() {
   if (location.protocol === "file:") return;
   try {
-    const res = await fetch("/api/problem-notes");
+    const res = await fetch("/api/problem-notes", { credentials: "include" });
     if (res.status === 200) {
       const data = await res.json();
       if (data.success && data.notes) {
@@ -4516,6 +4518,7 @@ window.rateRecallDifficulty = async function(quality) {
   try {
     const res = await fetch(`/api/spaced-repetition/${problemId}`, {
       method: "PUT",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ existing, quality })
     });
@@ -4576,7 +4579,7 @@ window.rateRecallDifficulty = async function(quality) {
 window.syncSpacedRepetitionDown = async function() {
   if (location.protocol === "file:") return;
   try {
-    const res = await fetch("/api/spaced-repetition");
+    const res = await fetch("/api/spaced-repetition", { credentials: "include" });
     if (res.status === 200) {
       const data = await res.json();
       if (data.success && data.cards) {
