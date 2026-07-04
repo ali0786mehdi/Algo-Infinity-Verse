@@ -8486,9 +8486,6 @@ html.light-mode .dropdown-menu {
     font-size: 0.75rem;
   }
 
-  .quiz-problem-panel .test-cases-container,
-  .test-cases-container {}
-
   .quiz-problem-panel {
     padding: 1rem 0.75rem;
   }
@@ -8541,9 +8538,6 @@ html.light-mode .dropdown-menu {
   .output-content {
     max-height: 80px;
   }
-
-  .quiz-problem-panel .test-cases-container,
-  .test-cases-container {}
 
   .quiz-problem-panel {
     padding: 0.75rem 1rem;

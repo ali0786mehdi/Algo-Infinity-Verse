@@ -61,8 +61,6 @@ input[type="range"]{width:100%;}
 .process-card .pc-queue{font-size:.75rem;color:rgba(255,255,255,.75);font-weight:700;}
 .process-card .pc-bottom{margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;}
 .pill-mini{font-size:.75rem;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.12);color:rgba(255,255,255,.85)}
-
-.cpuTimeline{ }
 .timeline{display:flex;gap:10px;align-items:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;}
 .tslice{min-width:58px;height:56px;border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative;}
 .tslice.running{border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,58,237,0.18)}
@@ -86,6 +84,4 @@ input[type="range"]{width:100%;}
 .rules-mini{padding:10px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);}
 .rules-mini-title{font-weight:900;}
 .rule{display:flex;align-items:center;gap:10px;margin:8px 0;color:var(--text-secondary);font-weight:700;}
-
-#scheduleLog{ }
 
