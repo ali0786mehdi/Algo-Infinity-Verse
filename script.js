@@ -1,10 +1,19 @@
 // ============================================
 // ABORT MANAGER
 // ============================================
+/**
+ * Manages AbortControllers to allow cancellation of ongoing requests.
+ */
 class AbortManager {
   constructor() {
     this.controllers = new Map();
   }
+  /**
+   * Retrieves an AbortSignal for the given key, cancelling any previous request with the same key.
+   *
+   * @param {string} key - The unique identifier for the request.
+   * @returns {AbortSignal} The signal to pass to the fetch API.
+   */
   getSignal(key) {
     if (this.controllers.has(key)) {
       this.controllers.get(key).abort();
@@ -13,6 +22,11 @@ class AbortManager {
     this.controllers.set(key, controller);
     return controller.signal;
   }
+  /**
+   * Removes the AbortController associated with the given key.
+   *
+   * @param {string} key - The unique identifier for the request.
+   */
   clearSignal(key) {
     this.controllers.delete(key);
   }
@@ -23,6 +37,9 @@ const apiAbort = new AbortManager();
 // ============================================
 // CACHE MANAGER (IndexedDB)
 // ============================================
+/**
+ * Manages caching of API responses and partials using IndexedDB.
+ */
 class CacheManager {
   constructor(dbName = 'AlgoInfinityCache', storeName = 'api_responses') {
     this.dbName = dbName;
@@ -30,6 +47,11 @@ class CacheManager {
     this.dbPromise = this.initDB();
   }
 
+  /**
+   * Initializes the IndexedDB database.
+   *
+   * @returns {Promise<IDBDatabase>} The initialized database instance.
+   */
   initDB() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, 1);
@@ -44,6 +66,15 @@ class CacheManager {
     });
   }
 
+  /**
+   * Stores data in the cache.
+   *
+   * @param {string} url - The URL key for the cached data.
+   * @param {any} data - The data to cache.
+   * @param {string} [type='json'] - The type of data being cached ('json' or 'text').
+   * @param {number} [ttlMs=3600000] - Time to live in milliseconds.
+   * @returns {Promise<void>}
+   */
   async set(url, data, type = 'json', ttlMs = 3600000) {
     try {
       const db = await this.dbPromise;
@@ -66,6 +97,12 @@ class CacheManager {
     }
   }
 
+  /**
+   * Retrieves data from the cache.
+   *
+   * @param {string} url - The URL key for the cached data.
+   * @returns {Promise<Object|null>} The cached record, or null if not found or expired.
+   */
   async get(url) {
     try {
       const db = await this.dbPromise;
@@ -90,6 +127,12 @@ class CacheManager {
     }
   }
 
+  /**
+   * Invalidates a specific cache entry.
+   *
+   * @param {string} url - The URL key to invalidate.
+   * @returns {Promise<void>}
+   */
   async invalidate(url) {
     try {
       const db = await this.dbPromise;
@@ -105,6 +148,15 @@ class CacheManager {
     }
   }
 
+  /**
+   * Fetches data from a URL, utilizing the cache if available and not expired.
+   *
+   * @param {string} url - The URL to fetch.
+   * @param {Object} [options={}] - Fetch options (e.g., method, headers, signal).
+   * @param {number} [ttlMs=3600000] - Time to live in milliseconds for the cache.
+   * @param {string} [type='json'] - The expected response type ('json' or 'text').
+   * @returns {Promise<any>} The fetched or cached data.
+   */
   async fetchWithCache(url, options = {}, ttlMs = 3600000, type = 'json') {
     const cached = await this.get(url);
     
@@ -142,6 +194,11 @@ const apiCache = new CacheManager();
 // ============================================
 // PARTIAL LOADER
 // ============================================
+/**
+ * Retrieves the base path for partial HTML files.
+ *
+ * @returns {string} The base path for partials.
+ */
 function getPartialsBase() {
   const scripts = document.getElementsByTagName('script');
   for (let s of scripts) {
@@ -155,6 +212,13 @@ function getPartialsBase() {
 
 const PARTIALS_VERSION = 1;
 
+/**
+ * Asynchronously loads a partial HTML file and injects it into a target element.
+ *
+ * @param {string} id - The ID of the target DOM element.
+ * @param {string} url - The relative URL of the partial to load.
+ * @returns {Promise<void>}
+ */
 async function loadPartial(id, url) {
   const abortKey = `partial_${id}`;
   try {
