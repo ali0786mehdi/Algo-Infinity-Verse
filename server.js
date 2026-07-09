@@ -1185,7 +1185,8 @@ async function handleApi(req, res, pathname) {
         return sendJson(res, 409, { error: "An account with this email already exists." });
       }
 
-      const verifyToken = crypto.randomBytes(32).toString("hex");
+      const emailConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+      const verifyToken = emailConfigured ? crypto.randomBytes(32).toString("hex") : null;
       const user = {
         id: crypto.randomUUID(),
         name: String(payload.name).trim(),
@@ -1194,15 +1195,17 @@ async function handleApi(req, res, pathname) {
         createdAt: new Date().toISOString(),
         isDeactivated: false,
         deactivatedAt: null,
-        emailVerified: false,
+        emailVerified: !emailConfigured,
         verifyToken,
-        verifyTokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
+        verifyTokenExpiry: emailConfigured ? Date.now() + 24 * 60 * 60 * 1000 : null,
       };
       await createUser(user);
 
-      sendVerificationEmail(email, user.name, verifyToken).catch((err) =>
-        console.error("[email] Signup verification failed:", err)
-      );
+      if (emailConfigured) {
+        sendVerificationEmail(email, user.name, verifyToken).catch((err) =>
+          console.error("[email] Signup verification failed:", err)
+        );
+      }
 
       const token = createAccessToken(user);
       const refreshToken = await createRefreshToken(user);
@@ -1232,7 +1235,7 @@ async function handleApi(req, res, pathname) {
       return sendJson(res, 401, { error: "Invalid email or password." });
       }
 
-      if (!user.emailVerified) {
+      if (!user.emailVerified && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
         return sendJson(res, 403, {
           error: "Please verify your email before logging in.",
           requiresVerification: true,
@@ -2935,21 +2938,24 @@ const routes = {
   "/signup.html": "pages/auth/signup.html",
   "/verify-email": "pages/auth/verify-email.html",
   "/verify-email.html": "pages/auth/verify-email.html",
-    "/community": "community.html",
-    "/python-learning": "python-learning.html",
-    "/javascript-learning": "javascript-learning.html",
-    "/dbms-learning": "dbms-learning.html",
-    "/powerbi-learning": "powerbi-learning.html",
-    "/cplusplus-learning": "cplusplus-learning.html",
-    "/learning/php": "php-learning.html",
-    "/php-learning": "php-learning.html",
-    "/learning/oop": "oop-learning.html",
-    "/oop-learning": "oop-learning.html",
-    "/feedback": "feedback.html",
-    "/feedback.html": "feedback.html",
-    "/memory-scanner": "memory-scanner.html",
-    "/memory-scanner.html": "memory-scanner.html",
-    "/algorithm-timeline": "algorithm-timeline.html",
+    "/community": "pages/community/community/community.html",
+    "/community.html": "pages/community/community/community.html",
+    "/rust-learning": "rust-learning.html",
+    "/rust-learning.html": "rust-learning.html",
+    "/python-learning": "pages/learning/python-learning/python-learning.html",
+    "/javascript-learning": "pages/learning/javascript-learning/javascript-learning.html",
+    "/dbms-learning": "pages/learning/dbms-learning/dbms-learning.html",
+    "/powerbi-learning": "pages/learning/powerbi-learning/powerbi-learning.html",
+    "/cplusplus-learning": "pages/learning/cplusplus-learning/cplusplus-learning.html",
+    "/learning/php": "pages/learning/php-learning/php-learning.html",
+    "/php-learning": "pages/learning/php-learning/php-learning.html",
+    "/learning/oop": "pages/learning/oop-learning/oop-learning.html",
+    "/oop-learning": "pages/learning/oop-learning/oop-learning.html",
+    "/feedback": "pages/community/feedback/feedback.html",
+    "/feedback.html": "pages/community/feedback/feedback.html",
+    "/memory-scanner": "pages/tools/memory-scanner/memory-scanner.html",
+    "/memory-scanner.html": "pages/tools/memory-scanner/memory-scanner.html",
+    "/algorithm-timeline": "pages/visualizers/algorithm-timeline/algorithm-timeline.html",
     "/support-page": "support-page/index.html",
     "/support-page/": "support-page/index.html",
   };

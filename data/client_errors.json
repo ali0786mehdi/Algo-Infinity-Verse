@@ -550,5 +550,125 @@
     "timestamp": 1783432089801,
     "stack": "SyntaxError: Unexpected token 'export'",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:264:5)",
+    "url": "http://127.0.0.1:3000/pages/editors/python-editor/python-editor.html",
+    "timestamp": "2026-07-08T19:02:02.808Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:300:3)",
+    "url": "http://127.0.0.1:3000/pages/editors/python-editor/python-editor.html",
+    "timestamp": "2026-07-08T19:02:02.808Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:264:5)",
+    "url": "http://127.0.0.1:3000/pages/editors/java-editor/java-editor.html",
+    "timestamp": "2026-07-08T19:02:04.387Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:300:3)",
+    "url": "http://127.0.0.1:3000/pages/editors/java-editor/java-editor.html",
+    "timestamp": "2026-07-08T19:02:04.387Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:264:5)",
+    "url": "http://127.0.0.1:3000/pages/editors/cpp-editor/cpp-editor.html",
+    "timestamp": "2026-07-08T19:02:05.543Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:300:3)",
+    "url": "http://127.0.0.1:3000/pages/editors/cpp-editor/cpp-editor.html",
+    "timestamp": "2026-07-08T19:02:05.543Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:264:5)",
+    "url": "http://127.0.0.1:3000/pages/editors/c-editor/c-editor.html",
+    "timestamp": "2026-07-08T19:02:06.738Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:300:3)",
+    "url": "http://127.0.0.1:3000/pages/editors/c-editor/c-editor.html",
+    "timestamp": "2026-07-08T19:02:06.738Z"
+  },
+  {
+    "message": "Unexpected end of input",
+    "stack": "SyntaxError: Unexpected end of input",
+    "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
+    "timestamp": "2026-07-08T19:02:08.393Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:264:5)",
+    "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
+    "timestamp": "2026-07-08T19:02:08.393Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:300:3)",
+    "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
+    "timestamp": "2026-07-08T19:02:08.393Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:264:5)",
+    "url": "http://127.0.0.1:3000/pages/editors/html-editor/html-editor.html",
+    "timestamp": "2026-07-08T19:02:09.939Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:300:3)",
+    "url": "http://127.0.0.1:3000/pages/editors/html-editor/html-editor.html",
+    "timestamp": "2026-07-08T19:02:09.939Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:264:5)",
+    "url": "http://127.0.0.1:3000/pages/editors/perl/perl.html",
+    "timestamp": "2026-07-08T19:02:12.955Z"
+  },
+  {
+    "message": "initPracticeSection is not defined",
+    "stack": "ReferenceError: initPracticeSection is not defined\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/script.js:300:3)",
+    "url": "http://127.0.0.1:3000/pages/editors/perl/perl.html",
+    "timestamp": "2026-07-08T19:02:12.955Z"
+  },
+  {
+    "message": "Unexpected end of input",
+    "stack": "SyntaxError: Unexpected end of input",
+    "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
+    "timestamp": "2026-07-08T19:21:12.431Z"
+  },
+  {
+    "message": "Unexpected end of input",
+    "stack": "SyntaxError: Unexpected end of input",
+    "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
+    "timestamp": "2026-07-08T19:21:34.476Z"
+  },
+  {
+    "message": "Unexpected end of input",
+    "stack": "SyntaxError: Unexpected end of input",
+    "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
+    "timestamp": "2026-07-08T19:33:17.733Z"
+  },
+  {
+    "message": "Unexpected end of input",
+    "stack": "SyntaxError: Unexpected end of input",
+    "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
+    "timestamp": "2026-07-08T19:46:00.507Z"
+  },
+  {
+    "message": "Unexpected end of input",
+    "stack": "SyntaxError: Unexpected end of input",
+    "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
+    "timestamp": "2026-07-08T19:46:34.307Z"
   }
 ]

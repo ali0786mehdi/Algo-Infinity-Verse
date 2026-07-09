@@ -256,19 +256,19 @@ let currentProblem = null;
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired, initializing app...');
     if (typeof loadUserData === 'function') loadUserData();
-    initLoadingScreen();
-    initNavbar();
-    initHeroSection();
-    initTopicsSection();
-    initQuizSection();
-    initPracticeSection();
-    initRoadmap();
-    initDashboard();
-    initGamification();
-    initChatbot();
-    initProfile();
-    initScrollEffects();
-    initDarkMode();
+    if (typeof initLoadingScreen === 'function') initLoadingScreen();
+    if (typeof initNavbar === 'function') initNavbar();
+    if (typeof initHeroSection === 'function') initHeroSection();
+    if (typeof initTopicsSection === 'function') initTopicsSection();
+    if (typeof initQuizSection === 'function') initQuizSection();
+    if (typeof initPracticeSection === 'function') initPracticeSection();
+    if (typeof initRoadmap === 'function') initRoadmap();
+    if (typeof initDashboard === 'function') initDashboard();
+    if (typeof initGamification === 'function') initGamification();
+    if (typeof initChatbot === 'function') initChatbot();
+    if (typeof initProfile === 'function') initProfile();
+    if (typeof initScrollEffects === 'function') initScrollEffects();
+    if (typeof initDarkMode === 'function') initDarkMode();
 
     // Update profile display after loading
     
@@ -291,25 +291,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // Apply saved theme only after DOM is ready to avoid touching document.body too early
 
   if (typeof loadUserData === 'function') loadUserData();
-  initLoadingScreen();
-  initNavbar();
-  initHeroSection();
-  initTopicOfTheDay();
-  initTopicsSection();
-  initQuizSection();
-  initPracticeSection();
-  initRoadmap();
-  initDashboard();
-  initGamification();
-  initDailyChallenge();
-  initChatbot();
-  initProfile();
-  initNewsletterValidation();
-  initScrollEffects();
-  initFooterCurrentDate();
+  if (typeof initLoadingScreen === 'function') initLoadingScreen();
+  if (typeof initNavbar === 'function') initNavbar();
+  if (typeof initHeroSection === 'function') initHeroSection();
+  if (typeof initTopicOfTheDay === 'function') initTopicOfTheDay();
+  if (typeof initTopicsSection === 'function') initTopicsSection();
+  if (typeof initQuizSection === 'function') initQuizSection();
+  if (typeof initPracticeSection === 'function') initPracticeSection();
+  if (typeof initRoadmap === 'function') initRoadmap();
+  if (typeof initDashboard === 'function') initDashboard();
+  if (typeof initGamification === 'function') initGamification();
+  if (typeof initDailyChallenge === 'function') initDailyChallenge();
+  if (typeof initChatbot === 'function') initChatbot();
+  if (typeof initProfile === 'function') initProfile();
+  if (typeof initNewsletterValidation === 'function') initNewsletterValidation();
+  if (typeof initScrollEffects === 'function') initScrollEffects();
+  if (typeof initFooterCurrentDate === 'function') initFooterCurrentDate();
 
   // Update profile display after loading
-  updateProfile();
+  if (typeof updateProfile === 'function') updateProfile();
 
   // Language change handler for code editor
   const langSelect = document.getElementById("languageSelect");
@@ -402,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function initLoadingScreen() {
   setTimeout(() => {
     document.getElementById("loading-screen").classList.add("hidden");
-    initializeAnimations();
+    if (typeof initializeAnimations === 'function') initializeAnimations();
   }, 2000);
 }
 
