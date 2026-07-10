@@ -42,7 +42,7 @@ class ThinkingReplayService {
         timestamp: s.timestamp,
         code: s.code,
         status: s.status,
-        executionTime: s.executionTime,
+        executionTime: s.execution_time,
         errors: s.errors
       })),
       events: events.map(e => ({
