@@ -1,11 +1,3 @@
-window.addEventListener("load", () => {
-  const loader = document.getElementById("loading-screen");
-
-  if (loader) {
-    loader.style.display = "none";
-  }
-});
-
 document.addEventListener("DOMContentLoaded", () => {
   const sourceTopic = document.getElementById("sourceTopic");
   const targetTopic = document.getElementById("targetTopic");

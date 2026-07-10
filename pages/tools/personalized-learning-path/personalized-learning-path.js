@@ -4,12 +4,6 @@
 
 "use strict";
 
-// ── Loading screen ──────────────────────────────────────────
-window.addEventListener("load", () => {
-  const loader = document.getElementById("loading-screen");
-  if (loader) loader.style.display = "none";
-});
-
 // ── Constants ───────────────────────────────────────────────
 const LS_PREFIX = "plp_v2_";
 

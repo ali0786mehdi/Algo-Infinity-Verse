@@ -380,11 +380,5 @@ function showNotification(msg, type = 'info') {
 
 // Standard project page load handler
 document.addEventListener('DOMContentLoaded', () => {
-    const loadingScreen = document.getElementById('loading-screen');
-    
-    // Simulate generation delay for premium feel
-    setTimeout(() => {
-        if (loadingScreen) loadingScreen.classList.add('hidden');
-        initGame();
-    }, 1000);
+    initGame();
 });

@@ -670,5 +670,53 @@
     "stack": "SyntaxError: Unexpected end of input",
     "url": "http://127.0.0.1:3000/pages/editors/js-sandbox.html",
     "timestamp": "2026-07-08T19:46:34.307Z"
+  },
+  {
+    "message": "Cannot access 'searchInput' before initialization",
+    "stack": "ReferenceError: Cannot access 'searchInput' before initialization\n    at filterAndRender (http://127.0.0.1:3000/pages/tools/my-notes/my-notes.js:24:20)\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/pages/tools/my-notes/my-notes.js:11:3)",
+    "url": "http://127.0.0.1:3000/pages/tools/my-notes/my-notes.html",
+    "timestamp": "2026-07-09T20:41:13.605Z"
+  },
+  {
+    "message": "Cannot access 'searchInput' before initialization",
+    "stack": "ReferenceError: Cannot access 'searchInput' before initialization\n    at filterAndRender (http://127.0.0.1:3000/pages/tools/my-notes/my-notes.js:24:20)\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/pages/tools/my-notes/my-notes.js:11:3)",
+    "url": "http://127.0.0.1:3000/pages/tools/my-notes/my-notes.html",
+    "timestamp": "2026-07-09T20:41:20.502Z"
+  },
+  {
+    "message": "Cannot read properties of null (reading 'addEventListener')",
+    "stack": "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/pages/tools/compare/compare.js:262:43)",
+    "url": "http://127.0.0.1:3000/pages/tools/compare/compare.html",
+    "timestamp": "2026-07-09T20:41:43.851Z"
+  },
+  {
+    "message": "Cannot read properties of null (reading 'addEventListener')",
+    "stack": "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at HTMLDocument.<anonymous> (http://127.0.0.1:3000/pages/tools/compare/compare.js:262:43)",
+    "url": "http://127.0.0.1:3000/pages/tools/compare/compare.html",
+    "timestamp": "2026-07-09T20:41:47.406Z"
+  },
+  {
+    "message": "Cannot access 'searchInput' before initialization",
+    "stack": "ReferenceError: Cannot access 'searchInput' before initialization\n    at filterAndRender (http://localhost:3000/pages/tools/my-notes/my-notes.js:24:20)\n    at HTMLDocument.<anonymous> (http://localhost:3000/pages/tools/my-notes/my-notes.js:11:3)",
+    "url": "http://localhost:3000/pages/tools/my-notes/my-notes.html",
+    "timestamp": "2026-07-09T20:43:17.370Z"
+  },
+  {
+    "message": "Cannot access 'searchInput' before initialization",
+    "stack": "ReferenceError: Cannot access 'searchInput' before initialization\n    at filterAndRender (http://localhost:3000/pages/tools/my-notes/my-notes.js:24:20)\n    at HTMLDocument.<anonymous> (http://localhost:3000/pages/tools/my-notes/my-notes.js:11:3)",
+    "url": "http://localhost:3000/pages/tools/my-notes/my-notes.html",
+    "timestamp": "2026-07-09T20:45:15.772Z"
+  },
+  {
+    "message": "Cannot access 'searchInput' before initialization",
+    "stack": "ReferenceError: Cannot access 'searchInput' before initialization\n    at filterAndRender (http://localhost:3000/pages/tools/my-notes/my-notes.js:24:20)\n    at HTMLDocument.<anonymous> (http://localhost:3000/pages/tools/my-notes/my-notes.js:11:3)",
+    "url": "http://localhost:3000/pages/tools/my-notes/my-notes.html",
+    "timestamp": "2026-07-09T20:45:25.433Z"
+  },
+  {
+    "message": "Cannot read properties of null (reading 'addEventListener')",
+    "stack": "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at HTMLDocument.<anonymous> (http://localhost:3000/pages/tools/compare/compare.js:262:43)",
+    "url": "http://localhost:3000/pages/tools/compare/compare.html",
+    "timestamp": "2026-07-09T20:45:51.117Z"
   }
 ]

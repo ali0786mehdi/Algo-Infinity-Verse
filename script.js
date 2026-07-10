@@ -401,7 +401,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===== LOADING SCREEN =====
 function initLoadingScreen() {
   setTimeout(() => {
-    document.getElementById("loading-screen").classList.add("hidden");
+    const ls = document.getElementById("loading-screen");
+    if (ls) ls.classList.add("hidden");
     if (typeof initializeAnimations === 'function') initializeAnimations();
   }, 2000);
 }
