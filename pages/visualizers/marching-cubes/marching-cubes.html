@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marching Cubes · Algo Infinity Verse</title>
+<meta name="description" content="An interactive 3D visualizer for the Marching Cubes isosurface algorithm — sweep a cube through a scalar noise field and watch it build a mesh, triangle by triangle.">
+<link rel="stylesheet" href="marching-cubes.css">
+
+<!-- Three.js (module build) -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="starfield"></div>
+<div class="bg-glow"></div>
+
+<div class="app-shell">
+
+  <!-- ============ Top bar ============ -->
+  <header class="topbar">
+    <a href="../../index.html" class="brand">
+      <span class="logo-mark">🧊</span>
+      <span class="name">Algo Infinity Verse</span>
+    </a>
+
+    <div class="page-title">
+      <h1>Marching Cubes</h1>
+      <p>From scalar noise field to renderable isosurface</p>
+    </div>
+
+    <div class="topbar-actions">
+      <span class="crumb">Visualizers / <strong>Marching Cubes</strong></span>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      <button class="icon-btn" id="infoToggle" title="About this algorithm">ℹ️</button>
+    </div>
+  </header>
+
+  <!-- ============ Workspace ============ -->
+  <main class="workspace">
+
+    <!-- ---------- Left panel: field + generation controls ---------- -->
+    <aside class="panel">
+      <div class="panel-header"><span class="dot"></span><h2>Scalar Field</h2></div>
+      <div class="panel-body">
+
+        <div class="control-group">
+          <div class="control-label"><span>Isovalue (threshold)</span><span class="val" id="isoVal">0.00</span></div>
+          <input type="range" id="isoSlider" min="-1" max="1" step="0.01" value="0">
+          <p class="hint" style="margin-top:6px;">Corners above this value count as "inside." Drag to reshape the surface live.</p>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Grid resolution</span><span class="val" id="resVal">18³</span></div>
+          <input type="range" id="resSlider" min="8" max="30" step="1" value="18">
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Noise frequency</span><span class="val" id="freqVal">1.0</span></div>
+          <input type="range" id="freqSlider" min="0.4" max="2.5" step="0.1" value="1.0">
+        </div>
+
+        <div class="control-group">
+          <button class="btn primary full" id="reseedBtn">🎲 Reseed noise field</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="toggle-row">
+          <span>Show field points</span>
+          <label class="switch">
+            <input type="checkbox" id="togglePoints" checked>
+            <span class="track"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span>Show grid wireframe</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleGrid">
+            <span class="track"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span>Wireframe surface</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleWire">
+            <span class="track"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span>Auto-rotate camera</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleSpin">
+            <span class="track"></span>
+          </label>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ---------- Center: 3D viewport ---------- -->
+    <section class="panel viewport-panel">
+      <div id="viewport">
+        <div class="viewport-overlay">
+          <span class="chip">Isovalue <strong id="chipIso">0.00</strong></span>
+          <span class="chip">Case <strong id="chipCase">—</strong></span>
+          <span class="chip">Triangles <strong id="chipTris">0</strong></span>
+        </div>
+
+        <div class="progress-bar-wrap" id="progressWrap">
+          <span class="pct" id="progressPct">0%</span>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <div class="loading-veil" id="loadingVeil">
+          <div class="spinner"></div>
+          <p>booting scene…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Right panel: step mode + legend ---------- -->
+    <aside class="panel">
+      <div class="panel-header"><span class="dot"></span><h2>Step-by-Step Mode</h2></div>
+      <div class="panel-body">
+
+        <div class="toggle-row">
+          <span>Enable step mode</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleStep">
+            <span class="track"></span>
+          </label>
+        </div>
+
+        <div class="btn-row" style="margin-bottom:16px;">
+          <button class="btn" id="stepBackBtn" disabled>⏮ Reset</button>
+          <button class="btn" id="stepPlayBtn" disabled>▶ Play</button>
+          <button class="btn" id="stepNextBtn" disabled>Step ⏭</button>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Sweep speed</span><span class="val" id="speedVal">6/s</span></div>
+          <input type="range" id="speedSlider" min="1" max="30" step="1" value="6">
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-box"><div class="num" id="statCell">0 / 0</div><div class="lbl">Cell</div></div>
+          <div class="stat-box"><div class="num" id="statProg">0%</div><div class="lbl">Swept</div></div>
+        </div>
+
+        <div class="case-readout" id="caseReadout">
+          <div><span class="k">Cube case</span> <span class="v" id="roCase">0</span> / 255</div>
+          <div><span class="k">Corner bits</span> <span class="bits" id="roBits"></span></div>
+          <div><span class="k">Edges cut</span> <span class="v" id="roEdges">0</span></div>
+          <div><span class="k">Triangles</span> <span class="v" id="roTris">0</span></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="legend-item"><span class="swatch sweep"></span> Active sweep cube</div>
+        <div class="legend-item"><span class="swatch inside"></span> Corner: inside (&gt; isovalue)</div>
+        <div class="legend-item"><span class="swatch outside"></span> Corner: outside (&lt; isovalue)</div>
+        <div class="legend-item"><span class="swatch edge"></span> Interpolated edge intersection</div>
+        <div class="legend-item"><span class="swatch surface"></span> Generated isosurface</div>
+
+        <div class="divider"></div>
+        <p class="hint">Each active cube corner is tested against the isovalue. The pattern of 8 inside/outside corners forms an 8-bit case index (0–255), looked up in a triangulation table to place 0–4 triangles through the interpolated edge points.</p>
+      </div>
+    </aside>
+
+  </main>
+</div>
+
+<script type="module" src="marching-cubes.js"></script>
+</body>
+</html>
