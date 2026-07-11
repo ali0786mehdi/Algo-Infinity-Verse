@@ -15,6 +15,13 @@ import { getSession, clearSessionCookie } from "./utils/sessionToken.js";
 import { commonPasswords } from "./config/passwordBlacklist.js";
 import { validateAndNormalizeEmail } from "./utils/emailValidation.js";
 import securityConfig from "./config/security.js";
+import {
+  ensureUserStore,
+  readUsers,
+  writeUsers,
+  getUserByEmail,
+  createUser,
+} from "./utils/helpers.js";
 import { protectedPaths } from "./config/protectedPaths.js";
 import { getClientIdentifier } from "./utils/clientIdentifier.js";
 
@@ -198,51 +205,6 @@ async function loadEnvFile() {
 
 let db = null;
 let useFirestore = false;
-
-async function getUserByEmail(email) {
-  if (!useFirestore) {
-    const users = await readUsers();
-    return users.find((u) => u.email === email) || null;
-  }
-  const snapshot = await db
-    .collection(COLLECTIONS.USERS)
-    .where("email", "==", email)
-    .limit(1)
-    .get();
-  if (snapshot.empty) return null;
-  return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-}
-
-async function createUser(userData) {
-  if (!useFirestore) {
-    const users = await readUsers();
-    users.push(userData);
-    await writeUsers(users);
-    return userData;
-  }
-  const docRef = await db.collection(COLLECTIONS.USERS).add(userData);
-  return { id: docRef.id, ...userData };
-}
-
-async function ensureUserStore() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  try {
-    await fs.access(USERS_FILE);
-  } catch {
-    await fs.writeFile(USERS_FILE, "[]\n");
-  }
-}
-
-async function readUsers() {
-  await ensureUserStore();
-  const raw = await fs.readFile(USERS_FILE, "utf8");
-  return JSON.parse(raw || "[]");
-}
-
-async function writeUsers(users) {
-  await ensureUserStore();
-  await fs.writeFile(USERS_FILE, `${JSON.stringify(users, null, 2)}\n`);
-}
 
 // ── Memory Scanner (Spaced Repetition, SM-2) ─────────────────────────────────
 // NOTE: This currently uses local JSON file storage, matching the existing

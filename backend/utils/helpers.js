@@ -19,6 +19,7 @@ import {
   clearSessionCookie,
 } from "./sessionToken.js";
 import { COLLECTIONS } from "../../firebase.js";
+let userWriteQueue = Promise.resolve();
 
 export const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -116,10 +117,15 @@ export async function readUsers() {
 }
 
 export async function writeUsers(users) {
-  const DATA_DIR = path.join(process.cwd(), "data");
-  const USERS_FILE = path.join(DATA_DIR, "users.json");
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(USERS_FILE, `${JSON.stringify(users, null, 2)}\n`);
+  const task = userWriteQueue.then(async () => {
+    const DATA_DIR = path.join(process.cwd(), "data");
+    const USERS_FILE = path.join(DATA_DIR, "users.json");
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.writeFile(USERS_FILE, `${JSON.stringify(users, null, 2)}\n`);
+  });
+  // Update the queue synchronously so next write waits for this one
+  userWriteQueue = task.catch(() => { });
+  return task;
 }
 
 export async function getUserByEmail(email, useFirestore = false, db = null) {
@@ -198,4 +204,13 @@ export async function createUserAtomic(userData, useFirestore = false, db = null
   // Update the lock synchronously so the next caller queues behind this write.
   _createUserLock = run.catch(() => { });
   return run;
+}
+export async function ensureUserStore() {
+  const DATA_DIR = path.join(process.cwd(), "data");
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  try {
+    await fs.access(path.join(DATA_DIR, "users.json"));
+  } catch {
+    await fs.writeFile(path.join(DATA_DIR, "users.json"), "[]\n");
+  }
 }
