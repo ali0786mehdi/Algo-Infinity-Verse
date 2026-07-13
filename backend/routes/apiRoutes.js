@@ -88,22 +88,53 @@ export function setupApiRoutes(req, res, pathname) {
   // Note: pathname will be like /api/memory/Spanish%20Verbs
   if (pathname.startsWith('/api/memory/') && req.method === 'DELETE') {
     // Extract topic from pathname
-    const topic = pathname.replace('/api/memory/', '');
-    if (topic && topic.length > 0) {
+    const rawTopic = pathname.replace('/api/memory/', '');
+    if (rawTopic && rawTopic.length > 0) {
       // Add topic to request params
       req.params = req.params || {};
+
       try {
-      
-        req.params.topic = decodeURIComponent(topic);
+        // 1. Safely decode the topic (Fixes #2206)
+        const decodedTopic = decodeURIComponent(rawTopic);
+
+        const MAX_TOPIC_LENGTH = 100;
+
+        // a. Reject empty or whitespace-only strings
+        const trimmedTopic = decodedTopic.trim();
+        if (trimmedTopic.length === 0) {
+          return res.status(400).json({
+            error: 'Invalid topic provided. Topic cannot be empty or contain only whitespace.'
+          });
+        }
+
+        // b. Enforce maximum length
+        if (trimmedTopic.length > MAX_TOPIC_LENGTH) {
+          return res.status(400).json({
+            error: `Topic exceeds maximum length of ${MAX_TOPIC_LENGTH} characters.`
+          });
+        }
+
+        // c. Validate against supported character rules 
+        // (Allows letters, numbers, spaces, hyphens, underscores, and periods)
+        if (!/^[a-zA-Z0-9\s\-_.]+$/.test(trimmedTopic)) {
+          return res.status(400).json({
+            error: 'Topic contains unsupported characters. Only letters, numbers, spaces, hyphens, underscores, and periods are allowed.'
+          });
+        }
+        // ==========================================
+
+        // Assign the sanitized topic to params
+        req.params.topic = trimmedTopic;
+        return handleMemoryDelete(req, res);
+
       } catch (error) {
         if (error instanceof URIError) {
           return res.status(400).json({
             error: 'Invalid URL-encoded route parameter. Please provide a valid topic identifier.'
           });
         }
-        throw error; 
+        throw error; // Rethrow any other unexpected system errors
       }
-      return handleMemoryDelete(req, res);
     }
   }
 
