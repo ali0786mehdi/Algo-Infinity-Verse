@@ -167,6 +167,13 @@ const visualizers = [
     icon: 'fa-book',
     desc: 'Visualize binomial heap merge and extract-min operations.',
   },
+  {
+  name: 'Interval Tree Visualizer',
+  path: '/pages/visualizers/interval-tree/interval-tree.html',
+  category: 'Data Structures',
+  icon: 'fa-ruler-horizontal',
+  desc: 'Augmented BST storing intervals — max-endpoint pruning, overlap queries, and calendar conflict detection in O(log n + k).',
+  },
 
   // ── Graph Algorithms ──
   {
