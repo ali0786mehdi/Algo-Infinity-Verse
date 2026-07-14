@@ -367,33 +367,35 @@ function updateBadges() {
 
   if (container) {
     container.innerHTML = badges
-      .map(
-        (badge) =>
-          `<div class="badge ${badge.earned ? '' : 'locked'}" tabindex="0">
-                <span class="badge-tooltip">
+      .map((badge) => {
+        const tooltipId = `badge-tooltip-${badge.id}`;
+        const lockedLabel = badge.earned ? '' : ' (locked)';
+        return `<div class="badge ${badge.earned ? '' : 'locked'}" tabindex="0" aria-describedby="${tooltipId}" aria-label="${badge.name}${lockedLabel}">
+                <span class="badge-tooltip" id="${tooltipId}" role="tooltip">
                     <strong>${badge.name}</strong>
                     <span>${badge.description}</span>
                     <span>${badge.criteria}</span>
                 </span>
                 ${badge.icon}
-            </div>`
-      )
+            </div>`;
+      })
       .join('');
   }
 
   if (grid) {
     grid.innerHTML = badges
-      .map(
-        (badge) =>
-          `<div class="badge-lg ${badge.earned ? '' : 'locked'}" tabindex="0">
-                <span class="badge-tooltip">
+      .map((badge) => {
+        const tooltipId = `badge-lg-tooltip-${badge.id}`;
+        const lockedLabel = badge.earned ? '' : ' (locked)';
+        return `<div class="badge-lg ${badge.earned ? '' : 'locked'}" tabindex="0" aria-describedby="${tooltipId}" aria-label="${badge.name}${lockedLabel}">
+                <span class="badge-tooltip" id="${tooltipId}" role="tooltip">
                     <strong>${badge.name}</strong>
                     <span>${badge.description}</span>
                     <span>${badge.criteria}</span>
                 </span>
                 ${badge.icon}
-            </div>`
-      )
+            </div>`;
+      })
       .join('');
   }
 }

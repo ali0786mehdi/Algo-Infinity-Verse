@@ -4507,6 +4507,11 @@ section[id] {
   transform: scale(1.1);
 }
 
+.badge:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .badge.locked {
   background: var(--dark-card);
   opacity: 0.5;
@@ -4533,7 +4538,9 @@ section[id] {
 }
 
 .badge:hover .badge-tooltip,
-.badge:focus .badge-tooltip {
+.badge:focus .badge-tooltip,
+.badge-lg:hover .badge-tooltip,
+.badge-lg:focus .badge-tooltip {
   opacity: 1;
 }
 
@@ -5483,6 +5490,11 @@ section[id] {
 
 .badge-lg:hover {
   transform: scale(1.1) rotate(10deg);
+}
+
+.badge-lg:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 #dailyChallengeCard {
@@ -7192,6 +7204,12 @@ body.modal-open {
   border-color: var(--primary);
   background: rgba(124, 58, 237, 0.1);
   transform: translateX(5px);
+}
+
+.quiz-option:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
 }
 
 .quiz-option.selected {
