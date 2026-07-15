@@ -20,7 +20,12 @@ import { findMissingSkills } from './backend/resume-analyzer/skills.js';
 import { getSuggestions } from './backend/resume-analyzer/suggestions.js';
 import { analyzeWorkflow } from './backend/repository-analyzer/cicdValidator.js';
 import { VCSFactory } from './backend/vcs/VCSFactory.js';
-import { enqueueBulkAudit, getBatchProgress, MAX_BULK_AUDIT_URLS } from './backend/jobs/queue.js';
+import {
+  enqueueBulkAudit,
+  getBatchProgress,
+  MAX_BULK_AUDIT_URLS,
+  getReportStatus,
+} from './backend/jobs/queue.js';
 import './backend/jobs/worker.js'; // Initialize worker
 
 import { parse as csvParse } from 'csv-parse/sync';
@@ -2281,6 +2286,41 @@ async function handleApi(req, res, pathname) {
     const session = getSession(req);
     if (!session) return sendJson(res, 401, { error: 'Authentication required.' });
     return await handleReportRequest(req, res, pathname, session);
+  }
+
+  if (pathname === '/api/reports/status' && req.method === 'GET') {
+    const session = getSession(req);
+    if (!session) return sendJson(res, 401, { error: 'Authentication required.' });
+
+    const urlParams = new URL(req.url, `http://${req.headers.host}`).searchParams;
+    const jobId = urlParams.get('jobId');
+    if (!jobId) return sendJson(res, 400, { error: 'Missing jobId' });
+
+    try {
+      const jobStatus = await getReportStatus(jobId);
+      if (!jobStatus) return sendJson(res, 404, { error: 'Job not found' });
+
+      if (jobStatus.status === 'completed') {
+        const buffer = Buffer.from(jobStatus.data, 'base64');
+        const isPdf = jobStatus.type === 'pdf';
+        const contentType = isPdf ? 'application/pdf' : 'image/png';
+        const ext = isPdf ? 'pdf' : 'png';
+
+        res.writeHead(200, {
+          'Content-Type': contentType,
+          'Content-Disposition': `attachment; filename="report_${session.sub}.${ext}"`,
+          'Content-Length': buffer.length,
+        });
+        return res.end(buffer);
+      } else if (jobStatus.status === 'failed') {
+        return sendJson(res, 500, { error: jobStatus.error || 'Report generation failed' });
+      } else {
+        return sendJson(res, 200, { status: jobStatus.status });
+      }
+    } catch (err) {
+      console.error('Error fetching report status:', err);
+      return sendJson(res, 500, { error: 'Failed to fetch report status' });
+    }
   }
 
   if (pathname === '/api/user/benchmark' && req.method === 'GET') {

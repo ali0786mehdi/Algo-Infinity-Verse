@@ -1,5 +1,7 @@
 import puppeteer from 'puppeteer';
 import { escapeHtml } from '../../modules/domSanitizer.js';
+import { v4 as uuidv4 } from 'uuid';
+import { enqueueReport } from '../jobs/queue.js';
 
 // ============================================
 // CONFIGURABLE SETTINGS
@@ -231,6 +233,34 @@ function buildHtmlTemplate(user, _data) {
   `;
 }
 
+export async function generateReportBuffer(session, type) {
+  let page = null;
+  try {
+    page = await browserManager.createPage();
+    const mockData = {};
+    const html = buildHtmlTemplate(session, mockData);
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    if (type === 'pdf') {
+      return await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
+      });
+    } else {
+      return await page.screenshot({
+        type: 'png',
+        fullPage: true,
+        deviceScaleFactor: 2,
+      });
+    }
+  } finally {
+    if (page && !page.isClosed()) {
+      await browserManager.closePage(page);
+    }
+  }
+}
+
 export async function handleReportRequest(req, res, pathname, session) {
   if (req.method !== 'GET') {
     res.writeHead(405, { 'Content-Type': 'application/json' });
@@ -238,50 +268,23 @@ export async function handleReportRequest(req, res, pathname, session) {
   }
 
   const type = pathname === '/api/reports/export/pdf' ? 'pdf' : 'image';
-  let page = null;
 
   try {
-    page = await browserManager.createPage();
+    const jobId = uuidv4();
+    await enqueueReport(jobId, session, type);
 
-    const mockData = {};
-    const html = buildHtmlTemplate(session, mockData);
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-
-    if (type === 'pdf') {
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
-      });
-
-      res.writeHead(200, {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="report_${session.sub}.pdf"`,
-        'Content-Length': pdfBuffer.length,
-      });
-      return res.end(pdfBuffer);
-    } else {
-      const imageBuffer = await page.screenshot({
-        type: 'png',
-        fullPage: true,
-        deviceScaleFactor: 2,
-      });
-
-      res.writeHead(200, {
-        'Content-Type': 'image/png',
-        'Content-Disposition': `attachment; filename="report_${session.sub}.png"`,
-        'Content-Length': imageBuffer.length,
-      });
-      return res.end(imageBuffer);
-    }
+    res.writeHead(202, { 'Content-Type': 'application/json' });
+    return res.end(
+      JSON.stringify({
+        status: 'processing',
+        jobId,
+        message: 'Report generation started in the background.',
+      })
+    );
   } catch (error) {
-    console.error('Report generation error:', error);
+    console.error('Report enqueue error:', error);
     res.writeHead(500, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ error: 'Failed to generate report' }));
-  } finally {
-    if (page && !page.isClosed()) {
-      await browserManager.closePage(page);
-    }
+    return res.end(JSON.stringify({ error: 'Failed to enqueue report generation' }));
   }
 }
 
