@@ -3035,6 +3035,152 @@ async function handleApi(req, res, pathname) {
     }
   }
 
+  // ── AI Code Reviewer ──────────────────────────────────────────────────────
+  if (pathname === '/api/ai/review' && req.method === 'POST') {
+    if (
+      !applyRateLimit(
+        req,
+        res,
+        sdlcAdvisorLimiter,
+        'Too many review requests. Please try again later.'
+      )
+    ) {
+      return;
+    }
+
+    let payload;
+    try {
+      payload = await readJsonBody(req);
+    } catch {
+      return sendJson(res, 400, { error: 'Invalid JSON body.' });
+    }
+
+    const problemName = String(payload.problemName || '').trim();
+    const problemDescription = String(payload.problemDescription || '').trim();
+    const code = String(payload.code || '');
+    const language = String(payload.language || '').trim();
+
+    if (!code) {
+      return sendJson(res, 400, { error: 'Code is required for review.' });
+    }
+
+    const MAX_REVIEW_CODE_LENGTH = 20000;
+    if (code.length > MAX_REVIEW_CODE_LENGTH) {
+      return sendJson(res, 400, {
+        error: `Code exceeds maximum length of ${MAX_REVIEW_CODE_LENGTH} characters.`,
+      });
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return sendJson(res, 503, { error: 'AI reviewer unavailable (GEMINI_API_KEY not set).' });
+    }
+
+    const prompt = `You are a critical senior software engineer and static analysis tool. Analyze the following user code for the problem "${problemName}" (Language: ${language}).
+Problem description (if any):
+${problemDescription}
+
+User Code:
+\`\`\`${language}
+${code}
+\`\`\`
+
+Perform an in-depth audit of the code. Look for:
+1. Poor time/space complexity (e.g., O(N^2) where O(N) is possible).
+2. Unsafe operations, memory leaks, or potential crash points.
+3. Styling issues, bad practices, or un-idiomatic code.
+4. Edge-case bugs, off-by-one errors, or incorrect logic.
+
+You must return a JSON array of suggestions.
+Each item in the array must be an object with the following exact keys:
+- "lineStart": (number) 1-based start line number of the flagged code section.
+- "lineEnd": (number) 1-based end line number of the flagged code section (inclusive).
+- "severity": (string) either "warning" or "error".
+- "message": (string) clear, concise description of the issue and why it is a problem.
+- "suggestionContent": (string) the proposed code snippet that should replace the code from lineStart to lineEnd. Make sure this snippet integrates seamlessly as a drop-in replacement for the exact lines from lineStart to lineEnd.
+
+Example format:
+[
+  {
+    "lineStart": 5,
+    "lineEnd": 8,
+    "severity": "error",
+    "message": "This linear search inside a loop causes O(N^2) complexity. Use a hash map for O(N) lookup.",
+    "suggestionContent": "    if (seen.has(complement)) {\\n        return [seen.get(complement), i];\\n    }"
+  }
+]
+
+CRITICAL RULES:
+1. Only flag genuine issues. If the code is perfect, return an empty array [].
+2. The lineStart and lineEnd must match the line numbers of the user code EXACTLY.
+3. "suggestionContent" must be a direct replacement for the lines from lineStart to lineEnd (inclusive). Ensure correct indentation, newlines, and syntax so that replacing those lines with suggestionContent keeps the overall file syntax correct.
+4. Return ONLY valid JSON. Do not include markdown code block tags in your raw response (like \`\`\`json) if possible, but if you do, the server will parse it. Ensure it parses as a valid JSON array.`;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.2,
+              responseMimeType: 'application/json',
+            },
+          }),
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+
+      const result = await response.json();
+      let raw = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!raw) {
+        return sendJson(res, 502, { error: 'No suggestions were generated. Please try again.' });
+      }
+
+      raw = raw.trim();
+      if (raw.startsWith('```')) {
+        raw = raw
+          .replace(/^```(?:json)?\n?/, '')
+          .replace(/\n?```$/, '')
+          .trim();
+      }
+
+      let suggestions;
+      try {
+        suggestions = JSON.parse(raw);
+      } catch (err) {
+        console.error('Failed to parse Gemini review JSON:', raw);
+        return sendJson(res, 502, { error: 'AI returned an invalid JSON response format.' });
+      }
+
+      const lines = code.split('\n');
+      const totalLines = lines.length;
+
+      const validSuggestions = (Array.isArray(suggestions) ? suggestions : []).map((s) => {
+        const lineStart = Math.max(1, Math.min(totalLines, Number(s.lineStart)));
+        const lineEnd = Math.max(lineStart, Math.min(totalLines, Number(s.lineEnd)));
+        const severity = s.severity === 'error' ? 'error' : 'warning';
+        return {
+          lineStart,
+          lineEnd,
+          severity,
+          message: String(s.message || 'AI Review Suggestion'),
+          suggestionContent: String(s.suggestionContent || ''),
+        };
+      });
+
+      return sendJson(res, 200, { success: true, suggestions: validSuggestions });
+    } catch (error) {
+      console.error('AI review error:', error);
+      return sendJson(res, 500, { error: 'Failed to complete AI review.' });
+    }
+  }
+
   // ── Leaderboard ──────────────────────────────────────────────────────────
   if (pathname === '/api/leaderboard' && req.method === 'GET') {
     try {
