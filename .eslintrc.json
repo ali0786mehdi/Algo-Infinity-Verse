@@ -14,7 +14,13 @@
     "cachedSession": "writable",
     "renderPersonalityCard": "readonly",
     "renderMistakeDnaCard": "readonly",
-    "openQuizEditor": "readonly"
+    "openQuizEditor": "readonly",
+    "addXP": "readonly",
+    "recordAnalyticsEvent": "readonly",
+    "recordDailyActivity": "readonly",
+    "handleQuizCompletionForRevision": "readonly",
+    "updateDashboard": "readonly",
+    "updateGamification": "readonly"
   },
   "extends": "eslint:recommended",
   "parserOptions": {
