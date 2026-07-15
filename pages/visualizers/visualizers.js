@@ -1069,6 +1069,13 @@ const visualizers = [
     icon: 'fa-tower-broadcast',
     desc: 'Visualize Peer-to-Peer connections, STUN hole-punching, and TURN relays.',
   },
+  {
+    name: 'Snowflake Distributed ID Visualizer',
+    path: '/pages/visualizers/snowflake-id-visualizer/snowflake-id-visualizer.html',
+    category: 'Architecture',
+    icon: 'fa-bolt',
+    desc: 'Generate highly-scalable 64-bit unique identifiers using timestamps and machine IDs.',
+  },
 ];
 
 /* ─── Categories ─── */
