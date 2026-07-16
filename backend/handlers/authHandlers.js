@@ -17,6 +17,7 @@ import {
 import {
   getClientIdentifier,
   isLoginRateLimited,
+  recordLoginAttempt,
   LOGIN_WINDOW_MS,
 } from '../services/auth.service.js';
 import { applyRateLimit, signupLimiter, loginLimiter } from '../utils/rateLimiter.js';
@@ -149,6 +150,7 @@ export async function handleLogin(req, res) {
   const user = await getUserByEmail(email, useFirestore, db);
 
   if (!user || !passwordMatches(password, user.password)) {
+    recordLoginAttempt(clientId);
     await normalizeAuthDelay();
     return sendJson(res, 401, { error: 'Invalid email or password.' });
   }
