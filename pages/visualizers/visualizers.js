@@ -3,6 +3,13 @@
    ============================================ */
 
 const visualizers = [
+  {
+    name: 'CQRS & Event Sourcing',
+    path: '/pages/visualizers/cqrs-visualizer/cqrs-visualizer.html',
+    category: 'Distributed Systems',
+    icon: 'fa-database',
+    desc: 'Interactive simulator for Command Query Responsibility Segregation and Event Sourcing.',
+  },
   // ── Sorting & Searching ──
   {
     name: 'Sorting Visualizer',
@@ -175,11 +182,11 @@ const visualizers = [
     desc: 'Visualize binomial heap merge and extract-min operations.',
   },
   {
-  name: 'Interval Tree Visualizer',
-  path: '/pages/visualizers/interval-tree/interval-tree.html',
-  category: 'Data Structures',
-  icon: 'fa-ruler-horizontal',
-  desc: 'Augmented BST storing intervals — max-endpoint pruning, overlap queries, and calendar conflict detection in O(log n + k).',
+    name: 'Interval Tree Visualizer',
+    path: '/pages/visualizers/interval-tree/interval-tree.html',
+    category: 'Data Structures',
+    icon: 'fa-ruler-horizontal',
+    desc: 'Augmented BST storing intervals — max-endpoint pruning, overlap queries, and calendar conflict detection in O(log n + k).',
   },
 
   // ── Graph Algorithms ──
@@ -289,11 +296,11 @@ const visualizers = [
     desc: 'Greedy vs backtracking coloring — exam scheduling, register allocation, and map coloring.',
   },
   {
-  name: 'Boyer-Moore Voting Visualizer',
-  path: '/pages/visualizers/boyer-moore-voting/boyer-moore-voting.html',
-  category: 'Algorithms',
-  icon: 'fa-vote-yea',
-  desc: 'Find the majority element in one pass with O(1) space — step through candidate replacement, verification, and the n/3 extension.',
+    name: 'Boyer-Moore Voting Visualizer',
+    path: '/pages/visualizers/boyer-moore-voting/boyer-moore-voting.html',
+    category: 'Algorithms',
+    icon: 'fa-vote-yea',
+    desc: 'Find the majority element in one pass with O(1) space — step through candidate replacement, verification, and the n/3 extension.',
   },
   {
   name: 'Circuit Breaker Visualizer',
@@ -1096,11 +1103,15 @@ const visualizers = [
     category: 'Architecture',
     icon: 'fa-diagram-project',
     desc: 'Visualize naive GraphQL resolvers causing the N+1 problem, and how DataLoader batches requests.',
+  },
+  {
     name: 'WebAssembly Memory & Interop Visualizer',
     path: '/pages/visualizers/wasm-memory-simulator/wasm-memory-simulator.html',
     category: 'Systems & OS',
     icon: 'fa-memory',
     desc: 'Understand WebAssembly linear memory and how it exchanges data with JavaScript.',
+  },
+  {
     name: 'Snowflake Distributed ID Visualizer',
     path: '/pages/visualizers/snowflake-id-visualizer/snowflake-id-visualizer.html',
     category: 'Architecture',
