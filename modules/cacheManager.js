@@ -2,10 +2,16 @@
 // CACHE MANAGER (IndexedDB)
 // ============================================
 class CacheManager {
-  constructor(dbName = 'AlgoInfinityCache', storeName = 'api_responses') {
+  constructor(dbName = 'AlgoInfinityCache', storeName = 'api_responses', maxConsecutiveFailures = 3) {
     this.dbName = dbName;
     this.storeName = storeName;
     this.dbPromise = this.initDB();
+    // Tracks consecutive background-refresh failures per URL. Without this,
+    // a persistently failing endpoint would keep serving the same
+    // stale-while-revalidate cached data forever, past its TTL, with no way
+    // to recover other than a fetch eventually succeeding again (#2537).
+    this.maxConsecutiveFailures = maxConsecutiveFailures;
+    this.failureCounts = new Map();
   }
 
   initDB() {
@@ -92,10 +98,20 @@ class CacheManager {
         if (!resp.ok) throw new Error('Network response was not ok');
         const data = type === 'json' ? await resp.json() : await resp.text();
         await this.set(url, data, type, ttlMs);
+        this.failureCounts.delete(url);
         return data;
       } catch (e) {
         if (e.name === 'AbortError') throw e;
-        void 0;
+        const failures = (this.failureCounts.get(url) || 0) + 1;
+        this.failureCounts.set(url, failures);
+        if (cached && failures >= this.maxConsecutiveFailures) {
+          // Stop trusting cached data after too many consecutive failures —
+          // it may be arbitrarily stale/wrong by now. Let this and future
+          // calls fail (or hit an empty cache) rather than silently and
+          // indefinitely serving old data.
+          await this.invalidate(url);
+          throw e;
+        }
         if (cached) return cached.data;
         throw e;
       }
