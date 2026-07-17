@@ -1,37 +1,9 @@
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { initializeFirebase } from '../firebase.js';
 import { SESSION_COOKIE, verifySessionToken, parseCookies } from '../backend/utils/sessionToken.js';
 import { getLeaderboardData } from '../backend/services/leaderboard.service.js';
 
-let db = null;
-let useFirestore = false;
-
-function initFirebase() {
-  if (getApps().length > 0) {
-    db = getFirestore();
-    useFirestore = true;
-    return;
-  }
-
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
-  if (!projectId || !clientEmail || !privateKey) {
-    void 0;
-    return;
-  }
-
-  try {
-    initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
-    db = getFirestore();
-    useFirestore = true;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-initFirebase();
+const db = initializeFirebase();
+const useFirestore = !!db;
 
 function publicUser(user) {
   return {
