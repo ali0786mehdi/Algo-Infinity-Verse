@@ -160,10 +160,31 @@ const filterContainer = document.getElementById('edFilters');
 const emptyState = document.getElementById('edEmpty');
 const countDisplay = document.getElementById('edCountDisplay');
 
+/* ─── Safe localStorage helper ─── */
+function lsGet(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch (_) {
+    return null;
+  }
+}
+function lsSet(key, val) {
+  try {
+    localStorage.setItem(key, val);
+  } catch (_) {
+    /* noop */
+  }
+}
+function lsRemove(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (_) {
+    /* noop */
+  }
+}
+
 let activeCategory =
-  new URLSearchParams(window.location.search).get('category') ||
-  localStorage.getItem('edFilterCategory') ||
-  'all';
+  new URLSearchParams(window.location.search).get('category') || lsGet('edFilterCategory') || 'all';
 let searchQuery = '';
 const pageReferrer = document.referrer;
 
@@ -186,7 +207,7 @@ function buildFilters() {
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
       activeCategory = btn.dataset.category;
-      localStorage.setItem('edFilterCategory', activeCategory);
+      lsSet('edFilterCategory', activeCategory);
       const url = new URL(window.location);
       if (activeCategory === 'all') {
         url.searchParams.delete('category');
@@ -295,7 +316,7 @@ document.addEventListener('keydown', (e) => {
 
 /* ─── Back button ─── */
 document.getElementById('edBackBtn')?.addEventListener('click', () => {
-  localStorage.removeItem('edFilterCategory');
+  lsRemove('edFilterCategory');
   if (pageReferrer && new URL(pageReferrer).origin === window.location.origin) {
     window.location.href = pageReferrer;
   } else if (window.history.length > 1) {
@@ -334,6 +355,8 @@ function initTitleLetterAnimation() {
 
   let rafId = null;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const _prefersDark = true; // our theme is always dark bg
+
   /* ── Compute 3D extrusion shadows ──
      Shadows extend in the direction OPPOSITE the cursor,
      simulating the 'side walls' of a 3D extruded object.
@@ -605,6 +628,12 @@ buildFilters();
 initTitleLetterAnimation();
 initCodeScrollBackground();
 
+/* ─── Sync hero subtitle count to editors array length ─── */
+(function syncEditorCount() {
+  const countEl = document.querySelector('.ed-hero-subtitle strong');
+  if (countEl) countEl.textContent = editors.length;
+})();
+
 /* Restore active chip from URL */
 function syncChipFromURL() {
   filterContainer.querySelectorAll('.ed-filter-chip').forEach((c) => {
@@ -620,7 +649,7 @@ render();
 window.addEventListener('popstate', () => {
   activeCategory =
     new URLSearchParams(window.location.search).get('category') ||
-    localStorage.getItem('edFilterCategory') ||
+    lsGet('edFilterCategory') ||
     'all';
   syncChipFromURL();
   render();
