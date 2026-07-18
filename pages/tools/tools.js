@@ -62,6 +62,7 @@ const practiceTools = [
   { name: "LeetCode Sync", path: "/pages/tools/leetcode/leetcode.html", category: "Other", icon: "fa-cloud-arrow-up", desc: "Sync your LeetCode submissions and track your progress across platforms." },
   { name: "Assessments", path: "/pages/tools/quiz-system/quiz-system.html", category: "Other", icon: "fa-clipboard-question", desc: "Take structured assessments to evaluate your DSA knowledge and track improvement over time." },
   { name: "CSS Design Token Playground", path: "/pages/tools/design-token-playground/design-token-playground.html", category: "Other", icon: "fa-palette", desc: "Edit AIV :root tokens (colors, spacing, fonts) and live-preview quiz card and navbar — matching README Customization." },
+  { name: "Open Source PR Checklist Generator", path: "/pages/tools/pr-checklist-generator/pr-checklist-generator.html", category: "Other", icon: "fa-code-branch", desc: "Generate AIV-flavored PR checklists, conventional commit templates, and HTML/CSS/JS separation reminders by contribution type." },
 ];
 
 /* ─── Categories ─── */
