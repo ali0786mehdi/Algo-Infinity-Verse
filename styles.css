@@ -826,6 +826,15 @@ body[data-page='signup'] .auth-form .auth-submit {
     inset 0 0 15px rgba(124, 58, 237, 0.03);
 }
 
+.form-group input:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow:
+    0 0 0 1px rgba(124, 58, 237, 0.15),
+    0 0 20px rgba(124, 58, 237, 0.1),
+    inset 0 0 15px rgba(124, 58, 237, 0.03) !important;
+}
+
 /* Remove: border-image conflicts with border-radius, replaced by the box-shadow glow above */
 
 button.auth-submit {
