@@ -151,6 +151,18 @@ export function initModalManager() {
                         node.querySelectorAll && node.querySelectorAll('.modal, .modal-overlay, [class*="modal"]').forEach(checkElement);
                     }
                 });
+                // 🐛 FIX: Also handle removed modal elements to restore scroll
+                mutation.removedNodes.forEach(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        if (isModalElement(node)) {
+                            // Force close handling for removed modal
+                            handleModalClose(node);
+                        }
+                        // Check for nested modals within removed subtree
+                        const nested = node.querySelectorAll && node.querySelectorAll('.modal, .modal-overlay, [class*="modal"]');
+                        if (nested) nested.forEach(handleModalClose);
+                    }
+                });
             }
         });
     });

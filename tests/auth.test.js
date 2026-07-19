@@ -99,7 +99,7 @@ describe('Auth Helper Functions', () => {
       };
 
       global.document.querySelectorAll = jest.fn((selector) => {
-        if (selector === '.password-toggle') return [mockToggleBtn];
+        if (selector === '.cpw-toggle') return [mockToggleBtn];
         return [];
       });
 

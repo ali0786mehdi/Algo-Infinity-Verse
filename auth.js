@@ -661,122 +661,273 @@ function passwordStrength(password) {
 }
 
 function wireChangePassword() {
-  document.querySelectorAll('.password-toggle').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const input = document.getElementById(btn.dataset.target);
-
-      input.type = input.type === 'password' ? 'text' : 'password';
-
-      btn.innerHTML =
-        input.type === 'password'
-          ? '<i class="fas fa-eye"></i>'
-          : '<i class="fas fa-eye-slash"></i>';
-    });
+  // ── Toggle password visibility (delegated — works even when partial loads late) ──
+  document.addEventListener('click', (e) => {
+    const toggle = e.target.closest('.cpw-toggle');
+    if (!toggle) return;
+    const input = document.getElementById(toggle.dataset.target);
+    if (!input) return;
+    const wasPassword = input.type === 'password';
+    input.type = wasPassword ? 'text' : 'password';
+    toggle.innerHTML = wasPassword
+      ? '<i class="fas fa-eye-slash"></i>'
+      : '<i class="fas fa-eye"></i>';
   });
-  const passwordInput = document.getElementById('newPassword');
 
-  const strengthBar = document.getElementById('passwordStrengthBar');
-
-  const strengthText = document.getElementById('passwordStrengthText');
-
-  if (passwordInput && strengthBar && strengthText) {
-    passwordInput.addEventListener('input', () => {
-      const score = passwordStrength(passwordInput.value);
-
-      strengthBar.style.width = `${score * 20}%`;
-
-      const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Excellent'];
-
-      strengthText.textContent = labels[score];
-
-      if (score <= 1) {
-        strengthBar.style.background = '#ef4444';
-      } else if (score <= 3) {
-        strengthBar.style.background = '#f59e0b';
-      } else {
-        strengthBar.style.background = '#22c55e';
-      }
-    });
-  }
-  const confirmPassword = document.getElementById('confirmNewPassword');
-
-  if (confirmPassword) {
-    confirmPassword.addEventListener('input', () => {
-      const error = document.getElementById('confirmPasswordError');
-
-      if (confirmPassword.value && confirmPassword.value !== passwordInput.value) {
-        error.textContent = 'Passwords do not match';
-      } else {
-        error.textContent = '';
-      }
-    });
-  }
+  // ── DOM refs ──
   const modal = document.getElementById('changePasswordModal');
-
   const openBtn = document.getElementById('changePasswordBtn');
-
   if (!modal || !openBtn) return;
 
   const closeBtn = document.getElementById('changePasswordClose');
-
   const cancelBtn = document.getElementById('cancelPasswordChange');
-
   const saveBtn = document.getElementById('savePasswordBtn');
-
   const message = document.getElementById('changePasswordMessage');
+  const formBody = document.getElementById('cpwFormBody');
+  const guestNotice = document.getElementById('cpwGuestNotice');
+  const currentPasswordInput = document.getElementById('currentPassword');
+  const newPasswordInput = document.getElementById('newPassword');
+  const confirmPasswordInput = document.getElementById('confirmNewPassword');
+  const strengthBar = document.getElementById('passwordStrengthBar');
+  const strengthText = document.getElementById('passwordStrengthText');
+  const confirmError = document.getElementById('confirmPasswordError');
 
-  function closeModal() {
-    modal.classList.remove('active');
+  // ── Password strengths labels and colors ──
+  const STRENGTH_LABELS = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Excellent'];
+  const STRENGTH_COLORS = [
+    '#ef4444', '#ef4444', '#f97316', '#facc15', '#22c55e', '#22c55e',
+  ];
+
+  // ── Helper: show/hide guest notice ──
+  function isAuthenticatedUser() {
+    // Use the <html> class set by auth.js as primary indicator,
+    // fall back to window.algoAuth for in-memory guest upgrades.
+    return document.documentElement.classList.contains('auth-verified') ||
+           !!(window.algoAuth && window.algoAuth.authenticated);
   }
 
+  function updateGuestState() {
+    const isAuth = isAuthenticatedUser();
+    if (guestNotice) guestNotice.hidden = isAuth;
+    if (formBody) formBody.hidden = !isAuth;
+    if (saveBtn) saveBtn.disabled = !isAuth;
+    if (message) {
+      message.hidden = true;
+      message.className = 'cpw-message';
+      message.textContent = '';
+    }
+  }
+
+  // ── Close modal with scroll restoration ──
+  function closeModal() {
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    // Safety net: restore scroll only when no other modal is active
+    if (!document.querySelector('.modal.active')) {
+      document.body.classList.remove('modal-open');
+      document.documentElement.style.removeProperty('--scrollbar-width');
+    }
+  }
+
+  // ── Open modal ──
   openBtn.addEventListener('click', () => {
     modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    resetForm();
+    // Must run after resetForm() so guest state (diasbled button) wins
+    updateGuestState();
+    // Focus first field when not guest
+    if (currentPasswordInput && !guestNotice?.hidden) {
+      setTimeout(() => currentPasswordInput.focus(), 100);
+    }
   });
 
+  // ── Close handlers ──
   closeBtn?.addEventListener('click', closeModal);
-
   cancelBtn?.addEventListener('click', closeModal);
 
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // ── Reset form fields ──
+  function resetForm() {
+    [currentPasswordInput, newPasswordInput, confirmPasswordInput].forEach((el) => {
+      if (el) {
+        el.value = '';
+        el.classList.remove('input-error');
+      }
+    });
+    if (strengthBar) {
+      strengthBar.style.width = '0%';
+      strengthBar.style.background = '#ef4444';
+    }
+    if (strengthText) strengthText.textContent = 'Password strength';
+    if (confirmError) confirmError.textContent = '';
+    if (message) {
+      message.hidden = true;
+      message.className = 'cpw-message';
+      message.textContent = '';
+    }
+    // Reset rules (scoped to this modal)
+    modal.querySelectorAll('.cpw-rule').forEach((r) => {
+      r.classList.remove('valid', 'invalid');
+      const icon = r.querySelector('.cpw-rule-icon i');
+      if (icon) icon.className = 'fas fa-circle';
+    });
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="fas fa-key"></i><span>Change Password</span>';
+    }
+  }
+
+  // ── Live password strength & rules ──
+  if (newPasswordInput && strengthBar && strengthText) {
+    newPasswordInput.addEventListener('input', () => {
+      const val = newPasswordInput.value;
+      const score = passwordStrength(val);
+
+      strengthBar.style.width = `${score * 20}%`;
+      strengthBar.style.background = STRENGTH_COLORS[score] || '#ef4444';
+      strengthText.textContent = STRENGTH_LABELS[score] || 'Very Weak';
+
+      // Update rule icons
+      updateRule('ruleLength', val.length >= 8);
+      updateRule('ruleUpper', /[A-Z]/.test(val));
+      updateRule('ruleLower', /[a-z]/.test(val));
+      updateRule('ruleNumber', /\d/.test(val));
+      updateRule('ruleSpecial', /[^A-Za-z0-9]/.test(val));
+
+      // Re-check confirm match
+      if (confirmPasswordInput && confirmPasswordInput.value) {
+        checkConfirmMatch();
+      }
+    });
+  }
+
+  function updateRule(id, isValid) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('valid', 'invalid');
+    el.classList.add(isValid ? 'valid' : 'invalid');
+    const icon = el.querySelector('.cpw-rule-icon i');
+    if (icon) {
+      icon.className = isValid ? 'fas fa-check-circle' : 'fas fa-circle';
+    }
+  }
+
+  // ── Confirm password matching ──
+  function checkConfirmMatch() {
+    if (!confirmPasswordInput || !newPasswordInput || !confirmError) return;
+    if (confirmPasswordInput.value && confirmPasswordInput.value !== newPasswordInput.value) {
+      confirmError.textContent = 'Passwords do not match';
+      confirmPasswordInput.classList.add('input-error');
+    } else {
+      confirmError.textContent = '';
+      confirmPasswordInput.classList.remove('input-error');
+    }
+  }
+
+  if (confirmPasswordInput) {
+    confirmPasswordInput.addEventListener('input', checkConfirmMatch);
+  }
+
+  // ── Save / submit ──
   saveBtn?.addEventListener('click', async () => {
-    const currentPassword = document.getElementById('currentPassword').value;
+    const currentPassword = currentPasswordInput?.value || '';
+    const newPassword = newPasswordInput?.value || '';
+    const confirmPassword = confirmPasswordInput?.value || '';
 
-    const newPassword = document.getElementById('newPassword').value;
+    // ── Client-side validation ──
+    if (!currentPassword) {
+      showMessage('Please enter your current password.', 'error');
+      currentPasswordInput?.focus();
+      return;
+    }
+    if (!newPassword) {
+      showMessage('Please enter a new password.', 'error');
+      newPasswordInput?.focus();
+      return;
+    }
+    if (passwordStrength(newPassword) < 3) {
+      showMessage('Password is too weak. Aim for at least "Good" strength.', 'error');
+      newPasswordInput?.focus();
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showMessage('New passwords do not match.', 'error');
+      confirmPasswordInput?.focus();
+      return;
+    }
 
-    const confirmPassword = document.getElementById('confirmNewPassword').value;
-
-    message.textContent = '';
+    // ── Loading state ──
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="cpw-btn-spinner"></span><span>Saving...</span>';
+    showMessage('Changing password...', 'info');
 
     try {
+      // ── Fetch CSRF token ──
+      let csrfToken = null;
+      if (location.protocol !== 'file:') {
+        try {
+          const csrfRes = await fetch('/api/csrf-token', { credentials: 'include' });
+          if (csrfRes.ok) {
+            const csrfData = await csrfRes.json();
+            csrfToken = csrfData.csrfToken;
+          }
+        } catch (e) {
+          // Non-critical; proceed without CSRF
+        }
+      }
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (csrfToken) headers['x-csrf-token'] = csrfToken;
+
       const response = await fetch('/api/change-password', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-          confirmPassword,
-        }),
+        headers,
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error);
+        throw new Error(data.error || 'Failed to change password.');
       }
 
-      message.className = 'password-message success';
+      showMessage('Password changed successfully. Redirecting to login...', 'success');
 
-      message.textContent = 'Password changed successfully. Redirecting...';
+      // Reset button state
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-check"></i><span>Done</span>';
 
       setTimeout(() => {
         window.location.href = '/login';
       }, 1500);
     } catch (error) {
-      message.className = 'password-message error';
-
-      message.textContent = error.message;
+      showMessage(error.message || 'Something went wrong. Please try again.', 'error');
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="fas fa-key"></i><span>Change Password</span>';
     }
   });
+
+  // ── Helper: show message ──
+  function showMessage(text, type) {
+    if (!message) return;
+    message.hidden = false;
+    message.className = `cpw-message ${type}`;
+    message.textContent = text;
+  }
+
+  // ── Escape key handler ──
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      closeModal();
+    }
+  });
+
+  // ── Initial guest check ──
+  updateGuestState();
 }

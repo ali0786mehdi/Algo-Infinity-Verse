@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "id": "1f936e20-4432-4cef-8fd8-ce107e978192",
+    "name": "Aritro Bag",
+    "email": "aritrobag362@gmail.com",
+    "password": {
+      "salt": "cd29ffc25c4e1a1c246060611100a5a4",
+      "hash": "426c443293b76ae2ded6ce2747e4fbe4e1a1d662f3eccc37c1ba56040dd69e58",
+      "iterations": 210000,
+      "digest": "sha256"
+    },
+    "createdAt": "2026-07-19T11:50:35.458Z",
+    "isDeactivated": false,
+    "deactivatedAt": null,
+    "emailVerified": true,
+    "verifyToken": null,
+    "verifyTokenExpiry": null
+  }
+]
