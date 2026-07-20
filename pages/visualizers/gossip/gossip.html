@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gossip Protocol &amp; phi-Accrual Detector Visualizer · Algo Infinity Verse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="gossip.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+</head>
+<body>
+
+<div class="starfield" id="starfield"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-icon">∞</span>
+    <div class="brand-text">
+      <span class="brand-name">Algo</span>
+      <span class="brand-sub">INFINITY VERSE</span>
+    </div>
+  </div>
+  <nav class="topnav">
+    <span>Learn</span><span>Practice</span><span class="active">Interview</span><span>Discussions</span>
+  </nav>
+</header>
+
+<main class="page">
+
+  <section class="hero">
+    <p class="eyebrow">CLOUD ARCHITECTURE · MASTERLESS SYSTEMS</p>
+    <h1>Epidemic <span class="accent">Gossip Engine</span></h1>
+    <p class="subhead">No leader. No census. Just rumor, spreading exponentially.</p>
+    <p class="lede">With no central coordinator, nodes in systems like DynamoDB or Cassandra discover state and failures through <strong>gossip</strong> — every round, each node swaps its state matrix with a random peer. State converges in O(log n) rounds. Failure isn't a boolean either: a <strong>&phi;-accrual detector</strong> converts a sliding window of heartbeat gaps into a live probability that a node is dead.</p>
+  </section>
+
+  <section class="panel controls-panel">
+    <div class="controls-row">
+      <div class="control-group">
+        <label for="nodeCount">Nodes</label>
+        <input type="number" id="nodeCount" value="50" min="6" max="120">
+      </div>
+      <button class="btn btn-primary" id="btnRebuild">🔄 Rebuild Cluster</button>
+      <button class="btn btn-secondary" id="btnPlay">▶ Start Gossiping</button>
+      <button class="btn btn-ghost" id="btnStep">Step ⏭</button>
+      <div class="control-group">
+        <label for="speedSlider">Round speed <span id="speedVal">700ms</span></label>
+        <input type="range" id="speedSlider" min="80" max="1500" step="20" value="700">
+      </div>
+    </div>
+    <div class="controls-row">
+      <button class="btn btn-secondary" id="btnInject">💉 Inject Data (random node)</button>
+      <button class="btn btn-ghost" id="btnHiccup">🌐 Simulate Latency Hiccup</button>
+      <button class="btn btn-danger-ghost" id="btnReviveAll">Revive All</button>
+      <span class="hint-text">Click a node in the mesh to kill / revive it directly.</span>
+    </div>
+    <div class="status-line" id="statusLine" aria-live="polite">Click "Start Gossiping" to begin — every alive node exchanges state with one random peer per round.</div>
+  </section>
+
+  <section class="panel mesh-panel">
+    <div class="view-header">
+      <h2>Network Mesh <span class="view-tag">D3-Force · glowing links = this round's gossip exchanges</span></h2>
+    </div>
+    <div class="legend-row">
+      <span class="legend-item"><span class="dot alive"></span> Alive</span>
+      <span class="legend-item"><span class="dot suspect"></span> Suspect (&phi; &ge; 3)</span>
+      <span class="legend-item"><span class="dot dead"></span> Dead (&phi; &ge; 8)</span>
+      <span class="legend-item"><span class="dot killed"></span> Killed by you</span>
+    </div>
+    <svg id="meshSvg" viewBox="0 0 900 480" preserveAspectRatio="xMidYMid meet"></svg>
+  </section>
+
+  <section class="panel dual-view">
+    <div class="view-col">
+      <div class="view-header">
+        <h2>Selected Node Detail <span class="view-tag" id="selectedTag">click a node</span></h2>
+      </div>
+      <div class="detail-box" id="detailBox">Click any node above to inspect its heartbeat, and how a few other nodes currently perceive it.</div>
+    </div>
+    <div class="view-col">
+      <div class="view-header">
+        <h2>Convergence Telemetry <span class="view-tag">last injected update, fraction of cluster caught up</span></h2>
+      </div>
+      <svg id="convergenceSvg" viewBox="0 0 500 280" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+  </section>
+
+  <footer class="foot-note">
+    Built as an Epidemic Gossip Engine · Algo Infinity Verse
+  </footer>
+
+</main>
+
+<script src="gossip-core.js"></script>
+<script src="gossip.js"></script>
+</body>
+</html>
