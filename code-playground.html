@@ -527,6 +527,7 @@
           <option value="java">Java</option>
           <option value="cpp">C++</option>
           <option value="lisp">Common Lisp</option>
+          <option value="fsharp">F#</option>
           <option value="prolog">Prolog</option>
         </select>
         <button type="button" id="runBtn" aria-label="Run code">▶ Run</button>
@@ -572,6 +573,7 @@
         java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello");\n    }\n}`,
         cpp: `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello" << endl;\n    return 0;\n}`,
         lisp: `(defun solve ()\n  (format t "Hello, World!~%")\n  t)\n\n(solve)`,
+        fsharp: `// F# Code Playground\nlet solve input =\n    printfn "%A" input\n    input\n\n[<EntryPoint>]\nlet main argv =\n    solve "Hello from F#"\n    0`,
         prolog: `% Prolog Code Playground\nparent(john, bob).\nparent(bob, charlie).\nancestor(X, Y) :- parent(X, Y).\nancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).`,
       };
 
@@ -627,6 +629,7 @@
           java: 'java',
           cpp: 'cpp',
           lisp: 'lisp',
+          fsharp: 'fsharp',
           prolog: 'prolog',
         };
         const lang = modeMap[this.value];

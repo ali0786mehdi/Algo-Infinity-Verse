@@ -124,6 +124,12 @@ const editors = [
     desc: 'Explore functional programming paradigms, list operations, recursion, and powerful macro metaprogramming in Common Lisp.',
   },
   {
+    name: 'F# Playground',
+    path: '/pages/editors/fsharp-playground/fsharp-playground.html',
+    category: 'JVM & Functional',
+    icon: 'fa-code-branch',
+    desc: 'Write F# with live syntax highlighting, functional pipeline operators, pattern matching, discriminated unions, and execution.'}
+  ,{
     name: 'Prolog Playground',
     path: '/pages/editors/prolog-playground/prolog-playground.html',
     category: 'JVM & Functional',

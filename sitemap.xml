@@ -505,6 +505,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://algoinfinityverse.com/pages/editors/fsharp-playground/fsharp-playground.html</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://algoinfinityverse.com/pages/editors/go-editor/go-editor.html</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
