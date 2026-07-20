@@ -526,6 +526,7 @@
           <option value="python">Python</option>
           <option value="java">Java</option>
           <option value="cpp">C++</option>
+          <option value="lisp">Common Lisp</option>
         </select>
         <button type="button" id="runBtn" aria-label="Run code">▶ Run</button>
         <button type="button" id="profileBtn" aria-label="Profile time complexity">
@@ -569,6 +570,7 @@
         python: `def solve(input):\n    print(input)\n    return input`,
         java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello");\n    }\n}`,
         cpp: `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello" << endl;\n    return 0;\n}`,
+        lisp: `(defun solve ()\n  (format t "Hello, World!~%")\n  t)\n\n(solve)`,
       };
 
       let editor;
@@ -617,7 +619,13 @@
       loadEditor();
 
       document.getElementById('lang').addEventListener('change', function () {
-        const modeMap = { javascript: 'javascript', python: 'python', java: 'java', cpp: 'cpp' };
+        const modeMap = {
+          javascript: 'javascript',
+          python: 'python',
+          java: 'java',
+          cpp: 'cpp',
+          lisp: 'lisp',
+        };
         const lang = modeMap[this.value];
         if (editor && monacoInstance) {
           const model = editor.getModel();
