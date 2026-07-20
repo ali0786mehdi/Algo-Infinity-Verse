@@ -4,10 +4,14 @@ import { extractResumeText } from '../resume-analyzer/parser.js';
 import { calculateATS } from '../resume-analyzer/atsScore.js';
 import { findMissingSkills } from '../resume-analyzer/skills.js';
 import { getSuggestions } from '../resume-analyzer/suggestions.js';
+import {
+  RESUME_FILE_FILTER_MESSAGE_SUBSTRINGS,
+  RESUME_TEXT_LENGTH,
+  resolveResumeUploadError,
+} from '../resume-analyzer/constants.js';
 import securityConfig from '../config/security.js';
 
 const MAX_RESUME_FILE_SIZE_BYTES = securityConfig.MAX_RESUME_FILE_SIZE_BYTES;
-const MAX_RESUME_TEXT_LENGTH = securityConfig.MAX_RESUME_TEXT_LENGTH;
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -18,69 +22,7 @@ const upload = multer({
 }).single('resume');
 
 function handleMulterError(err) {
-  // Multer-specific errors
-  if (err instanceof multer.MulterError) {
-    switch (err.code) {
-      case 'LIMIT_FILE_SIZE':
-        return {
-          statusCode: 413,
-          error: `File too large. Maximum size is ${MAX_RESUME_FILE_SIZE_BYTES / (1024 * 1024)}MB.`,
-        };
-      case 'LIMIT_FILE_COUNT':
-        return {
-          statusCode: 400,
-          error: 'Only one file can be uploaded at a time.',
-        };
-      case 'LIMIT_UNEXPECTED_FILE':
-        return {
-          statusCode: 400,
-          error: 'Unexpected field name. Please use "resume" as the field name.',
-        };
-      case 'LIMIT_FIELD_KEY':
-        return {
-          statusCode: 400,
-          error: 'Field name too long or contains invalid characters.',
-        };
-      case 'LIMIT_FIELD_VALUE':
-        return {
-          statusCode: 400,
-          error: 'Field value too large or contains invalid data.',
-        };
-      case 'LIMIT_FIELD_COUNT':
-        return {
-          statusCode: 400,
-          error: 'Too many fields in the request.',
-        };
-      case 'LIMIT_PART_COUNT':
-        return {
-          statusCode: 400,
-          error: 'Too many parts in the request.',
-        };
-      default:
-        return {
-          statusCode: 400,
-          error: `Upload error: ${err.message}`,
-        };
-    }
-  }
-
-  // File filter errors
-  if (
-    err.message &&
-    (err.message.includes('Invalid file type') ||
-      err.message.includes('Only JPEG, PNG, and WEBP images are allowed'))
-  ) {
-    return {
-      statusCode: 415,
-      error: err.message,
-    };
-  }
-
-  // Unknown errors
-  return {
-    statusCode: 500,
-    error: err.message || 'An unexpected error occurred during upload.',
-  };
+  return resolveResumeUploadError(err);
 }
 
 export async function handleAnalyzeResume(req, res) {
@@ -103,9 +45,9 @@ export async function handleAnalyzeResume(req, res) {
 
     const text = await extractResumeText(req.file);
 
-    if (text.length > MAX_RESUME_TEXT_LENGTH) {
+    if (text.length > RESUME_TEXT_LENGTH.max) {
       return sendJson(res, 400, {
-        error: `Resume text is too long (${text.length} characters). Please limit your resume text to ${MAX_RESUME_TEXT_LENGTH} characters.`,
+        error: RESUME_TEXT_LENGTH.tooLongMessage(text.length),
       });
     }
 
@@ -130,8 +72,7 @@ export async function handleAnalyzeResume(req, res) {
     // Handle file filter errors
     if (
       error.message &&
-      (error.message.includes('Invalid file type') ||
-        error.message.includes('Only JPEG, PNG, and WEBP images are allowed'))
+      RESUME_FILE_FILTER_MESSAGE_SUBSTRINGS.some((s) => error.message.includes(s))
     ) {
       const handled = handleMulterError(error);
       return sendJson(res, handled.statusCode, { error: handled.error });
