@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MATLAB Editor | Algo Infinity Verse</title>
+  <link rel="stylesheet" href="matlab.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <div class="starfield" id="starfield"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <i class="fa-solid fa-infinity"></i>
+      <div class="brand-text">
+        <span class="brand-name">Algo</span>
+        <span class="brand-sub">INFINITY VERSE</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="lang-badge"><i class="fa-solid fa-table-cells-large"></i> MATLAB</span>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </header>
+
+  <main class="editor-shell">
+
+    <aside class="side-panel" id="examplePanel">
+      <div class="side-panel-header">
+        <i class="fa-solid fa-flask"></i>
+        <h2>Engineering Examples</h2>
+      </div>
+      <p class="side-panel-hint">Click an example to load it into the editor.</p>
+      <div class="example-list" id="exampleList"></div>
+
+      <div class="side-panel-header matrix-header">
+        <i class="fa-solid fa-diagram-project"></i>
+        <h2>Matrix Operations</h2>
+      </div>
+      <div class="example-list" id="matrixList"></div>
+
+      <div class="side-panel-header snippets-header">
+        <i class="fa-solid fa-layer-group"></i>
+        <h2>Common Snippets</h2>
+      </div>
+      <div class="snippet-list" id="snippetList"></div>
+    </aside>
+
+    <section class="editor-main">
+      <div class="editor-toolbar">
+        <div class="file-info">
+          <i class="fa-regular fa-file-lines"></i>
+          <input id="fileName" class="filename-input" value="hello_world.m" spellcheck="false" />
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="loadStarterBtn">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Reset to Starter
+          </button>
+          <label class="btn btn-ghost" for="fileUpload">
+            <i class="fa-solid fa-file-arrow-up"></i> Open .m
+          </label>
+          <input type="file" id="fileUpload" accept=".m,.txt" hidden />
+          <button class="btn btn-ghost" id="downloadBtn">
+            <i class="fa-solid fa-file-arrow-down"></i> Save .m
+          </button>
+          <button class="btn btn-primary" id="runBtn">
+            <i class="fa-solid fa-play"></i> Run
+          </button>
+        </div>
+      </div>
+
+      <div class="code-frame">
+        <div class="gutter" id="gutter"></div>
+        <div class="code-layer-wrap">
+          <pre class="highlight-layer" id="highlightLayer" aria-hidden="true"><code id="highlightCode"></code></pre>
+          <textarea
+            id="codeInput"
+            class="code-input"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            wrap="off"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="output-panel">
+        <div class="output-header">
+          <span><i class="fa-solid fa-terminal"></i> Command Window</span>
+          <button class="icon-btn small" id="clearOutputBtn" title="Clear output"><i class="fa-solid fa-broom"></i></button>
+        </div>
+        <pre class="output-body" id="outputBody">Press <strong>Run</strong> to simulate executing this MATLAB script.</pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="editor-footer">
+    <span>MATLAB Editor · execution is simulated locally, no MATLAB engine round trip</span>
+    <span class="footer-cursor" id="cursorPos">Ln 1, Col 1</span>
+  </footer>
+
+  <script src="matlab.js"></script>
+</body>
+</html>
