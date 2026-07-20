@@ -86,9 +86,14 @@ describe('Auth Helper Functions', () => {
   describe('DOM Wiring Functions', () => {
     test('wireChangePassword sets up toggle handlers', () => {
       let clickHandler;
+      global.document.addEventListener = jest.fn((event, handler) => {
+        if (event === 'click') clickHandler = handler;
+      });
+
       const mockToggleBtn = {
-        addEventListener: jest.fn((event, handler) => {
-          if (event === 'click') clickHandler = handler;
+        closest: jest.fn((selector) => {
+          if (selector === '.cpw-toggle') return mockToggleBtn;
+          return null;
         }),
         dataset: { target: 'mockInput' },
         innerHTML: '',
@@ -98,11 +103,6 @@ describe('Auth Helper Functions', () => {
         type: 'password',
       };
 
-      global.document.querySelectorAll = jest.fn((selector) => {
-        if (selector === '.cpw-toggle') return [mockToggleBtn];
-        return [];
-      });
-
       global.document.getElementById = jest.fn((id) => {
         if (id === 'mockInput') return mockInput;
         return null;
@@ -110,10 +110,15 @@ describe('Auth Helper Functions', () => {
 
       if (typeof global.wireChangePassword === 'function') {
         global.wireChangePassword();
-        expect(mockToggleBtn.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));
+        expect(global.document.addEventListener).toHaveBeenCalledWith(
+          'click',
+          expect.any(Function)
+        );
 
         // Trigger the handler explicitly
-        if (clickHandler) clickHandler();
+        if (clickHandler) {
+          clickHandler({ target: mockToggleBtn });
+        }
 
         expect(mockInput.type).toBe('text');
         expect(mockToggleBtn.innerHTML).toContain('fa-eye-slash');

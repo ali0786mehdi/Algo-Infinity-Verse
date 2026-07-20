@@ -1,683 +1,516 @@
 // ====== CODE EXECUTOR ENGINE ======
 class CodeExecutor {
-    constructor(code) {
-        this.code = code;
-        this.lines = code.split('\n').map((line, i) => ({
-            number: i + 1,
-            text: line,
-            trimmed: line.trim()
-        }));
-        this.variables = {};
-        this.trace = [];
-        this.output = [];
-        this.currentLine = 0;
-        this.isRunning = false;
-        this.isPaused = false;
-        this.isFinished = false;
-        this.originalConsoleLog = console.log;
-        this.history = [{
-            currentLine: 0,
-            variables: {},
-            output: [],
-            trace: [],
-            explanation: "Ready to start execution."
-        }];
-        this.playInterval = null;
-        this.updateExplanationUI("Ready to start execution.");
+  constructor(code, snapshots, output) {
+    this.code = code;
+    this.snapshots = snapshots || [];
+    this.output = output || [];
+    this.currentIndex = -1; // -1 represents initial ready state (line 0, no variables yet)
+    this.isRunning = false;
+    this.isPaused = false;
+    this.isFinished = false;
+    this.playInterval = null;
+  }
+
+  // Step Into: Go to the very next step
+  stepInto() {
+    if (this.isFinished || this.snapshots.length === 0) {
+      this.finishExecution();
+      return false;
     }
 
-    // Step forward one line
-    stepForward() {
-        if (this.isFinished || this.currentLine >= this.lines.length) {
-            this.isFinished = true;
-            this.addTrace('⏹️ Execution complete!');
-            this.updateStatus('Finished');
-            this.updateExplanationUI("Execution complete! Click Reset to edit or run again.");
-            if (this.playInterval) {
-                clearInterval(this.playInterval);
-                this.playInterval = null;
-            }
-            if (typeof updateControlsUI === 'function') updateControlsUI();
-            return false;
-        }
-
-        const line = this.lines[this.currentLine];
-        const trimmed = line.trimmed;
-
-        // Skip empty lines
-        if (!trimmed || trimmed.startsWith('//')) {
-            this.addTrace(`⏭️ Skipped: "${trimmed || 'empty line'}"`);
-            this.currentLine++;
-            return this.stepForward();
-        }
-
-        this.addTrace(`▶️ Executing line ${line.number}: "${trimmed}"`);
-
-        try {
-            // Execute the line
-            this.executeLine(trimmed);
-            this.updateStatus(`Line ${line.number} executed`);
-            this.currentLine++;
-            this.highlightLine(this.currentLine);
-            this.updateVariables();
-
-            // Check if finished
-            if (this.currentLine >= this.lines.length) {
-                this.isFinished = true;
-                this.addTrace('✅ Execution complete!');
-                this.updateStatus('Finished');
-            }
-
-            // Generate step explanation
-            const explanation = this.generateExplanation(trimmed);
-            this.updateExplanationUI(explanation);
-
-            // Record snapshot in history
-            this.history.push({
-                currentLine: this.currentLine,
-                variables: JSON.parse(JSON.stringify(this.variables)),
-                output: [...this.output],
-                trace: [...this.trace],
-                explanation: explanation
-            });
-
-            if (typeof updateControlsUI === 'function') updateControlsUI();
-            return true;
-        } catch (error) {
-            this.addTrace(`❌ Error: ${error.message}`);
-            this.updateStatus('Error');
-            this.updateExplanationUI(`Runtime Error on line ${line.number}: ${error.message}`);
-            this.isFinished = true;
-            if (this.playInterval) {
-                clearInterval(this.playInterval);
-                this.playInterval = null;
-            }
-            if (typeof updateControlsUI === 'function') updateControlsUI();
-            return false;
-        }
+    if (this.currentIndex >= this.snapshots.length - 1) {
+      this.finishExecution();
+      return false;
     }
 
-    // Step backward one line
-    stepBackward() {
-        if (this.history.length <= 1) {
-            this.reset();
-            return false;
-        }
+    this.currentIndex++;
+    this.updateUI();
+    return true;
+  }
 
-        // Pop the current step
-        this.history.pop();
-
-        // Restore state to previous step
-        const prevState = this.history[this.history.length - 1];
-        this.variables = JSON.parse(JSON.stringify(prevState.variables));
-        this.output = [...prevState.output];
-        this.trace = [...prevState.trace];
-        this.currentLine = prevState.currentLine;
-        this.isFinished = false;
-
-        this.highlightLine(this.currentLine);
-        this.updateVariables();
-        updateTraceUI(this.trace);
-        updateConsoleUI(this.output);
-        this.updateExplanationUI(prevState.explanation);
-        
-        if (this.currentLine === 0) {
-            this.updateStatus('Ready');
-        } else {
-            this.updateStatus(`Stepped back to Line ${this.currentLine}`);
-        }
-
-        if (typeof updateControlsUI === 'function') updateControlsUI();
-        return true;
+  // Step Over: Go to the next step at the same stack depth or less
+  stepOver() {
+    if (this.isFinished || this.snapshots.length === 0) {
+      this.finishExecution();
+      return false;
     }
 
-    // Generate readable explanations of what code does at runtime
-    generateExplanation(line) {
-        if (line.startsWith('console.log(')) {
-            const match = line.match(/console\.log\((.*)\)/);
-            if (match) {
-                const expr = match[1].trim();
-                const evaluatedVal = this.output[this.output.length - 1];
-                return `Line prints the expression <code>${expr}</code> to the console output.<br>Evaluated value printed: <strong style="color: var(--accent); font-family: monospace;">${evaluatedVal !== undefined ? evaluatedVal : 'undefined'}</strong>.`;
-            }
-            return "Executing <code>console.log</code> statement to output details.";
-        }
-
-        if (line.startsWith('let ')) {
-            const parts = line.replace('let ', '').split('=');
-            const varName = parts[0].trim();
-            const value = this.variables[varName];
-            const displayVal = typeof value === 'string' ? `"${value}"` : JSON.stringify(value);
-            return `Declaring local variable <code>${varName}</code> and initializing it to <strong style="color: #22c55e; font-family: monospace;">${displayVal !== undefined ? displayVal : 'undefined'}</strong>.`;
-        }
-
-        // Handle simple variable assignments
-        const assignmentMatch = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)/);
-        if (assignmentMatch) {
-            const varName = assignmentMatch[1];
-            const value = this.variables[varName];
-            const displayVal = typeof value === 'string' ? `"${value}"` : JSON.stringify(value);
-            return `Updating variable <code>${varName}</code> to <strong style="color: #22c55e; font-family: monospace;">${displayVal !== undefined ? displayVal : 'undefined'}</strong>.`;
-        }
-
-        return `Executing line: <code style="color: #cbd5e1; font-family: monospace;">${line}</code>.`;
+    if (this.currentIndex >= this.snapshots.length - 1) {
+      this.finishExecution();
+      return false;
     }
 
-    // Update explanation panel
-    updateExplanationUI(text) {
-        const container = document.getElementById('explanationContainer');
-        if (container) {
-            container.innerHTML = `<div class="explanation-step-text" style="line-height: 1.6; font-size: 0.95rem;">${text}</div>`;
-        }
+    if (this.currentIndex === -1) {
+      return this.stepInto();
     }
 
-    // Execute a single line
-    executeLine(line) {
-        // Handle console.log
-        if (line.startsWith('console.log(')) {
-            const match = line.match(/console\.log\((.*)\)/);
-            if (match) {
-                const args = match[1].split(',').map(arg => {
-                    const trimmedArg = arg.trim();
-                    // Check if it's a variable
-                    if (this.variables[trimmedArg] !== undefined) {
-                        return this.variables[trimmedArg];
-                    }
-                    // Check if it's a string
-                    if (trimmedArg.startsWith('"') || trimmedArg.startsWith("'")) {
-                        return trimmedArg.slice(1, -1);
-                    }
-                    // Check if it's a number
-                    if (!isNaN(trimmedArg)) {
-                        return Number(trimmedArg);
-                    }
-                    return trimmedArg;
-                });
-                const output = args.join(' ');
-                this.output.push(output);
-                this.addTrace(`📤 Output: ${output}`);
-                // Also show in console
-                console.log(output);
-                return;
-            }
-        }
+    const currentSnapshot = this.snapshots[this.currentIndex];
+    const currentDepth = currentSnapshot.stack.length;
 
-        // Handle variable declaration with let
-        if (line.startsWith('let ')) {
-            const parts = line.replace('let ', '').split('=');
-            const varName = parts[0].trim();
-            let value = parts.length > 1 ? parts[1].trim() : undefined;
-            
-            if (value !== undefined) {
-                // Check if value is a number
-                if (!isNaN(value)) {
-                    value = Number(value);
-                }
-                // Check if value is another variable
-                else if (this.variables[value] !== undefined) {
-                    value = this.variables[value];
-                }
-            }
-            
-            this.variables[varName] = value;
-            this.addTrace(`📦 ${varName} = ${value !== undefined ? value : 'undefined'}`);
-            return;
-        }
-
-        // Handle variable assignment (no let)
-        const assignmentMatch = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)/);
-        if (assignmentMatch) {
-            const varName = assignmentMatch[1];
-            let value = assignmentMatch[2].trim();
-            
-            // Check if value is a number
-            if (!isNaN(value)) {
-                value = Number(value);
-            }
-            // Check if value is another variable
-            else if (this.variables[value] !== undefined) {
-                value = this.variables[value];
-            }
-            
-            this.variables[varName] = value;
-            this.addTrace(`📦 ${varName} = ${value}`);
-            return;
-        }
-
-        // Handle simple expressions (e.g., x + y)
-        const exprMatch = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\+\s*([a-zA-Z_][a-zA-Z0-9_]*)/);
-        if (exprMatch) {
-            const varName = exprMatch[1];
-            const left = exprMatch[2];
-            const right = exprMatch[3];
-            
-            if (this.variables[left] !== undefined && this.variables[right] !== undefined) {
-                this.variables[varName] = this.variables[left] + this.variables[right];
-                this.addTrace(`📦 ${varName} = ${this.variables[left]} + ${this.variables[right]} = ${this.variables[varName]}`);
-                return;
-            }
-        }
-
-        // If we get here, we don't know how to execute the line
-        this.addTrace(`⚠️ Unknown command: "${line}"`);
+    let nextIndex = this.currentIndex + 1;
+    while (nextIndex < this.snapshots.length) {
+      const nextSnapshot = this.snapshots[nextIndex];
+      if (nextSnapshot.stack.length <= currentDepth) {
+        break;
+      }
+      nextIndex++;
     }
 
-    // Add to trace
-    addTrace(message) {
-        this.trace.push({
-            line: this.currentLine + 1,
-            message: message,
-            time: new Date().toISOString()
-        });
-        updateTraceUI(this.trace);
+    if (nextIndex >= this.snapshots.length) {
+      this.currentIndex = this.snapshots.length - 1;
+    } else {
+      this.currentIndex = nextIndex;
     }
 
-    // Update status
-    updateStatus(status) {
-        const el = document.getElementById('statusText');
-        if (el) el.textContent = `⏹️ ${status}`;
+    this.updateUI();
+    return true;
+  }
+
+  // Step Back: Go to the previous step in history
+  stepBackward() {
+    if (this.currentIndex <= 0) {
+      this.resetToStart();
+      return false;
     }
 
-    // Highlight current line
-    highlightLine(lineNumber) {
-        const highlightLineEl = document.getElementById('highlightLine');
-        if (!highlightLineEl) return;
-        if (lineNumber <= 0) {
-            highlightLineEl.style.display = 'none';
-            return;
-        }
-        const lineHeight = 1.6 * 16; // ~25.6px
-        const top = (lineNumber - 1) * lineHeight;
-        highlightLineEl.style.top = `${top}px`;
-        highlightLineEl.style.display = 'block';
-        
-        const lineStatusEl = document.getElementById('lineStatus');
-        if (lineStatusEl) lineStatusEl.textContent = `Line: ${lineNumber}`;
+    this.currentIndex--;
+    this.isFinished = false;
+    this.updateUI();
+    return true;
+  }
+
+  finishExecution() {
+    this.isFinished = true;
+    this.stopPlay();
+    updateStatus('Finished');
+    const container = document.getElementById('explanationContainer');
+    if (container) {
+      container.innerHTML = `<div class="explanation-step-text" style="line-height: 1.6; font-size: 0.95rem;">Execution complete! Click Reset to edit or run again.</div>`;
+    }
+    updateControlsUI();
+  }
+
+  resetToStart() {
+    this.currentIndex = -1;
+    this.isFinished = false;
+    this.stopPlay();
+
+    highlightLine(0);
+    updateVariablesUI({});
+    updateStackUI([]);
+    updateConsoleUI([]);
+    updateTraceUI([]);
+    updateStatus('Ready');
+
+    const container = document.getElementById('explanationContainer');
+    if (container) {
+      container.innerHTML = `<div class="explanation-step-text" style="line-height: 1.6; font-size: 0.95rem;">Ready to start execution. Click Step Into or Step Over.</div>`;
+    }
+    updateControlsUI();
+  }
+
+  updateUI() {
+    if (this.currentIndex < 0 || this.currentIndex >= this.snapshots.length) {
+      return;
     }
 
-    // Update variables UI
-    updateVariables() {
-        updateVariablesUI(this.variables);
+    const snapshot = this.snapshots[this.currentIndex];
+
+    // Highlight active line
+    highlightLine(snapshot.line);
+
+    // Update variables UI (with scope categorization)
+    updateVariablesUI(snapshot.vars);
+
+    // Update call stack UI
+    updateStackUI(snapshot.stack, snapshot.line);
+
+    // Update Console Logs up to this point
+    updateConsoleUI(snapshot.output);
+
+    // Update status text
+    updateStatus(`Step ${this.currentIndex + 1} of ${this.snapshots.length}`);
+
+    // Update explanation UI
+    this.generateStepExplanation(snapshot);
+
+    // Update trace logs UI
+    const traceLogs = this.snapshots.slice(0, this.currentIndex + 1).map((snap, idx) => {
+      const stackFrame = snap.stack[snap.stack.length - 1];
+      const stackStr = stackFrame ? ` (in ${stackFrame.name})` : ' (in global)';
+      return {
+        line: snap.line,
+        message: `▶️ Step ${idx + 1}: Line ${snap.line}${stackStr} - Variables: ${JSON.stringify(snap.vars)}`,
+      };
+    });
+    updateTraceUI(traceLogs);
+
+    updateControlsUI();
+  }
+
+  generateStepExplanation(snapshot) {
+    const container = document.getElementById('explanationContainer');
+    if (!container) return;
+
+    let explanation = '';
+    const stackFrame = snapshot.stack[snapshot.stack.length - 1];
+    const funcName = stackFrame ? `${stackFrame.name}()` : 'global scope';
+
+    explanation += `Executing code on line <code>${snapshot.line}</code> inside the <strong style="color: #3b82f6;">${funcName}</strong>.<br>`;
+
+    const varKeys = Object.keys(snapshot.vars);
+    if (varKeys.length > 0) {
+      explanation += `Variables currently active in scope:<ul>`;
+      for (const key of varKeys) {
+        const val = snapshot.vars[key];
+        const displayVal =
+          typeof val === 'object' && val !== null ? JSON.stringify(val) : String(val);
+        explanation += `<li><code>${key}</code> = <strong style="color: #22c55e; font-family: monospace;">${displayVal}</strong></li>`;
+      }
+      explanation += `</ul>`;
+    } else {
+      explanation += `No active variables in current scope at this line.`;
     }
 
-    // Run all code
-    runAll() {
-        this.reset();
-        this.isRunning = true;
-        this.updateStatus('Running...');
-        while (!this.isFinished && this.currentLine < this.lines.length) {
-            const result = this.stepForward();
-            if (!result) break;
-        }
-        this.isRunning = false;
-    }
+    container.innerHTML = `<div class="explanation-step-text" style="line-height: 1.6; font-size: 0.95rem;">${explanation}</div>`;
+  }
 
-    // Reset everything
-    reset() {
-        this.variables = {};
-        this.trace = [];
-        this.output = [];
-        this.currentLine = 0;
-        this.isRunning = false;
-        this.isPaused = false;
-        this.isFinished = false;
-        this.highlightLine(0);
-        this.updateVariables();
-        this.history = [{
-            currentLine: 0,
-            variables: {},
-            output: [],
-            trace: [],
-            explanation: "Ready to start execution."
-        }];
-        this.updateExplanationUI("Ready to start execution.");
-        updateTraceUI([]);
-        updateConsoleUI([]);
-        this.updateStatus('Ready');
-        console.log = this.originalConsoleLog;
-        if (this.playInterval) {
-            clearInterval(this.playInterval);
-            this.playInterval = null;
-        }
-        if (typeof updateControlsUI === 'function') updateControlsUI();
+  stopPlay() {
+    if (this.playInterval) {
+      clearInterval(this.playInterval);
+      this.playInterval = null;
     }
-
-    // Get the code lines
-    getLines() {
-        return this.lines;
-    }
+    updateControlsUI();
+  }
 }
 
 // ====== UI UPDATE FUNCTIONS ======
 
-// Update variables UI
-function updateVariablesUI(variables) {
-    const container = document.getElementById('variablesContainer');
-    const keys = Object.keys(variables);
-    
-    if (keys.length === 0) {
-        container.innerHTML = '<div class="empty-state">No variables yet. Run some code!</div>';
-        return;
-    }
-
-    let html = '';
-    for (const key of keys) {
-        const value = variables[key];
-        const displayValue = typeof value === 'string' ? `"${value}"` : value;
-        html += `
-            <div class="variable-item">
-                <span class="variable-name">${key}</span>
-                <span class="variable-value">${displayValue !== undefined ? displayValue : 'undefined'}</span>
-            </div>
-        `;
-    }
-    container.innerHTML = html;
+function updateStatus(status) {
+  const el = document.getElementById('statusText');
+  if (el)
+    el.textContent =
+      status.startsWith('⏹️') || status.startsWith('⏳') || status.startsWith('❌')
+        ? status
+        : `⏹️ ${status}`;
 }
 
-// Update trace UI
-function updateTraceUI(trace) {
-    const container = document.getElementById('traceContainer');
-    
-    if (trace.length === 0) {
-        container.innerHTML = '<div class="empty-state">Trace will appear here...</div>';
-        return;
-    }
+function highlightLine(lineNumber) {
+  const highlightLineEl = document.getElementById('highlightLine');
+  if (!highlightLineEl) return;
+  if (lineNumber <= 0) {
+    highlightLineEl.style.display = 'none';
+    return;
+  }
+  const lineHeight = 1.6 * 16; // ~25.6px
+  const top = (lineNumber - 1) * lineHeight + 12;
+  highlightLineEl.style.top = `${top}px`;
+  highlightLineEl.style.display = 'block';
 
-    let html = '';
-    for (const item of trace) {
-        const isError = item.message.includes('❌') || item.message.includes('Error');
-        const isActive = item.message.includes('▶️');
-        html += `
-            <div class="trace-item ${isActive ? 'active' : ''}" style="${isError ? 'color: #ef4444;' : ''}">
+  const lineStatusEl = document.getElementById('lineStatus');
+  if (lineStatusEl) lineStatusEl.textContent = `Line: ${lineNumber}`;
+}
+
+function updateVariablesUI(variables) {
+  const container = document.getElementById('variablesContainer');
+  if (!container) return;
+
+  const keys = Object.keys(variables);
+  if (keys.length === 0) {
+    container.innerHTML = '<div class="empty-state">No variables active in scope.</div>';
+    return;
+  }
+
+  let html = '';
+  for (const key of keys) {
+    const value = variables[key];
+    const displayValue =
+      typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value);
+    html += `
+            <div class="variable-item" style="display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: 'Courier New', monospace; font-size: 0.9rem;">
+                <span class="variable-name" style="font-weight: 600; color: #3b82f6;">${key}</span>
+                <span class="variable-value" style="color: #22c55e; word-break: break-all; max-width: 70%; text-align: right;">${displayValue}</span>
+            </div>
+        `;
+  }
+  container.innerHTML = html;
+}
+
+function updateStackUI(stack, currentLine) {
+  const container = document.getElementById('stackContainer');
+  if (!container) return;
+
+  if (!stack || stack.length === 0) {
+    container.innerHTML = `
+            <div class="stack-frame active" style="padding: 0.4rem 0.6rem; border-radius: 6px; background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; display: flex; justify-content: space-between; font-family: 'Courier New', monospace; font-size: 0.9rem;">
+                <span class="frame-name" style="font-weight: bold; color: #3b82f6;">(global)</span>
+                <span class="frame-line" style="color: #888; font-size: 0.8rem;">line ${currentLine || '-'}</span>
+            </div>
+        `;
+    return;
+  }
+
+  let html = '';
+  // Display stack from top (most recent) to bottom
+  for (let i = stack.length - 1; i >= 0; i--) {
+    const frame = stack[i];
+    const isActive = i === stack.length - 1;
+    html += `
+            <div class="stack-frame ${isActive ? 'active' : ''}" style="padding: 0.4rem 0.6rem; margin-bottom: 0.4rem; border-radius: 6px; background: ${isActive ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255,255,255,0.03)'}; border-left: 3px solid ${isActive ? '#3b82f6' : '#9ca3af'}; display: flex; justify-content: space-between; font-family: 'Courier New', monospace; font-size: 0.9rem;">
+                <span class="frame-name" style="font-weight: bold; color: ${isActive ? '#3b82f6' : '#e4e4e4'};">${frame.name}()</span>
+                <span class="frame-line" style="color: #888; font-size: 0.8rem;">line ${isActive ? currentLine : frame.line}</span>
+            </div>
+        `;
+  }
+
+  // Add global frame at the bottom
+  html += `
+        <div class="stack-frame" style="padding: 0.4rem 0.6rem; border-radius: 6px; background: rgba(255,255,255,0.01); border-left: 3px solid #6b7280; display: flex; justify-content: space-between; font-family: 'Courier New', monospace; font-size: 0.9rem;">
+            <span class="frame-name" style="color: #888;">(global)</span>
+            <span class="frame-line" style="color: #555; font-size: 0.8rem;">-</span>
+        </div>
+    `;
+
+  container.innerHTML = html;
+}
+
+function updateConsoleUI(output) {
+  const container = document.getElementById('outputConsole');
+  if (!container) return;
+
+  if (!output || output.length === 0) {
+    container.innerHTML = '<div class="empty-state">Console output will appear here...</div>';
+    return;
+  }
+
+  let html = '';
+  for (const line of output) {
+    const isError =
+      line.startsWith('❌') || line.includes('Error:') || line.includes('Runtime Error:');
+    const color = isError ? '#ef4444' : '#e4e4e4';
+    html += `<div class="log-line" style="color: ${color}; font-family: 'Courier New', monospace; font-size: 0.9rem;">> ${line}</div>`;
+  }
+  container.innerHTML = html;
+  container.scrollTop = container.scrollHeight;
+}
+
+function updateTraceUI(trace) {
+  const container = document.getElementById('traceContainer');
+  if (!container) return;
+
+  if (!trace || trace.length === 0) {
+    container.innerHTML =
+      '<div class="empty-state">Execution steps trace will appear here...</div>';
+    return;
+  }
+
+  let html = '';
+  for (let i = 0; i < trace.length; i++) {
+    const item = trace[i];
+    const isLast = i === trace.length - 1;
+    html += `
+            <div class="trace-item ${isLast ? 'active' : ''}" style="color: ${isLast ? '#3b82f6' : '#9ca3af'}; padding: 0.2rem 0; font-family: 'Courier New', monospace; font-size: 0.85rem; font-weight: ${isLast ? 'bold' : 'normal'};">
                 ${item.message}
             </div>
         `;
-    }
-    container.innerHTML = html;
-    container.scrollTop = container.scrollHeight;
+  }
+  container.innerHTML = html;
+  container.scrollTop = container.scrollHeight;
 }
 
-// Update console UI
-function updateConsoleUI(output) {
-    const container = document.getElementById('outputConsole');
-    
-    if (output.length === 0) {
-        container.innerHTML = '<div class="empty-state">Output will appear here...</div>';
-        return;
-    }
+function updateControlsUI() {
+  const prevBtn = document.getElementById('prevBtn');
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const stepIntoBtn = document.getElementById('stepIntoBtn');
+  const stepOverBtn = document.getElementById('stepOverBtn');
+  const runBtn = document.getElementById('runBtn');
 
-    let html = '';
-    for (const line of output) {
-        html += `<div class="log-line">> ${line}</div>`;
+  if (!executor) {
+    if (prevBtn) prevBtn.disabled = true;
+    if (stepIntoBtn) stepIntoBtn.disabled = true;
+    if (stepOverBtn) stepOverBtn.disabled = true;
+    if (playBtn) {
+      playBtn.disabled = true;
+      playBtn.style.display = 'inline-block';
     }
-    container.innerHTML = html;
-    container.scrollTop = container.scrollHeight;
+    if (pauseBtn) pauseBtn.style.display = 'none';
+    return;
+  }
+
+  if (prevBtn) {
+    prevBtn.disabled = executor.currentIndex <= -1;
+  }
+
+  if (executor.playInterval) {
+    if (playBtn) playBtn.style.display = 'none';
+    if (pauseBtn) pauseBtn.style.display = 'inline-block';
+    if (stepIntoBtn) stepIntoBtn.disabled = true;
+    if (stepOverBtn) stepOverBtn.disabled = true;
+    if (runBtn) runBtn.disabled = true;
+  } else {
+    if (playBtn) playBtn.style.display = 'inline-block';
+    if (pauseBtn) pauseBtn.style.display = 'none';
+
+    const isAtEnd = executor.isFinished || executor.currentIndex >= executor.snapshots.length - 1;
+    if (stepIntoBtn) stepIntoBtn.disabled = isAtEnd;
+    if (stepOverBtn) stepOverBtn.disabled = isAtEnd;
+    if (playBtn) playBtn.disabled = isAtEnd;
+    if (runBtn) runBtn.disabled = false;
+  }
 }
 
 // ====== SETUP EXECUTOR ======
-
 let executor = null;
 
-// Get code from editor
-function getCodeFromEditor() {
-    return document.getElementById('codeEditor').value;
-}
+async function runCode() {
+  const code = document.getElementById('codeEditor').value;
+  if (!code.trim()) {
+    updateConsoleUI(['❌ Error: Code editor is empty.']);
+    return;
+  }
 
-// Initialize executor
-function initExecutor() {
+  updateStatus('⏳ Tracing...');
+  updateConsoleUI(['⏳ Running code and tracing execution step-by-step...']);
+
+  const runBtn = document.getElementById('runBtn');
+  if (runBtn) runBtn.disabled = true;
+
+  try {
+    let headers = {
+      'Content-Type': 'application/json',
+    };
     try {
-        const code = getCodeFromEditor();
-
-        executor = new CodeExecutor(code);
-        executor.highlightLine(0);
-
-        return executor;
-    } catch (error) {
-        console.error(error);
-
-        executor = null;
-
-        updateConsoleUI([
-            "Failed to initialize executor.",
-            error.message,
-        ]);
-
-        updateTraceUI([
-            {
-                line: 0,
-                message: `❌ ${error.message}`,
-                time: new Date().toISOString(),
-            },
-        ]);
-
-        const status = document.getElementById("statusText");
-        if (status) {
-            status.textContent = "❌ Executor initialization failed";
+      const csrfRes = await fetch('/api/csrf-token');
+      if (csrfRes.ok) {
+        const data = await csrfRes.json();
+        if (data.csrfToken) {
+          headers['X-CSRF-Token'] = data.csrfToken;
         }
-
-        return null;
+      }
+    } catch (e) {
+      console.warn('Could not fetch CSRF token:', e);
     }
+
+    const response = await fetch('/api/execute/traced', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        sourceCode: code,
+        language: 'javascript',
+      }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || `Server returned status ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || 'Traced execution failed.');
+    }
+
+    if (!result.snapshots || result.snapshots.length === 0) {
+      throw new Error(
+        'No snapshots generated. Please make sure the code has executable statements.'
+      );
+    }
+
+    executor = new CodeExecutor(code, result.snapshots, result.data.output.split('\n'));
+    executor.resetToStart();
+
+    updateConsoleUI(['✅ Tracing complete! Use controls to step through the execution.']);
+  } catch (error) {
+    console.error(error);
+    updateStatus('❌ Traced execution failed');
+    updateConsoleUI([
+      '❌ Traced execution failed.',
+      error.message,
+      'Please make sure your JavaScript code is syntactically valid and contains no infinite loops.',
+    ]);
+    executor = null;
+    updateControlsUI();
+  } finally {
+    if (runBtn) runBtn.disabled = false;
+  }
 }
 
-// ====== BUTTON HANDLERS ======
+// ====== BUTTON EVENT LISTENERS ======
 
-function updateControlsUI() {
-    const prevBtn = document.getElementById('prevBtn');
-    const playBtn = document.getElementById('playBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const stepBtn = document.getElementById('stepBtn');
-    const runBtn = document.getElementById('runBtn');
+document.getElementById('runBtn').addEventListener('click', runCode);
 
-    if (!executor) {
-        if (prevBtn) prevBtn.disabled = true;
-        if (playBtn) playBtn.disabled = false;
-        if (playBtn) playBtn.style.display = 'inline-block';
-        if (pauseBtn) pauseBtn.style.display = 'none';
-        return;
-    }
-
-    if (prevBtn) {
-        prevBtn.disabled = executor.history.length <= 1;
-    }
-
-    if (executor.playInterval) {
-        if (playBtn) playBtn.style.display = 'none';
-        if (pauseBtn) pauseBtn.style.display = 'inline-block';
-        if (stepBtn) stepBtn.disabled = true;
-        if (runBtn) runBtn.disabled = true;
-    } else {
-        if (playBtn) playBtn.style.display = 'inline-block';
-        if (pauseBtn) pauseBtn.style.display = 'none';
-        if (stepBtn) stepBtn.disabled = executor.isFinished;
-        if (runBtn) runBtn.disabled = executor.isFinished;
-    }
-}
-
-// Run
-document.getElementById('runBtn').addEventListener('click', () => {
-    if (!executor) {
-        executor = initExecutor();
-    }
-
-    if (!executor) return;
-
-    try {
-        executor.runAll();
-        updateConsoleUI(executor.output);
-        updateVariablesUI(executor.variables);
-    } catch (error) {
-        console.error(error);
-
-        updateConsoleUI([
-            "Execution failed.",
-            error.message,
-        ]);
-
-        updateTraceUI([
-            {
-                line: executor?.currentLine ?? 0,
-                message: `❌ ${error.message}`,
-                time: new Date().toISOString(),
-            },
-        ]);
-    }
-});
-
-// Step
-document.getElementById('stepBtn').addEventListener('click', () => {
-    if (!executor) {
-        executor = initExecutor();
-    }
-
-    if (!executor) return;
-
-    try {
-        executor.stepForward();
-        updateConsoleUI(executor.output);
-        updateVariablesUI(executor.variables);
-    } catch (error) {
-        console.error(error);
-
-        updateConsoleUI([
-            "Execution failed.",
-            error.message,
-        ]);
-
-        updateTraceUI([
-            {
-                line: executor?.currentLine ?? 0,
-                message: `❌ ${error.message}`,
-                time: new Date().toISOString(),
-            },
-        ]);
-    }
-});
-
-// Prev Step
 document.getElementById('prevBtn').addEventListener('click', () => {
-    if (!executor) return;
-    try {
-        executor.stepBackward();
-    } catch (error) {
-        console.error(error);
-    }
+  if (executor) executor.stepBackward();
 });
 
-// Play
+document.getElementById('stepIntoBtn').addEventListener('click', () => {
+  if (executor) executor.stepInto();
+});
+
+document.getElementById('stepOverBtn').addEventListener('click', () => {
+  if (executor) executor.stepOver();
+});
+
 document.getElementById('playBtn').addEventListener('click', () => {
-    if (!executor) {
-        executor = initExecutor();
+  if (!executor) return;
+  if (executor.playInterval) return;
+
+  executor.playInterval = setInterval(() => {
+    if (executor.currentIndex >= executor.snapshots.length - 1) {
+      executor.finishExecution();
+      return;
     }
-    if (!executor) return;
+    executor.stepInto();
+  }, 1000);
 
-    if (executor.playInterval) return;
-
-    executor.playInterval = setInterval(() => {
-        if (executor.isFinished) {
-            clearInterval(executor.playInterval);
-            executor.playInterval = null;
-            updateControlsUI();
-            return;
-        }
-        executor.stepForward();
-        updateConsoleUI(executor.output);
-        updateVariablesUI(executor.variables);
-    }, 1000); // Step every 1000ms
-
-    updateControlsUI();
+  updateControlsUI();
 });
 
-// Pause
 document.getElementById('pauseBtn').addEventListener('click', () => {
-    if (!executor || !executor.playInterval) return;
-    clearInterval(executor.playInterval);
-    executor.playInterval = null;
-    updateControlsUI();
+  if (executor) executor.stopPlay();
 });
 
-// Reset
 document.getElementById('resetBtn').addEventListener('click', () => {
-    if (!executor) {
-        executor = initExecutor();
-    }
-
-    if (!executor) return;
-
-    try {
-        executor.reset();
-        updateConsoleUI([]);
-        updateVariablesUI({});
-    } catch (error) {
-        console.error(error);
-
-        updateConsoleUI([
-            "Reset failed.",
-            error.message,
-        ]);
-    }
-});
-
-// ====== DARK MODE TOGGLE ======
-// Add dark mode toggle to navbar if you want
-// Simple keyboard shortcut: press 'd' to toggle
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'd' && e.ctrlKey) {
-        document.body.classList.toggle('dark-mode');
-    }
+  if (executor) {
+    executor.stopPlay();
+    executor.resetToStart();
+  }
 });
 
 // ====== INITIAL SETUP ======
 /* global defaultCode, updateLineNumbers */
 document.addEventListener('DOMContentLoaded', () => {
-    // Set default code
-    const editor = document.getElementById('codeEditor');
+  const editor = document.getElementById('codeEditor');
+  if (editor) {
     editor.value = defaultCode;
     updateLineNumbers();
-    
-    // Initialize executor
-    executor = initExecutor();
+  }
 
-    if (!executor) {
-        return;
-    }
-    
-    // Show initial state
-    updateVariablesUI({});
-    updateTraceUI([]);
-    updateConsoleUI([]);
+  executor = null;
+  updateVariablesUI({});
+  updateTraceUI([]);
+  updateConsoleUI([]);
+  updateStackUI([]);
+  updateStatus('Ready');
 });
-
-// updateLineNumbers() is defined in editor.js, loaded before this file.
 
 // Re-initialize when code changes
 document.getElementById('codeEditor').addEventListener('input', () => {
-    if (executor) {
-        try {
-            executor.reset();
-        } catch (error) {
-            console.error(error);
-
-            updateConsoleUI([
-                "Reset failed.",
-                error.message,
-            ]);
-        }
-    }
-
-    executor = initExecutor();
-
-    if (!executor) return;
-
-    updateVariablesUI({});
-    updateTraceUI([]);
-    updateConsoleUI([]);
-
-    updateVariablesUI({});
-    updateTraceUI([]);
-    updateConsoleUI([]);
+  if (executor) {
+    executor.stopPlay();
+    executor = null;
+  }
+  updateVariablesUI({});
+  updateTraceUI([]);
+  updateConsoleUI([]);
+  updateStackUI([]);
+  updateStatus('Ready');
+  highlightLine(0);
+  updateControlsUI();
 });
 
-window.addEventListener("resize", () => {
+window.addEventListener('resize', () => {
   if (typeof window.updateLineNumbers === 'function') window.updateLineNumbers();
 });
 
@@ -694,7 +527,7 @@ function downloadCertificatePDF(userName, topicName, date, certId) {
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'px',
-    format: [842, 595] // Standard A4 Landscape dimension
+    format: [842, 595], // Standard A4 Landscape dimension
   });
 
   // --- 1. Draw Aesthetic Certificate Background/Borders ---
@@ -705,27 +538,27 @@ function downloadCertificatePDF(userName, topicName, date, certId) {
   doc.setDrawColor(118, 75, 162); // Purple primary theme accent
   doc.setLineWidth(8);
   doc.rect(20, 20, 802, 555);
-  
+
   doc.setDrawColor(102, 126, 234); // Indigo secondary inner border
   doc.setLineWidth(2);
   doc.rect(32, 32, 778, 531);
 
   // --- 2. Typography & Header Section ---
-  doc.setFont("Helvetica", "bold");
+  doc.setFont('Helvetica', 'bold');
   doc.setFontSize(36);
   doc.setTextColor(118, 75, 162);
-  doc.text("CERTIFICATE OF COMPLETION", 421, 110, { align: "center" });
+  doc.text('CERTIFICATE OF COMPLETION', 421, 110, { align: 'center' });
 
-  doc.setFont("Helvetica", "normal");
+  doc.setFont('Helvetica', 'normal');
   doc.setFontSize(16);
   doc.setTextColor(102, 102, 102);
-  doc.text("THIS IS PROUDLY PRESENTED TO", 421, 170, { align: "center" });
+  doc.text('THIS IS PROUDLY PRESENTED TO', 421, 170, { align: 'center' });
 
   // --- 3. Dynamic User Name ---
-  doc.setFont("Helvetica", "bold");
+  doc.setFont('Helvetica', 'bold');
   doc.setFontSize(28);
   doc.setTextColor(34, 34, 34);
-  doc.text(userName, 421, 225, { align: "center" });
+  doc.text(userName, 421, 225, { align: 'center' });
 
   // Elegant decorative line below name
   doc.setDrawColor(220, 220, 220);
@@ -733,25 +566,27 @@ function downloadCertificatePDF(userName, topicName, date, certId) {
   doc.line(250, 245, 592, 245);
 
   // --- 4. Topic Completion Statement ---
-  doc.setFont("Helvetica", "normal");
+  doc.setFont('Helvetica', 'normal');
   doc.setFontSize(16);
   doc.setTextColor(102, 102, 102);
-  doc.text("for successfully mastering and completing the structured learning track on", 421, 285, { align: "center" });
+  doc.text('for successfully mastering and completing the structured learning track on', 421, 285, {
+    align: 'center',
+  });
 
-  doc.setFont("Helvetica", "bold");
+  doc.setFont('Helvetica', 'bold');
   doc.setFontSize(22);
   doc.setTextColor(118, 75, 162);
-  doc.text(topicName, 421, 330, { align: "center" });
+  doc.text(topicName, 421, 330, { align: 'center' });
 
   // --- 5. Footer Analytics (Date, Signatures, IDs) ---
   // Date Field
-  doc.setFont("Helvetica", "normal");
+  doc.setFont('Helvetica', 'normal');
   doc.setFontSize(12);
   doc.setTextColor(102, 102, 102);
   doc.text(`Date of Completion: ${date}`, 100, 460);
 
   // Verification Hash Stamp
-  doc.setFont("Courier", "normal");
+  doc.setFont('Courier', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(153, 153, 153);
   doc.text(`Certificate ID: ${certId}`, 100, 480);
@@ -759,10 +594,10 @@ function downloadCertificatePDF(userName, topicName, date, certId) {
   // Decorative Digital Board Seal/Signature Placeholder
   doc.setDrawColor(118, 75, 162);
   doc.line(600, 460, 720, 460);
-  doc.setFont("Helvetica", "italic");
+  doc.setFont('Helvetica', 'italic');
   doc.setFontSize(12);
   doc.setTextColor(51, 51, 51);
-  doc.text("Authorized Platform Board", 660, 475, { align: "center" });
+  doc.text('Authorized Platform Board', 660, 475, { align: 'center' });
 
   // Trigger browser download workflow natively
   doc.save(`Certificate-${topicName.replace(/\s+/g, '-')}.pdf`);
@@ -774,10 +609,10 @@ function downloadCertificatePDF(userName, topicName, date, certId) {
 function renderCertificatesDashboard(tracks) {
   const certListContainer = document.getElementById('certificates-list');
   if (!certListContainer) return;
-  
+
   certListContainer.innerHTML = ''; // clear out loading tags
 
-  tracks.forEach(track => {
+  tracks.forEach((track) => {
     const li = document.createElement('li');
     li.style.display = 'flex';
     li.style.justifyContent = 'space-between';
@@ -812,8 +647,13 @@ function renderCertificatesDashboard(tracks) {
     downloadBtn.addEventListener('click', () => {
       // Real-time verification safety wrapper
       if (track.isCompleted) {
-        // Automatically uses structural records cleanly 
-        downloadCertificatePDF("Prasiddhi Mishra", track.topicName, track.completionDate, track.certificateId);
+        // Automatically uses structural records cleanly
+        downloadCertificatePDF(
+          'Prasiddhi Mishra',
+          track.topicName,
+          track.completionDate,
+          track.certificateId
+        );
       } else {
         downloadBtn.textContent = '⚠ Track not completed';
         downloadBtn.style.background = '#6b7280';
@@ -834,8 +674,18 @@ function renderCertificatesDashboard(tracks) {
 
 // Mock completion database list for roadmaps
 const mockUserCompletedRoadmaps = [
-  { topicName: "Data Structures & Algorithms", isCompleted: true, completionDate: "2026-05-14", certificateId: "CERT-DSA-9941X" },
-  { topicName: "System Design Foundation", isCompleted: true, completionDate: "2026-06-20", certificateId: "CERT-SYS-2180Z" }
+  {
+    topicName: 'Data Structures & Algorithms',
+    isCompleted: true,
+    completionDate: '2026-05-14',
+    certificateId: 'CERT-DSA-9941X',
+  },
+  {
+    topicName: 'System Design Foundation',
+    isCompleted: true,
+    completionDate: '2026-06-20',
+    certificateId: 'CERT-SYS-2180Z',
+  },
 ];
 
 // Execute layout setup on dashboard load hook
@@ -856,7 +706,7 @@ function renderReadinessDashboard(data) {
   // Render Suggestions
   const suggestionsList = document.getElementById('suggestions-list');
   suggestionsList.innerHTML = ''; // clear out loading placeholder
-  data.suggestions.forEach(tip => {
+  data.suggestions.forEach((tip) => {
     const li = document.createElement('li');
     li.style.fontSize = '14px';
     li.style.color = '#444';
@@ -868,7 +718,7 @@ function renderReadinessDashboard(data) {
   // Render Missing Topics
   const tagsContainer = document.getElementById('missing-topics-tags');
   tagsContainer.innerHTML = '';
-  data.missingTopics.forEach(topic => {
+  data.missingTopics.forEach((topic) => {
     const span = document.createElement('span');
     span.className = 'topic-tag';
     span.innerText = `⚠️ ${topic}`;
@@ -882,16 +732,16 @@ const dummyDataReport = {
   breakdown: { dsa: 80, systemDesign: 50, interview: 85 },
   missingTopics: ['Microservices', 'System Design Basics', 'Graphs'],
   suggestions: [
-    "Take more mock quizzes to boost your quick recall.",
-    "Focus on learning missing foundational topics: Microservices.",
-    "Try solving at least 2 DSA problems daily to hit your target."
-  ]
+    'Take more mock quizzes to boost your quick recall.',
+    'Focus on learning missing foundational topics: Microservices.',
+    'Try solving at least 2 DSA problems daily to hit your target.',
+  ],
 };
 
-// Auto-run dashboard on load 
+// Auto-run dashboard on load
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('readiness-dashboard')) {
-     renderReadinessDashboard(dummyDataReport);
+    renderReadinessDashboard(dummyDataReport);
   }
 });
 
@@ -907,7 +757,7 @@ function trackUserProgress(title, category, relativeUrl) {
     title,
     category,
     relativeUrl,
-    timestamp: new Date().toLocaleString()
+    timestamp: new Date().toLocaleString(),
   };
   localStorage.setItem('last_visited_learning_page', JSON.stringify(progressMetadata));
 }
@@ -950,10 +800,13 @@ function initResumeWidget() {
 document.addEventListener('DOMContentLoaded', () => {
   // If the user is checking out the dashboard for the first time, mock an active track
   if (!localStorage.getItem('last_visited_learning_page')) {
-    trackUserProgress("Graph Traversals (BFS & DFS)", "Data Structures & Algorithms", "#graph-visualizer");
+    trackUserProgress(
+      'Graph Traversals (BFS & DFS)',
+      'Data Structures & Algorithms',
+      '#graph-visualizer'
+    );
   }
 
   // Initialize and check layout visibility rules
   initResumeWidget();
 });
-

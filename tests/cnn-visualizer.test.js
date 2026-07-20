@@ -90,9 +90,6 @@ describe('CNN Visualizer - Logic and UI State', () => {
   let originalWindow;
   let elementsById;
   let domContentLoadedHandler;
-
-  let originalDocument;
-  let originalWindow;
   let originalImage;
   let originalEvent;
 
