@@ -1,0 +1,591 @@
+/* ─────────────────────────────────────────────
+   Weighted Interval Scheduling Visualizer
+   ───────────────────────────────────────────── */
+
+.wis-gradient {
+  background: linear-gradient(135deg, #10b981 0%, #7c3aed 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.wis-btn-primary  { background: linear-gradient(135deg, #10b981, #7c3aed); border: none; color: #fff; font-weight: 600; }
+.wis-btn-secondary{ background: linear-gradient(135deg, #06b6d4, #7c3aed); border: none; color: #fff; font-weight: 600; }
+.wis-btn-step     { background: linear-gradient(135deg, #f59e0b, #ef4444); border: none; color: #fff; font-weight: 600; }
+.wis-btn-auto     { background: linear-gradient(135deg, #8b5cf6, #06b6d4); border: none; color: #fff; font-weight: 600; }
+.wis-btn-compare  { background: linear-gradient(135deg, #ef4444, #f59e0b); border: none; color: #fff; font-weight: 600; }
+
+/* ── Control card ── */
+.wis-control-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 1.75rem;
+  backdrop-filter: blur(10px);
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.wis-add-row,
+.wis-run-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.wis-row-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  min-width: 70px;
+  white-space: nowrap;
+}
+
+.wis-input-triple {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.wis-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.wis-input-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wis-num-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 0.4rem 0.5rem;
+  font-family: "Fira Code", monospace;
+  font-size: 0.88rem;
+  outline: none;
+  width: 72px;
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.wis-num-input:focus { border-color: #10b981; }
+
+.wis-action-btn {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.48rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.wis-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wis-speed-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.wis-speed-label input[type="range"] {
+  accent-color: #10b981;
+  width: 110px;
+}
+
+/* ── Status ── */
+.wis-status {
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  min-height: 2.4rem;
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  line-height: 1.5;
+  transition: all 0.25s ease;
+}
+
+.wis-status.ok     { border-color: rgba(34, 197, 94, 0.4);  background: rgba(34, 197, 94, 0.07);  color: #22c55e; }
+.wis-status.fail   { border-color: rgba(239, 68, 68, 0.4);  background: rgba(239, 68, 68, 0.07);  color: #ef4444; }
+.wis-status.warn   { border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.07); color: #f59e0b; }
+.wis-status.info   { border-color: rgba(6, 182, 212, 0.4);  background: rgba(6, 182, 212, 0.07);  color: #06b6d4; }
+.wis-status.purple { border-color: rgba(124, 58, 237, 0.4); background: rgba(124, 58, 237, 0.07); color: #a78bfa; }
+
+/* ── Step bar ── */
+.wis-step-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  font-family: "Fira Code", monospace;
+}
+
+.wis-step-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.wis-step-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #7c3aed);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* ── Main layout ── */
+.wis-main-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1rem;
+}
+
+.wis-left-col,
+.wis-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.wis-panel-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 1.1rem;
+  backdrop-filter: blur(10px);
+}
+
+.wis-panel-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary);
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Timeline canvas ── */
+.wis-timeline-wrap { overflow-x: auto; }
+
+.wis-timeline-canvas {
+  display: block;
+  width: 100%;
+  min-width: 320px;
+}
+
+/* ── DP table ── */
+.wis-dp-wrap { overflow-x: auto; }
+
+.wis-dp-table {
+  border-collapse: separate;
+  border-spacing: 4px;
+  margin: 0 auto;
+  font-family: "Fira Code", monospace;
+}
+
+.wis-dp-th {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 0.2rem 0.4rem;
+  white-space: nowrap;
+}
+
+.wis-dp-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  padding: 0.2rem 0.5rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.wis-dp-cell {
+  width: 46px;
+  height: 38px;
+  border-radius: 6px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.wis-dp-cell.dp-current {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  transform: scale(1.1);
+}
+
+.wis-dp-cell.dp-included {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.wis-dp-cell.dp-excluded {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.wis-dp-cell.dp-optimal {
+  background: rgba(124, 58, 237, 0.3);
+  border-color: #7c3aed;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+  color: #c4b5fd;
+}
+
+/* ── Job list ── */
+.wis-job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.wis-job-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 0.75rem;
+  transition: all 0.25s ease;
+  cursor: default;
+}
+
+.wis-job-row.job-selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.wis-job-row.job-active {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.wis-job-row.job-excluded {
+  opacity: 0.45;
+}
+
+.wis-job-idx {
+  font-family: "Fira Code", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #7c3aed;
+  min-width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.wis-job-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.wis-job-range {
+  font-family: "Fira Code", monospace;
+  font-size: 0.72rem;
+  color: #06b6d4;
+  flex-shrink: 0;
+}
+
+.wis-job-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  flex: 1;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wis-job-profit {
+  font-family: "Fira Code", monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.wis-job-pred {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-family: "Fira Code", monospace;
+  flex-shrink: 0;
+}
+
+.wis-job-delete {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.wis-job-delete:hover { color: #ef4444; }
+
+/* ── Binary search ── */
+.wis-bsearch-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.wis-bs-array {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.wis-bs-cell {
+  width: 36px;
+  height: 30px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Fira Code", monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.wis-bs-cell.bs-lo  { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
+.wis-bs-cell.bs-hi  { border-color: #ef4444; background: rgba(239, 68, 68, 0.12); }
+.wis-bs-cell.bs-mid { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
+.wis-bs-cell.bs-found { border-color: #7c3aed; background: rgba(124, 58, 237, 0.25); }
+.wis-bs-cell.bs-out  { opacity: 0.3; }
+
+.wis-bs-desc {
+  font-size: 0.73rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-family: "Fira Code", monospace;
+}
+
+/* ── Result card ── */
+.wis-result-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wis-result-profit {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.wis-result-jobs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.wis-result-job-tag {
+  font-size: 0.72rem;
+  font-family: "Fira Code", monospace;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.wis-result-note {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Compare grid ── */
+.wis-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.wis-compare-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.wis-compare-col-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.wis-col-dp      { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.wis-col-profit  { background: rgba(245, 158, 11, 0.1);  color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+.wis-col-end     { background: rgba(239, 68, 68, 0.1);   color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+.wis-compare-profit {
+  font-family: "Fira Code", monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.wis-compare-jobs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.wis-cmp-job {
+  font-size: 0.65rem;
+  font-family: "Fira Code", monospace;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wis-compare-gap {
+  font-size: 0.68rem;
+  color: #ef4444;
+  text-align: center;
+  font-weight: 700;
+  font-family: "Fira Code", monospace;
+}
+
+/* ── Log ── */
+.wis-log-area {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.wis-log-entry {
+  font-size: 0.69rem;
+  font-family: "Fira Code", monospace;
+  padding: 0.22rem 0.5rem;
+  border-radius: 5px;
+  border-left: 2px solid transparent;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.wis-log-entry.log-sort    { border-left-color: #06b6d4; background: rgba(6, 182, 212, 0.05);  color: #06b6d4; }
+.wis-log-entry.log-bs      { border-left-color: #f59e0b; background: rgba(245, 158, 11, 0.05); color: #f59e0b; }
+.wis-log-entry.log-dp      { border-left-color: #7c3aed; background: rgba(124, 58, 237, 0.05); color: #a78bfa; }
+.wis-log-entry.log-inc     { border-left-color: #10b981; background: rgba(16, 185, 129, 0.05); color: #10b981; }
+.wis-log-entry.log-exc     { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.05);  color: #ef4444; }
+.wis-log-entry.log-trace   { border-left-color: #a855f7; background: rgba(168, 85, 247, 0.05); color: #c4b5fd; }
+.wis-log-entry.log-info    { border-left-color: rgba(255,255,255,0.15); }
+
+.wis-empty-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ── Learn cards ── */
+.wis-learn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
+}
+
+.wis-learn-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease;
+}
+
+.wis-learn-card:hover { transform: translateY(-3px); }
+
+.wis-learn-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+}
+
+.wis-learn-sort::before  { background: #06b6d4; }
+.wis-learn-pred::before  { background: #f59e0b; }
+.wis-learn-dp::before    { background: #7c3aed; }
+.wis-learn-trace::before { background: #10b981; }
+
+.wis-learn-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
+.wis-learn-card h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.5rem; }
+.wis-learn-card p  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.65; }
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .wis-main-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .wis-add-row, .wis-run-row { gap: 0.5rem; }
+  .wis-num-input { width: 58px; }
+  .wis-action-btn { font-size: 0.75rem; padding: 0.42rem 0.75rem; }
+  .wis-speed-label { margin-left: 0; }
+  .wis-compare-grid { grid-template-columns: 1fr; }
+}

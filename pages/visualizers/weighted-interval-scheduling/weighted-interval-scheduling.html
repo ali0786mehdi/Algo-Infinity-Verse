@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weighted Interval Scheduling | Algo Infinity Verse</title>
+  <meta name="description" content="Weighted interval scheduling DP — sort by end time, binary search for p(j), DP table fill, traceback, and greedy comparison." />
+  <link rel="stylesheet" href="../../../styles.css" />
+  <link rel="stylesheet" href="weighted-interval-scheduling.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body data-page="weighted-interval-scheduling">
+
+  <div id="loading-screen">
+    <div class="loader">
+      <div class="infinity-loader">∞</div>
+      <h2>Algo Infinity Verse</h2>
+      <div class="loading-bar"><div class="loading-progress"></div></div>
+    </div>
+  </div>
+
+  <button id="scrollTopBtn" aria-label="Scroll to top" class="scroll-top-btn">
+    <i class="fas fa-circle-chevron-up"></i>
+  </button>
+
+  <div id="navbar-placeholder"></div>
+
+  <section class="hero wis-hero">
+    <div class="hero-background">
+      <div class="stars"></div>
+      <div class="stars2"></div>
+      <div class="stars3"></div>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="title-line">Which Jobs Maximize Profit Without Overlapping?</span>
+        <span class="main-title wis-gradient">Weighted Interval Scheduling</span>
+        <span class="subtitle">DP + Binary Search · Sort by End Time · Traceback</span>
+      </h1>
+      <p class="section-subtitle">
+        Watch the DP table fill cell-by-cell with explicit include/exclude decisions, see binary search narrow down the latest compatible predecessor for each job, then trace back the optimal selection — and compare against greedy strategies that provably fail.
+      </p>
+      <div class="hero-buttons">
+        <a href="#simulator" class="btn btn-primary wis-btn-primary">
+          <i class="fas fa-calendar-check"></i> Open Visualizer
+        </a>
+        <a href="#learn" class="btn btn-secondary">
+          <i class="fas fa-graduation-cap"></i> How It Works
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="simulator" class="section">
+    <div class="container">
+
+      <div class="wis-control-card">
+
+        <div class="wis-add-row">
+          <span class="wis-row-label">Add Job:</span>
+          <div class="wis-input-triple">
+            <div class="wis-input-group">
+              <label class="wis-input-label" for="wisInputStart">Start</label>
+              <input type="number" id="wisInputStart" class="wis-num-input" min="0" max="99" value="1" />
+            </div>
+            <div class="wis-input-group">
+              <label class="wis-input-label" for="wisInputEnd">End</label>
+              <input type="number" id="wisInputEnd" class="wis-num-input" min="1" max="99" value="4" />
+            </div>
+            <div class="wis-input-group">
+              <label class="wis-input-label" for="wisInputProfit">Profit</label>
+              <input type="number" id="wisInputProfit" class="wis-num-input" min="1" max="999" value="5" />
+            </div>
+          </div>
+          <button class="btn wis-btn-primary wis-action-btn" id="wisAddJobBtn">
+            <i class="fas fa-plus"></i> Add Job
+          </button>
+          <button class="btn wis-btn-secondary wis-action-btn" id="wisPresetBtn">
+            <i class="fas fa-bolt"></i> Load Preset
+          </button>
+          <button class="btn btn-secondary wis-action-btn" id="wisResetBtn">
+            <i class="fas fa-undo"></i> Reset
+          </button>
+        </div>
+
+        <div class="wis-run-row">
+          <span class="wis-row-label">Run:</span>
+          <button class="btn wis-btn-primary wis-action-btn" id="wisSolveBtn">
+            <i class="fas fa-play"></i> Solve (DP)
+          </button>
+          <button class="btn wis-btn-step wis-action-btn" id="wisStepBtn" disabled>
+            <i class="fas fa-step-forward"></i> Step
+          </button>
+          <button class="btn wis-btn-auto wis-action-btn" id="wisAutoBtn" disabled>
+            <i class="fas fa-forward"></i> Auto-Play
+          </button>
+          <button class="btn wis-btn-compare wis-action-btn" id="wisCompareBtn" disabled>
+            <i class="fas fa-scale-balanced"></i> Compare Greedy
+          </button>
+          <label class="wis-speed-label">
+            Speed
+            <input type="range" id="wisSpeed" min="200" max="2000" step="100" value="800" />
+          </label>
+        </div>
+
+      </div>
+
+      <div class="wis-status" id="wisStatus">
+        Add jobs or load the preset, then click Solve to run the DP algorithm step-by-step.
+      </div>
+
+      <div class="wis-step-bar">
+        <span id="wisStepCounter">Step 0 / 0</span>
+        <div class="wis-step-track">
+          <div class="wis-step-fill" id="wisStepFill"></div>
+        </div>
+      </div>
+
+      <div class="wis-main-layout">
+
+        <div class="wis-left-col">
+
+          <div class="wis-panel-card">
+            <div class="wis-panel-title"><i class="fas fa-ruler-horizontal"></i> Job Timeline</div>
+            <div class="wis-timeline-wrap">
+              <canvas id="wisTimelineCanvas" class="wis-timeline-canvas" height="220"></canvas>
+            </div>
+          </div>
+
+          <div class="wis-panel-card" id="wisDpCard" style="display:none">
+            <div class="wis-panel-title"><i class="fas fa-table"></i> DP Table — OPT(j)</div>
+            <div class="wis-dp-wrap" id="wisDpWrap"></div>
+          </div>
+
+          <div class="wis-panel-card" id="wisCompareCard" style="display:none">
+            <div class="wis-panel-title"><i class="fas fa-scale-balanced"></i> Algorithm Comparison</div>
+            <div class="wis-compare-grid" id="wisCompareGrid"></div>
+          </div>
+
+        </div>
+
+        <div class="wis-right-col">
+
+          <div class="wis-panel-card">
+            <div class="wis-panel-title"><i class="fas fa-list-ol"></i> Jobs (sorted by end time)</div>
+            <div class="wis-job-list" id="wisJobList">
+              <span class="wis-empty-text">No jobs added yet.</span>
+            </div>
+          </div>
+
+          <div class="wis-panel-card" id="wisBSearchCard" style="display:none">
+            <div class="wis-panel-title"><i class="fas fa-magnifying-glass"></i> Binary Search — p(j)</div>
+            <div class="wis-bsearch-area" id="wisBSearchArea"></div>
+          </div>
+
+          <div class="wis-panel-card" id="wisResultCard" style="display:none">
+            <div class="wis-panel-title"><i class="fas fa-trophy"></i> Optimal Solution</div>
+            <div class="wis-result-body" id="wisResultBody"></div>
+          </div>
+
+          <div class="wis-panel-card">
+            <div class="wis-panel-title"><i class="fas fa-list"></i> Step Log</div>
+            <div class="wis-log-area" id="wisLog">
+              <span class="wis-empty-text">Steps appear here.</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section id="learn" class="section">
+    <div class="container">
+      <h2 class="section-title"><span class="title-icon">📅</span> Weighted Interval Scheduling Explained</h2>
+      <div class="wis-learn-grid">
+
+        <div class="wis-learn-card wis-learn-sort">
+          <div class="wis-learn-icon">📋</div>
+          <h3>Step 1: Sort by End Time</h3>
+          <p>Sort all jobs in non-decreasing order of finish time. This ordering is what makes the DP recurrence work — every "earlier" job in our sorted list genuinely finishes earlier, so we can safely reference them as predecessors.</p>
+        </div>
+
+        <div class="wis-learn-card wis-learn-pred">
+          <div class="wis-learn-icon">🔍</div>
+          <h3>Step 2: Compute p(j) via Binary Search</h3>
+          <p>For each job j, p(j) is the index of the latest job that finishes at or before job j's start time. Binary search on the sorted end-time array finds this in O(log n). If no job qualifies, p(j) = 0.</p>
+        </div>
+
+        <div class="wis-learn-card wis-learn-dp">
+          <div class="wis-learn-icon">📊</div>
+          <h3>Step 3: DP Recurrence</h3>
+          <p>OPT(j) = max(OPT(j−1), profit(j) + OPT(p(j))). The first term skips job j (exclude). The second takes job j plus the best schedule using only jobs compatible with j (include). Base case: OPT(0) = 0.</p>
+        </div>
+
+        <div class="wis-learn-card wis-learn-trace">
+          <div class="wis-learn-icon">↩️</div>
+          <h3>Step 4: Traceback</h3>
+          <p>Walk back from OPT(n). At each index j: if profit(j) + OPT(p(j)) &gt; OPT(j−1), job j was included — add it and jump to p(j). Otherwise skip and go to j−1. Greedy-by-profit and greedy-by-end both fail on weighted inputs.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="../../../auth.js"></script>
+  <script src="../../../script.js"></script>
+  <script src="../../../theme.js"></script>
+  <script src="../../../auth-gate.js"></script>
+  <script src="weighted-interval-scheduling.js"></script>
+  <script>
+    if (typeof loadPartial === 'function') {
+      loadPartial('navbar-placeholder', '/partials/navbar.html').then(function () {
+        if (typeof initNavbar === 'function') initNavbar();
+      });
+      loadPartial('footer-placeholder', '/partials/footer.html');
+    }
+  </script>
+</body>
+</html>
