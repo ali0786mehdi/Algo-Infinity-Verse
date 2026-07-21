@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solidity Editor | Algo Infinity Verse</title>
+  <link rel="stylesheet" href="solidity.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <div class="starfield"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <i class="fa-solid fa-infinity"></i>
+      <div class="brand-text">
+        <span class="brand-name">Algo</span>
+        <span class="brand-sub">INFINITY VERSE</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <label class="lang-select-wrap" for="languageSelect">
+        <i class="fa-solid fa-link"></i>
+        <select id="languageSelect" class="lang-select">
+          <option value="solidity" selected>Solidity</option>
+          <option value="v">V</option>
+          <option value="apex">Apex</option>
+          <option value="abap">ABAP</option>
+          <option value="cobol">COBOL</option>
+          <option value="fortran">Fortran</option>
+          <option value="assembly">x86 Assembly</option>
+          <option value="matlab">MATLAB</option>
+        </select>
+      </label>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </header>
+
+  <main class="editor-shell">
+
+    <aside class="side-panel" id="examplePanel">
+      <div class="side-panel-header">
+        <i class="fa-solid fa-file-contract"></i>
+        <h2>Contract Templates</h2>
+      </div>
+      <p class="side-panel-hint">Click a template to load it into the editor.</p>
+      <div class="example-list" id="exampleList"></div>
+
+      <div class="side-panel-header snippets-header">
+        <i class="fa-solid fa-layer-group"></i>
+        <h2>Common Snippets</h2>
+      </div>
+      <div class="snippet-list" id="snippetList"></div>
+    </aside>
+
+    <section class="editor-main">
+      <div class="editor-toolbar">
+        <div class="file-info">
+          <i class="fa-regular fa-file-lines"></i>
+          <input id="fileName" class="filename-input" value="HelloWorld.sol" spellcheck="false" />
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="loadStarterBtn">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Reset to Starter
+          </button>
+          <label class="btn btn-ghost" for="fileUpload">
+            <i class="fa-solid fa-file-arrow-up"></i> Open .sol
+          </label>
+          <input type="file" id="fileUpload" accept=".sol,.txt" hidden />
+          <button class="btn btn-ghost" id="downloadBtn">
+            <i class="fa-solid fa-file-arrow-down"></i> Save .sol
+          </button>
+          <button class="btn btn-primary" id="runBtn">
+            <i class="fa-solid fa-play"></i> Compile
+          </button>
+        </div>
+      </div>
+
+      <div class="code-frame">
+        <div class="gutter" id="gutter"></div>
+        <div class="code-layer-wrap">
+          <pre class="highlight-layer" id="highlightLayer" aria-hidden="true"><code id="highlightCode"></code></pre>
+          <textarea
+            id="codeInput"
+            class="code-input"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            wrap="off"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="output-panel">
+        <div class="output-header">
+          <span><i class="fa-solid fa-terminal"></i> Compiler Output</span>
+          <button class="icon-btn small" id="clearOutputBtn" title="Clear output"><i class="fa-solid fa-broom"></i></button>
+        </div>
+        <pre class="output-body" id="outputBody">Press <strong>Compile</strong> to simulate compiling this Solidity contract.</pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="editor-footer">
+    <span>Solidity Editor · compilation is simulated locally, no solc/EVM round trip</span>
+    <span class="footer-cursor" id="cursorPos">Ln 1, Col 1</span>
+  </footer>
+
+  <script src="solidity.js"></script>
+</body>
+</html>
