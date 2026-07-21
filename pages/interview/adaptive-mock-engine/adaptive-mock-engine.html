@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adaptive Interview Mock Engine | Algo Infinity Verse</title>
+  <meta name="description" content="Timed mock interview that adapts to your weak topics and ends with a STAR + DSA rubric scorecard." />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="adaptive-mock-engine.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('theme');
+        var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+        if (theme === 'light') document.documentElement.classList.add('light-mode');
+        else document.documentElement.classList.remove('light-mode');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="ame-body" data-page="adaptive-mock-engine">
+  <a href="#ame-main" class="ame-skip">Skip to main content</a>
+
+  <button type="button" id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+    <i class="fas fa-circle-chevron-up" aria-hidden="true"></i>
+  </button>
+
+  <div id="navbar-placeholder"></div>
+
+  <header class="ame-hero">
+    <div class="ame-badge"><i class="fas fa-brain" aria-hidden="true"></i> Adaptive Mock</div>
+    <h1>Adaptive Interview <span class="ame-accent">Mock Engine</span></h1>
+    <p>Questions adapt to your weak topics from saved progress. Escalate Easy → Hard, use panic mode, and export a STAR + DSA rubric scorecard.</p>
+  </header>
+
+  <main id="ame-main" class="ame-main">
+    <div class="ame-container">
+      <!-- Setup -->
+      <section id="ame-setup" class="ame-card" aria-labelledby="ame-setup-title">
+        <h2 id="ame-setup-title"><i class="fas fa-sliders" aria-hidden="true"></i> Session setup</h2>
+        <div id="ame-weak-panel" class="ame-weak-panel" role="status" aria-live="polite">
+          <div class="ame-loading" id="ame-progress-loading">
+            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Reading progress…
+          </div>
+          <div id="ame-weak-empty" class="ame-empty hidden">
+            <i class="fas fa-inbox" aria-hidden="true"></i>
+            <p>No quiz scores found in <code>algoInfinityVerse</code>. Using a balanced default bank. Take quizzes to personalize weak topics.</p>
+          </div>
+          <div id="ame-weak-list" class="ame-weak-list hidden"></div>
+        </div>
+
+        <div class="ame-setup-grid">
+          <label class="ame-field">
+            <span>Duration (minutes)</span>
+            <select id="ame-duration">
+              <option value="15">15</option>
+              <option value="30" selected>30</option>
+              <option value="45">45</option>
+              <option value="60">60</option>
+            </select>
+          </label>
+          <label class="ame-field">
+            <span>Questions</span>
+            <select id="ame-count">
+              <option value="3">3</option>
+              <option value="5" selected>5</option>
+              <option value="7">7</option>
+            </select>
+          </label>
+          <label class="ame-check">
+            <input type="checkbox" id="ame-panic" />
+            <span>Panic mode (shorter timer, high pressure)</span>
+          </label>
+        </div>
+
+        <div class="ame-actions">
+          <button type="button" id="ame-start" class="ame-btn ame-btn-primary"><i class="fas fa-play" aria-hidden="true"></i> Start mock</button>
+          <button type="button" id="ame-resume" class="ame-btn ame-btn-ghost hidden"><i class="fas fa-history" aria-hidden="true"></i> Resume session</button>
+        </div>
+      </section>
+
+      <!-- Active session -->
+      <section id="ame-session" class="ame-card hidden" aria-labelledby="ame-session-title">
+        <div class="ame-session-bar">
+          <h2 id="ame-session-title">Question <span id="ame-q-index">1</span></h2>
+          <div class="ame-timer-wrap">
+            <span id="ame-panic-flag" class="ame-panic-flag hidden" aria-live="polite">PANIC</span>
+            <span id="ame-timer" class="ame-timer" aria-live="polite">30:00</span>
+            <button type="button" id="ame-pause" class="ame-btn ame-btn-ghost" aria-pressed="false"><i class="fas fa-pause" aria-hidden="true"></i> Pause</button>
+          </div>
+        </div>
+
+        <div class="ame-meta">
+          <span id="ame-topic" class="ame-chip">arrays</span>
+          <span id="ame-difficulty" class="ame-chip ame-chip-diff">Easy</span>
+          <span id="ame-type" class="ame-chip">DSA</span>
+        </div>
+
+        <p id="ame-prompt" class="ame-prompt"></p>
+        <p id="ame-hint" class="ame-hint"></p>
+
+        <label class="ame-field">
+          <span>Your answer / approach (STAR for behavioral)</span>
+          <textarea id="ame-answer" rows="6" placeholder="Situation → Task → Action → Result, or algorithm approach + complexity…"></textarea>
+        </label>
+
+        <fieldset class="ame-rubric" aria-label="Self-score this answer">
+          <legend>Rubric (1–5)</legend>
+          <div class="ame-rubric-grid" id="ame-rubric-grid"></div>
+        </fieldset>
+
+        <div class="ame-actions">
+          <button type="button" id="ame-next" class="ame-btn ame-btn-primary"><i class="fas fa-arrow-right" aria-hidden="true"></i> Next</button>
+          <button type="button" id="ame-end" class="ame-btn ame-btn-danger"><i class="fas fa-flag-checkered" aria-hidden="true"></i> End &amp; score</button>
+        </div>
+      </section>
+
+      <!-- Scorecard -->
+      <section id="ame-scorecard" class="ame-card hidden" aria-labelledby="ame-score-title">
+        <h2 id="ame-score-title"><i class="fas fa-clipboard-check" aria-hidden="true"></i> STAR + DSA scorecard</h2>
+        <div id="ame-score-summary" class="ame-score-summary"></div>
+        <div id="ame-score-details" class="ame-score-details"></div>
+        <div class="ame-actions">
+          <button type="button" id="ame-export-md" class="ame-btn ame-btn-primary"><i class="fas fa-file-lines" aria-hidden="true"></i> Export Markdown</button>
+          <button type="button" id="ame-export-pdf" class="ame-btn ame-btn-ghost"><i class="fas fa-file-pdf" aria-hidden="true"></i> Print / PDF</button>
+          <button type="button" id="ame-restart" class="ame-btn ame-btn-ghost"><i class="fas fa-rotate" aria-hidden="true"></i> New session</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/theme.js"></script>
+  <script src="adaptive-mock-engine.js"></script>
+</body>
+</html>
