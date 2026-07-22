@@ -190,7 +190,13 @@ const editors = [
     icon: 'fa-gem',
     desc: 'Write D language code with syntax highlighting, starter templates, and simulated execution.',
   },
-  
+   {
+    name: 'Move Editor',
+    path: '/pages/editors/move-editor/move-editor.html',
+    category: 'Systems & Special',
+    icon: 'fa-link',
+    desc: 'Write Move smart contracts with syntax highlighting, starter templates, and simulated blockchain execution.'
+  },
   {
     name: 'SQL Editor',
     path: '/pages/editors/sql-editor/sql-editor.html',
