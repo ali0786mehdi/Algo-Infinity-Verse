@@ -1,3 +1,22 @@
+const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || '') ||
+  (navigator.userAgentData && navigator.userAgentData.platform === 'macOS');
+
+function isModKey(e) {
+  return e.ctrlKey || e.metaKey;
+}
+
+function updateShortcutLabels() {
+  if (!isMac) return;
+  document.querySelectorAll('#shortcutsModal kbd').forEach(el => {
+    if (el.textContent === 'Ctrl') el.textContent = 'Ctrl/Cmd';
+    if (el.textContent === 'Alt') el.textContent = 'Alt/Option';
+  });
+  document.querySelectorAll('.shortcut-key').forEach(el => {
+    if (el.textContent.includes('Ctrl/Cmd')) return;
+    el.textContent = el.textContent.replace(/Ctrl/g, 'Ctrl/Cmd');
+  });
+}
+
 export function initKeyboardShortcuts() {
   const toggleBtn = document.getElementById('shortcutsToggle');
   const modal = document.getElementById('shortcutsModal');
@@ -11,40 +30,42 @@ export function initKeyboardShortcuts() {
     });
   }
 
+  updateShortcutLabels();
+
   document.addEventListener('keydown', function(e) {
     const tag = e.target.tagName;
     const isEditing = tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable;
 
-    if (e.ctrlKey && e.key === 'k') {
+    if (isModKey(e) && e.key === 'k') {
       e.preventDefault();
       const searchInput = document.getElementById('searchInput');
       if (searchInput) searchInput.focus();
     }
-    if (e.altKey && e.key === 'h') {
+    if (e.altKey && e.code === 'KeyH') {
       e.preventDefault();
       window.location.href = '#home';
     }
-    if (e.altKey && e.key === 't') {
+    if (e.altKey && e.code === 'KeyT') {
       e.preventDefault();
       window.location.href = '/pages/learning/learning-topics.html';
     }
-    if (e.altKey && e.key === 'p') {
+    if (e.altKey && e.code === 'KeyP') {
       e.preventDefault();
       window.location.href = '/pages/practice/problems.html';
     }
-    if (e.altKey && e.key === 'q') {
+    if (e.altKey && e.code === 'KeyQ') {
       e.preventDefault();
       window.location.href = '#quiz';
     }
-    if (e.altKey && e.key === 'd') {
+    if (e.altKey && e.code === 'KeyD') {
       e.preventDefault();
       window.location.href = '#dashboard';
     }
-    if (e.altKey && e.key === 's') {
+    if (e.altKey && e.code === 'KeyS') {
       e.preventDefault();
       toggleDropdown('.nav-settings-dropdown');
     }
-    if (e.altKey && e.key === 'l') {
+    if (e.altKey && e.code === 'KeyL') {
       e.preventDefault();
       toggleDropdown('.nav-learn-dropdown');
     }
@@ -108,7 +129,7 @@ function toggleShortcutModal() {
 function openShortcutModal() {
   const modal = document.getElementById('shortcutsModal');
   if (!modal) return;
-  // Ensure modal is displayed (but invisible) before transitioning
+  updateShortcutLabels();
   modal.style.display = 'flex';
   // Force reflow to ensure the display property takes effect before the class transition
   void modal.offsetWidth;
