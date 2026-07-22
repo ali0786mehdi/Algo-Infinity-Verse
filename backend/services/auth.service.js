@@ -168,7 +168,7 @@ function sign(value) {
  */
 export function validateUserForToken(user) {
   if (user === null || typeof user !== 'object' || Array.isArray(user)) {
-    return 'A valid user object is required to generate an access token.';
+    return 'A valid user object is required to generate a token.';
   }
   const required = ['id', 'name', 'email'];
   for (const field of required) {
