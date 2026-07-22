@@ -144,6 +144,13 @@ const editors = [
     icon: 'fa-code-branch',
     desc: 'Write F# with live syntax highlighting, functional pipeline operators, pattern matching, discriminated unions, and execution.'
   },
+   {
+    name: 'OCaml Playground',
+    path: '/pages/editors/ocaml-editor/ocaml-editor.html',
+    category: 'JVM & Functional',
+    icon: 'fa-cube',
+    desc: 'Write OCaml with syntax highlighting, templates for pattern matching and functors, and real-time execution.'
+  },
   {
     name: 'Prolog Playground',
     path: '/pages/editors/prolog-playground/prolog-playground.html',
