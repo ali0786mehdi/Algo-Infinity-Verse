@@ -183,6 +183,28 @@ export function validateUserForToken(user) {
   return null;
 }
 
+/**
+ * Validates a refresh token family identifier before it is used for
+ * revocation. Returns `null` if valid, otherwise a string describing
+ * the first detected problem so callers can surface a consistent error.
+ *
+ * Contract:
+ *   - `familyId` must be a non-null, non-empty string
+ *   - Whitespace-only identifiers are rejected
+ */
+export function validateFamilyId(familyId) {
+  if (familyId === undefined || familyId === null) {
+    return 'Refresh token family identifier is required.';
+  }
+  if (typeof familyId !== 'string') {
+    return 'Refresh token family identifier must be a string.';
+  }
+  if (familyId.trim() === '') {
+    return 'Refresh token family identifier must be a non-empty string.';
+  }
+  return null;
+}
+
 export function createAccessToken(user) {
   const validationError = validateUserForToken(user);
   if (validationError) {
@@ -233,6 +255,10 @@ export async function createRefreshToken(
 }
 
 export async function revokeTokenFamily(familyId) {
+  const validationError = validateFamilyId(familyId);
+  if (validationError) {
+    throw new Error(validationError);
+  }
   if (redisAvailable && redisClient) {
     await redisClient.del(`refresh:${familyId}`);
   } else {
