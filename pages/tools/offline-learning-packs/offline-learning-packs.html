@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline Learning Packs · PWA Downloader</title>
+    <link rel="stylesheet" href="offline-learning-packs.css" />
+</head>
+<body>
+    <div class="app" id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div>
+                <h1>📦 Offline Learning Packs</h1>
+                <p class="subtitle">Download topics for offline study · PWA powered</p>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeToggle">
+                    <span id="themeIcon">🌙</span> <span id="themeLabel">Dark</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Storage Status -->
+        <section class="storage-status" id="storageStatus">
+            <div class="storage-info">
+                <span class="storage-label">💾 Storage Used</span>
+                <span class="storage-value" id="storageUsed">0 MB</span>
+                <span class="storage-divider">/</span>
+                <span class="storage-value" id="storageQuota">0 MB</span>
+            </div>
+            <div class="storage-bar-container">
+                <div class="storage-bar" id="storageBar" style="width: 0%"></div>
+            </div>
+            <div class="storage-warning" id="storageWarning" style="display: none;">
+                ⚠️ Storage is running low! Consider clearing some packs.
+            </div>
+        </section>
+
+        <!-- Topic Selection -->
+        <section class="topic-section">
+            <div class="section-header">
+                <h2>📚 Select Topics to Download</h2>
+                <div class="topic-controls">
+                    <button class="btn-select-all" id="selectAllBtn">Select All</button>
+                    <button class="btn-download" id="downloadBtn" disabled>
+                        ⬇️ Download Selected (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+            </div>
+            <div class="topic-grid" id="topicGrid">
+                <!-- Topics will be rendered by JS -->
+                <div class="loading-state">Loading topics...</div>
+            </div>
+        </section>
+
+        <!-- Downloaded Packs -->
+        <section class="packs-section">
+            <div class="section-header">
+                <h2>📥 Downloaded Packs</h2>
+                <button class="btn-clear-all" id="clearAllBtn">🗑️ Clear All</button>
+            </div>
+            <div class="packs-list" id="packsList">
+                <div class="empty-state">No packs downloaded yet. Select topics above to get started.</div>
+            </div>
+        </section>
+
+        <!-- Offline Quiz Attempt -->
+        <section class="quiz-section" id="quizSection" style="display: none;">
+            <div class="section-header">
+                <h2>📝 Offline Quiz</h2>
+                <button class="btn-close-quiz" id="closeQuizBtn">✕</button>
+            </div>
+            <div class="quiz-container" id="quizContainer">
+                <div class="quiz-progress" id="quizProgress">
+                    <span id="quizTopicName">Topic</span>
+                    <span id="quizQuestionCount">0 / 0</span>
+                </div>
+                <div class="quiz-question" id="quizQuestion">
+                    <p class="question-text" id="questionText">Loading question...</p>
+                    <div class="quiz-options" id="quizOptions"></div>
+                </div>
+                <div class="quiz-result" id="quizResult" style="display: none;">
+                    <p id="resultMessage">Quiz complete!</p>
+                    <button class="btn-retry-quiz" id="retryQuizBtn">🔄 Retry</button>
+                </div>
+                <div class="quiz-actions">
+                    <button class="btn-submit-answer" id="submitAnswerBtn" disabled>Submit</button>
+                    <button class="btn-next-question" id="nextQuestionBtn" style="display: none;">Next →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sync Status -->
+        <section class="sync-status" id="syncStatus" style="display: none;">
+            <div class="sync-info">
+                <span id="syncIcon">🔄</span>
+                <span id="syncMessage">Syncing offline progress...</span>
+                <span id="syncProgress">0%</span>
+            </div>
+            <div class="sync-bar-container">
+                <div class="sync-bar" id="syncBar" style="width: 0%"></div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <span>Offline Learning Packs · PWA ready · Data stored in IndexedDB</span>
+        </footer>
+    </div>
+
+    <script src="offline-learning-packs.js"></script>
+</body>
+</html>
