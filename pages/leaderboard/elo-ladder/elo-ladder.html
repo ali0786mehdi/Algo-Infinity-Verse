@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELO Ladder · Season Leaderboard</title>
+    <link rel="stylesheet" href="elo-ladder.css" />
+    <!-- Chart.js for rating history -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app" id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div>
+                <h1>🏆 ELO Ladder</h1>
+                <p class="subtitle">Season Leaderboard · Codeforces-style rating</p>
+            </div>
+            <div class="header-controls">
+                <button class="btn-season" id="seasonToggle">📅 Season 1</button>
+                <button class="theme-toggle" id="themeToggle">
+                    <span id="themeIcon">🌙</span> <span id="themeLabel">Dark</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Players</div>
+                <div class="stat-value" id="totalPlayers">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top Rating</div>
+                <div class="stat-value" id="topRating">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Season</div>
+                <div class="stat-value" id="activeSeason">Season 1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Matches Played</div>
+                <div class="stat-value" id="totalMatches">0</div>
+            </div>
+        </section>
+
+        <!-- Ladder Table -->
+        <section class="ladder-section">
+            <div class="section-header">
+                <h2>📊 Season Leaderboard</h2>
+                <div class="filter-controls">
+                    <input type="text" id="searchPlayer" placeholder="🔍 Search player..." />
+                    <select id="tierFilter">
+                        <option value="all">All Tiers</option>
+                        <option value="novice">Novice</option>
+                        <option value="apprentice">Apprentice</option>
+                        <option value="adept">Adept</option>
+                        <option value="expert">Expert</option>
+                        <option value="master">Master</option>
+                        <option value="grandmaster">Grandmaster</option>
+                        <option value="legend">Legend</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="ladder-table" id="ladderTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Player</th>
+                            <th>Rating</th>
+                            <th>Tier</th>
+                            <th>Matches</th>
+                            <th>Win Rate</th>
+                            <th>Streak</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ladderBody">
+                        <tr><td colspan="7" class="loading-state">Loading players...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Rating History Chart -->
+        <section class="chart-section">
+            <div class="section-header">
+                <h2>📈 Rating History</h2>
+                <div class="chart-controls">
+                    <select id="historyPlayer">
+                        <option value="">Select a player...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="ratingChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <span>ELO Ladder · Season resets every 3 months · Ratings persist in data/ratings.json</span>
+        </footer>
+    </div>
+
+    <script src="elo-ladder.js"></script>
+</body>
+</html>
