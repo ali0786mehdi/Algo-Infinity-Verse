@@ -73,6 +73,18 @@ const TOPIC_MAP = {
   numbertheory: 'numbertheory',
   'union find': 'unionfind',
   unionfind: 'unionfind',
+  'cp patterns': 'cppatterns',
+  cppatterns: 'cppatterns',
+  'cp patterns quiz': 'cppatterns',
+  'algorithm identification': 'algorithmid',
+  algorithmid: 'algorithmid',
+  'time complexity': 'timecomplexity',
+  timecomplexity: 'timecomplexity',
+  'mixed bag': 'mixedbag',
+  mixedbag: 'mixedbag',
+  'mixed bag challenge': 'mixedbag',
+  'dsa quick fire': 'dsaquickfire',
+  dsaquickfire: 'dsaquickfire',
 };
 
 function getTopicKey(topic) {
@@ -103,6 +115,11 @@ function getTopicName(topicKey) {
     trie: 'Trie',
     numbertheory: 'Number Theory',
     unionfind: 'Union Find',
+    cppatterns: 'CP Patterns',
+    algorithmid: 'Algorithm Identification',
+    timecomplexity: 'Time Complexity',
+    mixedbag: 'Mixed Bag',
+    dsaquickfire: 'DSA Quick Fire',
   };
   return reverseMap[topicKey] || topicKey.charAt(0).toUpperCase() + topicKey.slice(1);
 }
