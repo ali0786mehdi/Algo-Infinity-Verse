@@ -19,7 +19,23 @@ export const {
 import { redisAvailable, redisClient } from '../jobs/queue.js';
 
 export const activeRefreshFamilies = new Map();
+export const revokedUserSessions = new Map();
 const signupAttempts = new Map();
+
+export async function revokeAllUserSessions(userId) {
+  if (!userId) return;
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (redisAvailable && redisClient) {
+    await redisClient.set(
+      `user_revocation:${userId}`,
+      nowSeconds,
+      'EX',
+      ACCESS_TOKEN_MAX_AGE_SECONDS
+    );
+  } else {
+    revokedUserSessions.set(userId, nowSeconds);
+  }
+}
 const loginAttempts = new Map();
 
 export const _signupSweeper = setInterval(() => {
@@ -210,13 +226,15 @@ export function createAccessToken(user) {
   if (validationError) {
     throw new Error(validationError);
   }
+  const nowSeconds = Math.floor(Date.now() / 1000);
   const header = base64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const payload = base64Url(
     JSON.stringify({
       sub: user.id,
       name: user.name,
       email: user.email,
-      exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_MAX_AGE_SECONDS,
+      iat: nowSeconds,
+      exp: nowSeconds + ACCESS_TOKEN_MAX_AGE_SECONDS,
       type: 'access',
     })
   );
@@ -307,7 +325,17 @@ export function verifyToken(token, expectedType) {
 }
 
 export function verifyAccessToken(token) {
-  return verifyToken(token, 'access');
+  const session = verifyToken(token, 'access');
+  if (!session) return null;
+
+  if (session.sub && session.iat) {
+    const revokedAt = revokedUserSessions.get(session.sub);
+    if (revokedAt && session.iat <= revokedAt) {
+      return null;
+    }
+  }
+
+  return session;
 }
 
 export async function verifyRefreshToken(token) {
