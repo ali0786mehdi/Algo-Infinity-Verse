@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>R Editor -> Live Code Editor | Algo Infinity Verse</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="r-editor.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Theme Initialization Script -->
+    <script>
+      (function () {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = storedTheme || (prefersLight ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.classList.add('light-mode');
+          } else {
+            document.documentElement.classList.remove('light-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body data-page="r-editor" data-no-loading>
+    <div id="loading-screen" class="hidden">
+      <div class="loader">
+        <div class="infinity-loader">∞</div>
+        <h2>Algo Infinity Verse</h2>
+        <div class="loading-bar"><div class="loading-progress"></div></div>
+      </div>
+    </div>
+
+    <button type="button" id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <div id="navbar-placeholder"></div>
+
+    <section class="hero re-hero">
+      <div class="hero-background">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+      </div>
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="title-line">Write R.</span>
+          <span class="main-title re-gradient-text">Run It Instantly.</span>
+          <span class="subtitle">In-Browser R Editor</span>
+        </h1>
+        <p class="re-hero-desc">
+          Write R code and see variables, vectors, data frames, and plots evaluated in real time —
+          no install required.
+        </p>
+        <div class="hero-buttons">
+          <a href="#editor" class="btn btn-primary re-cta-btn">
+            <i class="fas fa-play"></i> Open Editor
+          </a>
+        </div>
+        <div class="re-note">
+          <i class="fas fa-info-circle"></i>
+          Runs a defined subset of R entirely in your browser — see
+          <button type="button" id="reOpenSupportBtn" class="re-link-btn">what's supported</button>.
+          Plots and histograms are rendered locally from your code's data.
+        </div>
+      </div>
+    </section>
+
+    <section id="editor" class="section re-section">
+      <div class="re-container">
+        <div class="re-toolbar">
+          <div class="re-toolbar-left">
+            <span class="re-label"><i class="fa-brands fa-r-project re-r-icon"></i> R Editor</span>
+            <select id="reExampleSelect" class="re-select" aria-label="Load example">
+              <option value="basics">Variables & Arithmetic</option>
+              <option value="vectors">Vectors</option>
+              <option value="dataframe">Data Frame</option>
+              <option value="dataset">Built-in Dataset</option>
+              <option value="plot">Plot</option>
+              <option value="hist">Histogram</option>
+              <option value="barplot">Bar Plot</option>
+            </select>
+            <select id="reDatasetSelect" class="re-select" aria-label="Insert built-in dataset">
+              <option value="">Insert dataset…</option>
+              <option value="students">students</option>
+              <option value="sales">sales</option>
+            </select>
+          </div>
+          <div class="re-toolbar-right">
+            <button type="button" id="reRunBtn" class="btn btn-primary re-run-btn">
+              <i class="fas fa-play"></i> Run
+            </button>
+            <button
+              type="button"
+              id="reResetBtn"
+              class="re-icon-btn"
+              title="Reset to example"
+              aria-label="Reset to example"
+            >
+              <i class="fas fa-undo"></i>
+            </button>
+            <button
+              type="button"
+              id="reCopyBtn"
+              class="re-icon-btn"
+              title="Copy code"
+              aria-label="Copy code to clipboard"
+            >
+              <i class="fas fa-copy"></i>
+            </button>
+            <button
+              type="button"
+              id="reSaveBtn"
+              class="re-icon-btn"
+              title="Save to browser storage"
+              aria-label="Save code to browser storage"
+            >
+              <i class="fas fa-save"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="re-split">
+          <div class="re-editor-pane">
+            <div class="re-pane-header">
+              <span><i class="fas fa-code"></i> Editor</span>
+              <span class="re-lang-badge">R</span>
+            </div>
+            <div class="re-editor-wrap">
+              <div class="re-line-numbers" id="reLineNumbers">1</div>
+              <textarea
+                id="reEditor"
+                class="re-editor"
+                spellcheck="false"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                aria-label="R code editor"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="re-output-pane">
+            <div class="re-pane-header">
+              <span><i class="fas fa-terminal"></i> Output</span>
+              <span id="reStatusBadge" class="re-status-badge re-status-ready">Ready</span>
+            </div>
+            <div class="re-output-body" id="reOutputBody">
+              <span class="re-output-placeholder">Run your code to see output here...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="re-support-modal" class="re-modal" hidden>
+      <div class="re-modal-backdrop" id="reModalBackdrop"></div>
+      <div class="re-modal-panel" role="dialog" aria-modal="true" aria-labelledby="reModalTitle">
+        <div class="re-modal-header">
+          <h2 id="reModalTitle">What this editor supports</h2>
+          <button type="button" id="reCloseSupportBtn" class="re-icon-btn" aria-label="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="re-modal-body">
+          <ul>
+            <li>Assignment with <code>&lt;-</code> or <code>=</code></li>
+            <li>Numbers, strings, <code>TRUE</code>/<code>FALSE</code></li>
+            <li>Vectors via <code>c(...)</code> and ranges via <code>1:10</code></li>
+            <li>Arithmetic: <code>+ - * /</code> on numbers and vectors</li>
+            <li><code>data.frame(col = c(...), ...)</code> with real table rendering</li>
+            <li><code>df$column</code> access on data frames</li>
+            <li>
+              Two built-in datasets, usable by name: <code>students</code>, <code>sales</code>
+            </li>
+            <li><code>print()</code>, <code>cat()</code>, and bare-variable auto-print</li>
+            <li>
+              <code>plot()</code>, <code>hist()</code>, <code>barplot()</code> rendered on canvas
+              from your actual data
+            </li>
+            <li>Built-ins: <code>c, length, sum, mean, round, seq, paste, nrow, ncol</code></li>
+          </ul>
+          <p class="re-modal-note">
+            Not supported: control flow (<code>if</code>/<code>for</code>/<code>while</code>),
+            custom functions, packages, or most of the R standard library. This runs a small
+            interpreter built for this editor, not a full R engine.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="/auth.js"></script>
+    <script src="/bootstrap-legacy.js"></script>
+    <script src="/script.js"></script>
+    <script type="module" src="/dist/legacy-bundle.mjs"></script>
+    <script src="./r-editor.js"></script>
+
+    <script>
+      loadPartial('navbar-placeholder', '/partials/navbar.html');
+      loadPartial('footer-placeholder', '/partials/footer.html');
+    </script>
+  </body>
+</html>
