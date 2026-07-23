@@ -69,6 +69,8 @@ const TOPIC_MAP = {
   'sliding window': 'slidingwindow',
   slidingwindow: 'slidingwindow',
   'trie': 'trie',
+  'number theory': 'numbertheory',
+  numbertheory: 'numbertheory',
   'union find': 'unionfind',
   unionfind: 'unionfind',
 };
@@ -99,6 +101,7 @@ function getTopicName(topicKey) {
     twopointers: 'Two Pointers',
     slidingwindow: 'Sliding Window',
     trie: 'Trie',
+    numbertheory: 'Number Theory',
     unionfind: 'Union Find',
   };
   return reverseMap[topicKey] || topicKey.charAt(0).toUpperCase() + topicKey.slice(1);
