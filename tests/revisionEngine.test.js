@@ -7,7 +7,7 @@ describe('Revision Engine', () => {
     const current = { currentStage: 0, history: [] };
     const result = defaultRevisionEngine.calculateNext(current, {
       scorePercentage: 70,
-      difficulty: 'Medium'
+      difficulty: 'Medium',
     });
 
     expect(result.nextStage).toBe(1);
@@ -19,7 +19,7 @@ describe('Revision Engine', () => {
     const current = { currentStage: 3, history: [] };
     const result = defaultRevisionEngine.calculateNext(current, {
       scorePercentage: 45,
-      difficulty: 'Medium'
+      difficulty: 'Medium',
     });
 
     expect(result.nextStage).toBe(0);
@@ -29,7 +29,7 @@ describe('Revision Engine', () => {
   it('resets stage to 0 if isIncorrect is true', () => {
     const current = { currentStage: 2, history: [] };
     const result = defaultRevisionEngine.calculateNext(current, {
-      isIncorrect: true
+      isIncorrect: true,
     });
 
     expect(result.nextStage).toBe(0);
@@ -41,14 +41,14 @@ describe('Revision Engine', () => {
 
     const resultEasy = defaultRevisionEngine.calculateNext(current, {
       scorePercentage: 70, // standard score (no multiplier)
-      difficulty: 'Easy'
+      difficulty: 'Easy',
     });
     // 7 * 1.3 = 9.1 -> 9 days
     expect(resultEasy.intervalDays).toBe(9);
 
     const resultHard = defaultRevisionEngine.calculateNext(current, {
       scorePercentage: 70,
-      difficulty: 'Hard'
+      difficulty: 'Hard',
     });
     // 7 * 0.7 = 4.9 -> 5 days
     expect(resultHard.intervalDays).toBe(5);
@@ -59,7 +59,7 @@ describe('Revision Engine', () => {
 
     const resultPerfect = defaultRevisionEngine.calculateNext(current, {
       scorePercentage: 95,
-      difficulty: 'Medium'
+      difficulty: 'Medium',
     });
     // 7 * 1.5 = 10.5 -> 11 days
     expect(resultPerfect.intervalDays).toBe(11);
@@ -68,10 +68,27 @@ describe('Revision Engine', () => {
   it('keeps current stage but shifts date by 1 day if isSkip is true', () => {
     const current = { currentStage: 3, history: [] };
     const result = defaultRevisionEngine.calculateNext(current, {
-      isSkip: true
+      isSkip: true,
     });
 
     expect(result.nextStage).toBe(3);
     expect(result.intervalDays).toBe(1);
+  });
+
+  it('correctly merges offline schedules preventing stale updates from resetting higher stages', () => {
+    const existing = {
+      currentStage: 3,
+      updatedAt: '2026-07-23T10:00:00.000Z',
+      isComplete: false,
+    };
+    const staleIncoming = {
+      currentStage: 1,
+      updatedAt: '2026-07-23T09:00:00.000Z',
+      isComplete: false,
+      isIncorrect: false,
+    };
+
+    const merged = defaultRevisionEngine.mergeSchedules(existing, staleIncoming);
+    expect(merged.currentStage).toBe(3);
   });
 });

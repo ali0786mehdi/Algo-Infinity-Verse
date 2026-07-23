@@ -18,6 +18,8 @@ export class RevisionEngine {
    */
   calculateNext(currentSchedule = {}, options = {}, config = {}) {
     const stage = Number(currentSchedule.currentStage || 0);
+    const revisionVersion = Number(currentSchedule.revisionVersion || 0) + 1;
+    const updatedAt = new Date().toISOString();
     const {
       scorePercentage = 100,
       isIncorrect = false,
@@ -52,6 +54,8 @@ export class RevisionEngine {
         intervalDays: 1,
         nextReviewDate: nextDate.toISOString(),
         isComplete: false,
+        revisionVersion,
+        updatedAt,
         message: ` Score ${scorePercentage}% below ${passThreshold}%, resetting to stage 0`,
       };
     }
@@ -126,6 +130,8 @@ export class RevisionEngine {
       intervalDays,
       nextReviewDate: nextDate.toISOString(),
       isComplete: isComplete,
+      revisionVersion,
+      updatedAt,
       message: isComplete
         ? "All stages complete! You're done! "
         : ` Moving to stage ${nextStage + 1} of ${maxStages} (${Math.round(((nextStage + 1) / maxStages) * 100)}% complete)`,
@@ -136,12 +142,32 @@ export class RevisionEngine {
    * Reset revision progress for a topic
    * @returns {Object} Reset schedule
    */
-  resetProgress() {
-    return {
-      currentStage: 0,
-      history: [],
-      isComplete: false,
-    };
+  /**
+   * Conflict-free merge strategy for offline/multi-tab schedules.
+   * Prevents stale offline updates from resetting higher verified stages
+   * unless accompanied by explicit low recall rating or newer version timestamp.
+   *
+   * @param {Object} existingSchedule
+   * @param {Object} incomingSchedule
+   * @returns {Object} Merged schedule
+   */
+  mergeSchedules(existingSchedule = {}, incomingSchedule = {}) {
+    if (!existingSchedule || !existingSchedule.updatedAt) return incomingSchedule;
+    if (!incomingSchedule || !incomingSchedule.updatedAt) return existingSchedule;
+
+    const existingTime = new Date(existingSchedule.updatedAt).getTime() || 0;
+    const incomingTime = new Date(incomingSchedule.updatedAt).getTime() || 0;
+
+    if (incomingTime < existingTime) {
+      if (
+        (incomingSchedule.currentStage || 0) < (existingSchedule.currentStage || 0) &&
+        !incomingSchedule.isIncorrect
+      ) {
+        return existingSchedule;
+      }
+    }
+
+    return incomingTime >= existingTime ? incomingSchedule : existingSchedule;
   }
 }
 
