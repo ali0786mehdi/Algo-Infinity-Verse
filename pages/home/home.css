@@ -151,7 +151,15 @@ body[data-page="index"] {
     radial-gradient(ellipse 50% 40% at 50% 50%, rgba(242, 213, 196, 0.03) 0%, transparent 50%),
     var(--hp-bg);
 }
-
+/* Light mode CSS variables override */
+html.light-mode {
+  --hp-bg: #FAFAF9;              /* Light background */
+  --hp-text: #2C1E4A;            /* Dark text for light mode */
+  --hp-text-secondary: #6B5B7F;  /* Secondary text */
+  --hp-card: #F0EEE8;            /* Light cards */
+  --hp-lavender: #8B5CF6;        /* Adjusted accent colors */
+  /* ... etc */
+}
 .hp-hero::after {
   content: '';
   position: absolute;
