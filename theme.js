@@ -61,22 +61,37 @@
     return cachedNavbar;
   }
 
-  function syncIcons() {
-    const toggles = document.querySelectorAll('[data-theme-toggle], #darkModeToggle');
-    const isLight = document.documentElement.classList.contains('light-mode');
-    toggles.forEach(function (toggle) {
-      const icon = toggle.querySelector('i');
-      if (!icon) return;
-      if (isLight) {
-        icon.classList.remove('fa-moon');
-        icon.classList.add('fa-sun');
-      } else {
+function syncIcons() {
+  const toggles = document.querySelectorAll('[data-theme-toggle], #darkModeToggle');
+  const isLight = document.documentElement.classList.contains('light-mode');
+
+  toggles.forEach(function (toggle) {
+    const icon = toggle.querySelector('i');
+    const text = toggle.querySelector('span'); // 1. Grab the span element
+
+    if (isLight) {
+      // If CURRENTLY Light Mode -> Button should offer DARK Mode
+      if (icon) {
         icon.classList.remove('fa-sun');
         icon.classList.add('fa-moon');
       }
-      toggle.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
-    });
-  }
+      if (text) {
+        text.textContent = 'Dark Mode'; // 2. Update the text
+      }
+      toggle.setAttribute('aria-label', 'Switch to dark mode');
+    } else {
+      // If CURRENTLY Dark Mode -> Button should offer LIGHT Mode
+      if (icon) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      }
+      if (text) {
+        text.textContent = 'Light Mode'; // 2. Update the text
+      }
+      toggle.setAttribute('aria-label', 'Switch to light mode');
+    }
+  });
+}
 
   function syncNavbar() {
     const navbar = getNavbar();
