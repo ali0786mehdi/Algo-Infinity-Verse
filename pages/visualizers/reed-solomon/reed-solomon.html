@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reed-Solomon Error Correction Visualizer | Algo Infinity Verse</title>
+  <link rel="stylesheet" href="reed-solomon.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <div class="starfield"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <i class="fa-solid fa-infinity"></i>
+      <div class="brand-text">
+        <span class="brand-name">Algo</span>
+        <span class="brand-sub">INFINITY VERSE</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="lang-badge"><i class="fa-solid fa-satellite-dish"></i> Reed-Solomon</span>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </header>
+
+  <main class="page-shell">
+
+    <section class="hero">
+      <h1>Reed-Solomon Error Correction Visualizer</h1>
+      <p>Type a short message, encode it as points on a polynomial over GF(2⁸), then drag points off the curve
+         to corrupt them. Reconstruct runs the real Berlekamp-Welch algorithm — exact Galois-Field arithmetic,
+         not a lookup — to find which points were corrupted and snap them back to the truth.</p>
+    </section>
+
+    <section class="panel controls-panel">
+      <div class="panel-header">
+        <i class="fa-solid fa-keyboard"></i>
+        <h2>1. Message &amp; Parity</h2>
+      </div>
+
+      <div class="controls-row">
+        <label class="control-field">
+          Message (2–6 characters)
+          <input type="text" id="messageInput" maxlength="6" value="CODE" spellcheck="false" />
+        </label>
+        <label class="control-field small">
+          Parity symbols
+          <input type="number" id="paritySelect" value="3" min="1" max="5" />
+        </label>
+        <button class="btn btn-primary" id="encodeBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Encode</button>
+      </div>
+      <div class="capacity-line" id="capacityLine"></div>
+    </section>
+
+    <section class="panel stage-panel">
+      <div class="panel-header">
+        <i class="fa-solid fa-chart-line"></i>
+        <h2>2. Corrupt the Data</h2>
+      </div>
+      <p class="stage-hint">Drag any point up or down to corrupt its value. The faint line is a visual guide
+        through the correct byte values — it is not itself part of the GF(2⁸) math, only the plotted points are.</p>
+
+      <canvas id="stageCanvas" width="900" height="360"></canvas>
+
+      <div class="stage-actions">
+        <button class="btn btn-ghost" id="randomCorruptBtn"><i class="fa-solid fa-bolt"></i> Corrupt Randomly</button>
+        <button class="btn btn-ghost" id="resetPointsBtn"><i class="fa-solid fa-rotate-left"></i> Reset Points</button>
+        <button class="btn btn-primary" id="reconstructBtn"><i class="fa-solid fa-play"></i> Reconstruct</button>
+      </div>
+    </section>
+
+    <section class="panel result-panel" id="resultPanel" hidden>
+      <div class="panel-header">
+        <i class="fa-solid fa-clipboard-check"></i>
+        <h2>3. Reconstruction Result</h2>
+      </div>
+      <div id="resultBody" class="result-body"></div>
+    </section>
+
+  </main>
+
+  <footer class="editor-footer">
+    <span>Reed-Solomon Visualizer · exact GF(2⁸) arithmetic and Berlekamp-Welch decoding, computed client-side</span>
+  </footer>
+
+  <script src="reed-solomon.js"></script>
+</body>
+</html>
