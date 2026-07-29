@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEAT Topology Evolution Visualizer | Algo-Infinity-Verse</title>
+  <link rel="stylesheet" href="topology-evolution-visualizer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="glass-header">
+      <div class="logo">
+        <i class="fa-solid fa-dna logo-icon"></i>
+        <span>Algo <span class="highlight">Infinity</span> Verse</span>
+      </div>
+      <div class="title-section">
+        <h1>NEAT Topology Evolution <span class="badge badge-algo">Genetic AI</span></h1>
+        <p>Historical Markings, Crossover Alignment, and Speciation</p>
+      </div>
+      <a href="https://github.com/Eshajha19/Algo-Infinity-Verse" target="_blank" class="github-link" aria-label="GitHub Repository">
+        <i class="fa-brands fa-github"></i>
+      </a>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      <!-- Left Sidebar: Controls & Analytics -->
+      <aside class="sidebar">
+        <!-- Engine Controls -->
+        <section class="glass-panel control-panel">
+          <h2><i class="fa-solid fa-microchip"></i> Mating Engine</h2>
+          <div class="btn-group">
+            <button id="btn-play" class="btn btn-primary" aria-label="Auto Play">
+              <i class="fa-solid fa-play"></i> Run Crossover
+            </button>
+            <button id="btn-step" class="btn btn-accent" aria-label="Step Forward">
+              <i class="fa-solid fa-forward-step"></i> Step
+            </button>
+            <button id="btn-reset" class="btn btn-danger" aria-label="Reset">
+              <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+            </button>
+          </div>
+          <div class="slider-control">
+            <label for="speed-slider">Animation Speed: <span id="speed-val">1.0x</span></label>
+            <input type="range" id="speed-slider" min="0.5" max="3.0" step="0.5" value="1.0">
+          </div>
+        </section>
+
+        <!-- Live Telemetry -->
+        <section class="glass-panel telemetry-panel mt-3">
+          <h2><i class="fa-solid fa-chart-line"></i> Genetic Metrics</h2>
+          <div class="metric-grid">
+             <div class="metric-box">
+                <span class="metric-title">Matching Genes</span>
+                <span class="metric-value text-emerald" id="val-matching">0</span>
+             </div>
+             <div class="metric-box">
+                <span class="metric-title">Disjoint / Excess</span>
+                <span class="metric-value text-warning" id="val-disjoint">0</span>
+             </div>
+          </div>
+        </section>
+
+        <!-- Phase Legend -->
+        <section class="glass-panel legend-panel mt-3">
+          <h2><i class="fa-solid fa-layer-group"></i> Gene Alignment Map</h2>
+          <ul class="phase-list">
+            <li class="phase-item">
+              <span class="color-box match-color"></span>
+              <div class="phase-info">
+                <strong>Matching Genes</strong>
+                <p>Both parents share the Innovation Number. Inherited randomly.</p>
+              </div>
+            </li>
+            <li class="phase-item">
+              <span class="color-box disjoint-color"></span>
+              <div class="phase-info">
+                <strong>Disjoint Genes</strong>
+                <p>Gene exists within the range of the other parent's genome, but is missing.</p>
+              </div>
+            </li>
+            <li class="phase-item">
+              <span class="color-box excess-color"></span>
+              <div class="phase-info">
+                <strong>Excess Genes</strong>
+                <p>Gene falls completely outside the range of the other parent's genome.</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </aside>
+
+      <!-- Center Stage: The Visualizer -->
+      <section class="visualizer-stage glass-panel">
+        <div class="stage-header">
+          <div class="status-display">
+            <span class="status-label">Evolution Log:</span>
+            <span id="status-text" class="status-message">Parents loaded. Awaiting crossover initialization...</span>
+          </div>
+        </div>
+
+        <div class="evolution-wrapper">
+           
+           <!-- Graph Topologies Canvas Area -->
+           <div class="graphs-container">
+               <div class="graph-box">
+                   <h3 class="panel-title text-cyan">Parent A (Fitter)</h3>
+                   <canvas id="canvas-parent-a"></canvas>
+               </div>
+               <div class="graph-box">
+                   <h3 class="panel-title text-purple">Parent B</h3>
+                   <canvas id="canvas-parent-b"></canvas>
+               </div>
+               <div class="graph-box box-child">
+                   <h3 class="panel-title text-emerald">Offspring (Child)</h3>
+                   <canvas id="canvas-child"></canvas>
+               </div>
+           </div>
+
+           <!-- Linear Genome Array Alignment Area -->
+           <div class="genome-container mt-3">
+               <h3 class="panel-title"><i class="fa-solid fa-dna"></i> Historical Innovation Alignment</h3>
+               
+               <div class="genome-track-wrapper">
+                   <div class="genome-label text-cyan">Parent A</div>
+                   <div class="genome-track" id="track-parent-a"></div>
+               </div>
+               
+               <div class="genome-track-wrapper">
+                   <div class="genome-label text-purple">Parent B</div>
+                   <div class="genome-track" id="track-parent-b"></div>
+               </div>
+
+               <div class="genome-divider"></div>
+
+               <div class="genome-track-wrapper">
+                   <div class="genome-label text-emerald">Child</div>
+                   <div class="genome-track" id="track-child"></div>
+               </div>
+           </div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="topology-evolution-visualizer.js"></script>
+</body>
+</html>
