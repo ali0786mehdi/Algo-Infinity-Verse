@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FABRIK Inverse Kinematics Visualizer | Algo-Infinity-Verse</title>
+  <link rel="stylesheet" href="fabrik-inverse-kinematics-visualizer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="glass-header">
+      <div class="logo">
+        <i class="fa-solid fa-robot logo-icon"></i>
+        <span>Algo <span class="highlight">Infinity</span> Verse</span>
+      </div>
+      <div class="title-section">
+        <h1>FABRIK Algorithm <span class="badge badge-algo">Geometric Inverse Kinematics</span></h1>
+        <p>Forward/Backward Reaching, Vector Scaling, and Iterative Convergence</p>
+      </div>
+      <a href="https://github.com/Eshajha19/Algo-Infinity-Verse" target="_blank" class="github-link" aria-label="GitHub Repository">
+        <i class="fa-brands fa-github"></i>
+      </a>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      <!-- Left Sidebar: Controls & Analytics -->
+      <aside class="sidebar">
+        <!-- Engine Controls -->
+        <section class="glass-panel control-panel">
+          <h2><i class="fa-solid fa-microchip"></i> Kinematics Engine</h2>
+          <div class="btn-group">
+            <button id="btn-play" class="btn btn-primary" aria-label="Auto Play">
+              <i class="fa-solid fa-pause"></i> Pause Engine
+            </button>
+            <button id="btn-reset" class="btn btn-danger" aria-label="Reset">
+              <i class="fa-solid fa-arrow-rotate-left"></i> Reset Arm
+            </button>
+          </div>
+          <div class="slider-control">
+            <label for="speed-slider">Solver Iteration Speed: <span id="speed-val">1.0x</span></label>
+            <input type="range" id="speed-slider" min="0.1" max="5.0" step="0.1" value="1.0">
+          </div>
+        </section>
+
+        <!-- Live Telemetry -->
+        <section class="glass-panel telemetry-panel mt-3">
+          <h2><i class="fa-solid fa-chart-line"></i> Arm Telemetry</h2>
+          <div class="metric-grid">
+             <div class="metric-box">
+                <span class="metric-title">Iterations</span>
+                <span class="metric-value text-cyan" id="val-iterations">0</span>
+             </div>
+             <div class="metric-box">
+                <span class="metric-title">Error Distance</span>
+                <span class="metric-value text-warning" id="val-error">0.0</span>
+             </div>
+          </div>
+        </section>
+
+        <!-- Phase Legend -->
+        <section class="glass-panel legend-panel mt-3">
+          <h2><i class="fa-solid fa-layer-group"></i> Algorithmic Phases</h2>
+          <ul class="phase-list">
+            <li class="phase-item" id="phase-backward">
+              <span class="color-box backward-color"></span>
+              <div class="phase-info">
+                <strong>1. Backward Reach</strong>
+                <p>Snaps the End-Effector to the Target, pulling previous joints backward along their vectors.</p>
+              </div>
+            </li>
+            <li class="phase-item" id="phase-forward">
+              <span class="color-box forward-color"></span>
+              <div class="phase-info">
+                <strong>2. Forward Reach</strong>
+                <p>Snaps the Base Joint back to the Origin ($0,0$), pushing subsequent joints forward.</p>
+              </div>
+            </li>
+            <li class="phase-item" id="phase-unreachable">
+              <span class="color-box unreachable-color"></span>
+              <div class="phase-info">
+                <strong>Unreachable Target</strong>
+                <p>Target distance exceeds total arm length ($D > \Sigma L_i$). Segments stretch in a straight line.</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </aside>
+
+      <!-- Center Stage: The Visualizer -->
+      <section class="visualizer-stage glass-panel">
+        <div class="stage-header">
+          <div class="status-display">
+            <span class="status-label">FABRIK State:</span>
+            <span id="status-text" class="status-message">Arm aligned. Drag the emerald target orb to calculate new kinematics.</span>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper">
+           <canvas id="fabrik-canvas"></canvas>
+           <div class="canvas-instruction"><i class="fa-solid fa-hand-pointer"></i> Drag the Target Orb</div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="fabrik-inverse-kinematics-visualizer.js"></script>
+</body>
+</html>
