@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Build Google From Scratch — Masterclass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="google-from-scratch.css" />
+</head>
+<body>
+
+<div class="crawl-bar" aria-hidden="true"></div>
+
+<!-- ================= WELCOME SCREEN ================= -->
+<div id="welcome-screen" class="screen active">
+  <aside class="syllabus-sidebar">
+    <h2 class="syllabus-title">Course Syllabus</h2>
+    <button class="dev-unlock-btn" id="dev-unlock-btn">[Dev] Unlock All</button>
+    <div class="syllabus-module current" id="module-1-chip">Module 1 · Search Engine Core</div>
+    <div class="syllabus-module locked">Module 2 · Crawling &amp; Indexing at Scale</div>
+    <div class="syllabus-module locked">Module 3 · Ranking &amp; Relevance</div>
+    <div class="syllabus-module locked">Module 4 · Distributed Query Serving</div>
+  </aside>
+
+  <main class="welcome-main">
+    <header class="welcome-header">
+      <h1>Welcome to the Masterclass</h1>
+    </header>
+    <div class="welcome-body">
+      <div class="welcome-card">
+        <h2>Build Google From Scratch</h2>
+        <p>Welcome to the advanced masterclass. You will be building the architecture that powers billions of users. To proceed, navigate to the first lesson in the syllabus.</p>
+        <button class="start-module-btn" id="start-module-btn">Start Module 1</button>
+      </div>
+    </div>
+    <footer class="welcome-footer">
+      <button class="nav-ghost-btn" id="previous-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Previous
+      </button>
+      <span></span>
+    </footer>
+  </main>
+</div>
+
+<!-- ================= WORKSPACE SCREEN ================= -->
+<div id="workspace-screen" class="screen">
+  <div class="workspace-topbar">
+    <button class="back-btn" id="back-to-welcome-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Back to Welcome
+    </button>
+    <div class="workspace-title">
+      Module 1 · Search Engine Core
+      <span class="badge-live">LIVE INDEX</span>
+    </div>
+    <div style="width:132px"></div>
+  </div>
+
+  <div class="split-pane">
+    <!-- LEFT PANE -->
+    <section class="left-pane">
+      <div class="tab-bar" role="tablist">
+        <button class="tab-btn active" data-tab="context" role="tab">Module Context</button>
+        <button class="tab-btn" data-tab="index" role="tab">Index Visualizer</button>
+        <button class="tab-btn" data-tab="scores" role="tab">Score Breakdown</button>
+      </div>
+
+      <!-- TAB 1: CONTEXT -->
+      <div class="tab-panel active" id="tab-context">
+        <h3>The Inverted Index</h3>
+        <p>A forward index maps documents to the words they contain. Flip that relationship and you get an <code>inverted index</code>: a hash map from every normalized term to the list of documents containing it. Looking up a term becomes an <code>O(1)</code> hash lookup instead of an <code>O(n)</code> scan across every document.</p>
+        <div class="formula-block">index["search"] = [
+  { docId: 1, tf: 0.045, count: 2, positions: [4, 41] },
+  { docId: 9, tf: 0.028, count: 1, positions: [3] },
+  ...
+]</div>
+        <p>Each posting stores the document id, the term frequency (<code>tf</code>), the raw <code>count</code>, and the token <code>positions</code> — enough data to rank results and highlight matches without re-reading the document.</p>
+
+        <h3>TF · IDF Ranking</h3>
+        <p>Term Frequency measures how often a term appears relative to document length. Inverse Document Frequency down-weights terms that appear in nearly every document, since they carry little distinguishing signal.</p>
+        <div class="formula-block">TF(t, d)  = count(t, d) / totalTerms(d)
+
+IDF(t, D) = log( |D| / (df(t) + 1) ) + 1
+
+Score(d,Q) = Σ  TF(t, d) × IDF(t, D)   for each t in Q</div>
+        <p>The engine sums the TF-IDF weight of every query term for each candidate document, then sorts descending. Try a query on the right and switch to <strong>Score Breakdown</strong> to see these numbers computed live.</p>
+
+        <div class="stat-row">
+          <div class="stat-chip">
+            <div class="stat-value" id="stat-doc-count">—</div>
+            <div class="stat-label">Documents</div>
+          </div>
+          <div class="stat-chip">
+            <div class="stat-value" id="stat-term-count">—</div>
+            <div class="stat-label">Unique Terms</div>
+          </div>
+          <div class="stat-chip">
+            <div class="stat-value" id="stat-posting-count">—</div>
+            <div class="stat-label">Postings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: INDEX VISUALIZER -->
+      <div class="tab-panel" id="tab-index">
+        <input type="text" class="index-filter" id="index-filter-input" placeholder="Filter index terms (e.g. search, quantum, rank)…" />
+        <div id="index-table-wrap"></div>
+      </div>
+
+      <!-- TAB 3: SCORE BREAKDOWN -->
+      <div class="tab-panel" id="tab-scores">
+        <div id="score-breakdown-wrap">
+          <div class="score-empty">Run a search on the right to see the exact TF, IDF, and weight for every matching document.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANE -->
+    <section class="right-pane">
+      <div class="search-zone">
+        <div class="search-bar">
+          <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="search-input" placeholder="Search the mini web… try “search engine” or “quantum”" autocomplete="off" />
+          <button class="clear-btn" id="clear-search-btn" title="Clear search" aria-label="Clear search">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <button class="search-submit-btn" id="search-submit-btn">Search</button>
+        </div>
+        <div class="autocomplete-dropdown" id="autocomplete-dropdown"></div>
+      </div>
+
+      <div class="benchmark-bar" id="benchmark-bar">Type a query to search 10 indexed documents.</div>
+
+      <div class="results-zone" id="results-zone">
+        <div class="empty-state" id="initial-empty-state">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <div class="empty-title">Nothing indexed to your query yet</div>
+          <div class="empty-sub">Start typing above — every keystroke re-runs the inverted-index lookup and TF-IDF ranking in real time.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box">
+    <button class="modal-close" id="modal-close-btn" aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <h2 id="modal-title"></h2>
+    <div class="modal-url" id="modal-url"></div>
+    <div class="modal-content-text" id="modal-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="google-from-scratch.js"></script>
+</body>
+</html>
